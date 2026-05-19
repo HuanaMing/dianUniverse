@@ -1,1 +1,1861 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="點點演化">
+<link rel="apple-touch-icon" href="data:image/png;base64,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">
 
+<title>點點演化</title>
+<style>
+/*================================================================================================背景區================================================================================================*/
+  body { margin: 0; overflow: hidden; background: transparent; cursor: none;}
+  canvas {
+    position: fixed;
+    left: 0;top: 0;
+    display: block;
+    cursor: none;
+  }
+  #world {
+    z-index: 2;
+  }
+  #terrain {
+    z-index: 1;
+  }
+/*==============================================================================================背景區結尾==============================================================================================*/
+/**/
+/**/
+/*================================================================================================視窗區================================================================================================*/
+  #info {
+    position: absolute; 
+    top: 10px;
+    right: 10px;
+    width: auto;
+    background: rgba(34, 34, 34, 0.8); 
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    padding: 10px;
+    max-height: 90%;
+    overflow-y: auto;
+    z-index: 10;
+    border-radius: 6px;
+    display: block;
+  }
+  #infoShift {
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 30px;
+    height: 30px;
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 10;
+    border-radius: 6px;
+  }
+  #restart {
+    width: 90%;
+    height: 30px;
+    margin: 10px auto;      /* 水平置中 + 與上面拉開距離 */
+    background: rgba(255, 255, 255, 0.1);
+    z-index: 10;
+    border-radius: 6px;
+
+    display: flex;          /* 文字置中 */
+    align-items: center;
+    justify-content: center;
+
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  #artControl {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    background: rgba(34, 34, 34, 0.8);
+    padding: 10px;
+    z-index: 10;
+    border-radius: 5px;
+    display:block;
+  }
+  #foodStatistic {
+    position: relative;
+  }
+  .Btn {
+    height: 16px;
+    background: rgba(120, 120, 120, 0.8);
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+  .Input {
+    height: 16px;
+    background: rgba(120, 120, 120, 0.8);
+    color: #fff;
+    font-family: monospace;
+    font-size: 14px;
+    border-radius: 6px;
+  }
+/*==============================================================================================視窗區結尾==============================================================================================*/
+</style>
+</head>
+<body>
+<!================================================================================================背景區================================================================================================!>
+<canvas id="terrain" ></canvas>
+<canvas id="world"></canvas>
+<!==============================================================================================背景區結尾==============================================================================================!>
+<!!>
+<!!>
+<!================================================================================================視窗區================================================================================================!>
+<div id="info"></div>
+<div id="infoShift"></div>
+<div id="artControl">
+  <div id="terrainUI" style="display:block;">
+    <input id="terrainInput" class="Input" type="text" value="Atlantis🦈" style="width:110px;height:16px;">
+    <button id="terrainBtn" class="Btn" style="height:20px; line-height:16px; padding:2 6px;">地形變動</button>
+  </div>
+  <div id="colorPalette" style="position:relative; margin:10px; display:flex; align-items:center;">
+    <div style=" margin-right:50px; color:#fff; font-family:monospace; font-size:14px; width:70px;">草食點點</div>
+    <canvas class="colorRing" id="草食" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="brightBar" id="草食" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="saturateBar" id="草食" style="margin-right:8px; position:relative;"></canvas>
+  </div>
+  <div id="colorPalette" style="position:relative; margin:10px; display:flex; align-items:center;">
+    <div style=" margin-right:50px; color:#fff; font-family:monospace; font-size:14px; width:70px;">肉食點點</div>
+    <canvas class="colorRing" id="肉食" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="brightBar" id="肉食" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="saturateBar" id="肉食" style="margin-right:8px; position:relative;"></canvas>
+  </div>
+  <div id="colorPalette" style="position:relative; margin:10px; display:flex; align-items:center;">
+    <div style=" margin-right:50px; color:#fff; font-family:monospace; font-size:14px; width:70px;">地形</div>
+    <canvas class="colorRing" id="地形" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="brightBar" id="地形" style="margin-right:13px; position:relative;"></canvas>
+    <canvas class="saturateBar" id="地形" style="margin-right:8px; position:relative;"></canvas>
+  </div>
+  <div id="restart" >
+    世界重來按鈕
+  </div>
+</div>
+<!==============================================================================================視窗區結尾==============================================================================================!>
+<script>
+//===============================================================================================環境變數===============================================================================================//
+const canvas = document.getElementById('world');
+const ctx = canvas.getContext('2d');
+const canvasTerrain = document.getElementById('terrain');
+const ctxTerrain = canvasTerrain.getContext('2d');
+const infoDiv = document.getElementById('info');
+const infoShift = document.getElementById('infoShift');
+const artControl = document.getElementById('artControl');
+const terrainInput = document.getElementById('terrainInput');
+const terrainBtn = document.getElementById('terrainBtn');
+const restart = document.getElementById('restart');
+//=============================================================================================環境變數結尾=============================================================================================//
+//
+//
+//===============================================================================================工具函數===============================================================================================//
+//算距離
+function distance(a, b) {
+  return Math.max(1, Math.hypot(a.x - b.x, a.y - b.y, (a.z || 0) - (b.z || 0)));
+}
+function random(min, max) {
+  return min+Math.random()*(max-min);
+}
+
+//依種子碼生成亂數
+function rand2 (x, y, seed = "Atlantis🦈") {
+  let n = x * 19990208 + y * 20011208 + seed * 20230508;
+  n = (n ^ (n >> 2)) * 20221208;
+  n = (n ^ (n >> 12));
+  return (n >>> 0) / 4294967295;
+}
+
+//依亂數生成像素高度
+function noise (x, y, seed = "Atlantis🦈") {
+  let n = 0;
+  for (const ch of seed) n += ch.codePointAt(0);
+  const x0 = Math.floor(x);
+  const y0 = Math.floor(y);
+  const x1 = x0 + 1;
+  const y1 = y0 + 1;
+  
+  const sx = ((x - x0) ** 2) * (3 - 2 * (x - x0));
+  const sy = ((y - y0) ** 2) * (3 - 2 * (y - y0));
+  
+  const n00 = rand2(x0, y0, n);
+  const n01 = rand2(x0, y1, n);
+  const n10 = rand2(x1, y0, n);
+  const n11 = rand2(x1, y1, n);
+  
+  const ix0 = n00 + (n10 - n00) * sx;
+  const ix1 = n01 + (n11 - n01) * sx;
+  return (ix0 + (ix1 - ix0) * sy);
+}
+
+//畫三角形
+function drawFly(ctx, cx, cy, size) {
+  ctx.beginPath();
+  for (let i = 0; i < 3; i++) {
+    const angle = Math.PI / 2 + i * (Math.PI * 2 / 3);
+    const x = cx + Math.cos(angle) * size;
+    const y = cy + Math.sin(angle) * size;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+}
+
+//畫正方形
+function drawDig(ctx, cx, cy, size) {
+  ctx.beginPath();
+  for (let i = 0; i < 4; i++) {
+    const angle = i * (Math.PI * 1 / 2);
+    const x = cx + Math.cos(angle) * size;
+    const y = cy + Math.sin(angle) * size;
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.stroke();
+}
+
+//畫雙波浪
+function drawSwim(ctx, cx, cy, width) {
+  ctx.beginPath();
+  const h = width * 0.15;
+  ctx.moveTo(cx - width/2, cy);
+  ctx.quadraticCurveTo(cx - width/4, cy - h, cx, cy);
+  ctx.quadraticCurveTo(cx + width/4, cy + h, cx + width/2, cy);
+  ctx.stroke();
+}
+
+let restarting = false;
+//儲存
+function saveWorld() {
+  if (restarting) return;
+  const data = {
+    seed: terrainInput.value,
+    selectedAgentId: selectedAgent?.id ?? null,
+    normalHue: normalHue,
+    normalSaturate: normalSaturate,
+    normalBright: normalBright,
+
+    huntHue: huntHue,
+    huntSaturate: huntSaturate,
+    huntBright: huntBright,
+
+    terrainHue: terrainHue,
+    terrainSaturate: terrainSaturate,
+    terrainBright: terrainBright,
+    agents: agents.map(a => ({
+      x: a.x,
+      y: a.y,
+      z: a.z,
+      vx: a.vx,
+      vy: a.vy,
+      vz: a.vz,
+      lastX: a.lastX,
+      lastY: a.lastY,
+      lastZ: a.lastZ,
+
+      attributes: a.attributes,
+      abilities: a.abilities,
+
+      hunt: a.hunt,
+      hunted: a.hunted,     
+ 
+      satiety: a.satiety,
+      moving: a.moving,
+      heat: a.heat,
+
+      age: a.age,
+      parents: [a.parents?.[0]?.id ?? {}, a.parents?.[1]?.id ?? {}],
+      cooldown: a.cooldown,
+
+      target: a.target && a.target.type === "wander"? a.target : null,
+
+      id: a.id,
+      parentSpecies1: a.parentSpecies1,
+      parentSpecies2: a.parentSpecies2,
+
+      // 只放「狀態」，不要放方法
+    })),
+    foods: foods.map(f => ({
+      x: f.x,
+      y: f.y,
+      z: f.z,
+      age: f.age,
+      last: f.last,
+    })),
+    eggs: eggs.map(e => ({
+      x: e.x,
+      y: e.y,
+      z: e.z,
+      attributes: e.attributes,
+      parents: [e.parents?.[0]?.id ?? {}, e.parents?.[1]?.id ?? {}],
+      parentSpecies1: e.parentSpecies1,
+      parentSpecies2: e.parentSpecies2,
+      age: e.age,
+    })),
+  };
+
+  localStorage.setItem("dianEvolutionSave", JSON.stringify(data));
+}
+
+window.addEventListener("beforeunload", () => {
+  saveWorld();
+});
+setInterval(() => {
+  saveWorld();
+}, 2000);
+
+//粒子生成
+function spawnParticle(type, x, y, dir = {x:0, y:0}){
+
+  const base = {
+    blood: () => ({
+      color: [0, 90, 40, 0.8],
+      radius: Math.random() * 2 + 0.5,
+      vx: (Math.random()-0.5)*2 + dir.x,
+      vy: (Math.random()-0.5)*2 + dir.y,
+      life: 30,
+      type: "blood"
+    }),
+
+    dust: () => ({
+      color: "gray",
+      radius: Math.random() * 1.5 + 0.5,
+      vx: (Math.random()-0.5)*2,
+      vy: (Math.random()-0.5)*2,
+      life: 40,
+      type: "dust"
+    }),
+
+    steam: () => ({
+      color: [0, 0, 100, 0.6],
+      radius: Math.random() * 2 + 1,
+      vx: (Math.random()-0.5)*0.5,
+      vy: -Math.random(),
+      life: 30,
+      type: "steam"
+    })
+  };
+
+  particles.push(
+    new Particle({
+      x,
+      y,
+      ...base[type]()
+    })
+  );
+}
+//=============================================================================================工具函數結尾=============================================================================================//
+//
+//
+//================================================================================================生產者================================================================================================//
+//
+//
+class Food {
+//============================================生產者生成============================================//
+  constructor(f) {
+    this.x = f.x;
+    this.y = f.y;
+
+    let ratio =  [];
+    for (let i=0; i<21; i++) {
+      const count = (foods.filter(f => f.z > (i-10)/10*canvasZ && f.z < (i-9)/10*canvasZ).length+1)/(foods.filter(f => f.z<canvasZ && f.z>-canvasZ).length+21);
+      ratio.push(count);
+    }
+
+    let zRatio = 0;
+    let p = Math.random();
+    let z;
+
+    for (let i=0; i<21; i++) {
+      zRatio += ratio[i];
+      if (zRatio >= p) {
+        z = (i-10+Math.random()-0.5)/10*canvasZ;
+        break;
+      }
+    }
+    this.z = f.z ?? (z - noise(f.x * scale, f.y * scale, terrainInput.value));
+    this.age = f.age || 0.208;
+    this.last = f.last || Math.random() * 150;
+    this.radius = ((this.last / 4.21) ** (1/3));
+    this.maxAge = frame * 40;
+    this.nutrition = 1;
+    this.type = "food";
+  }
+//==========================================生產者生成結尾==========================================//
+//
+//
+//============================================生產者受肉============================================//
+  draw() {
+    const t = 0.6 - 0.5 * (this.age / this.maxAge);
+    ctx.fillStyle = this.color || `rgba(208, 208, 208, ${0.6 * t + 0.1208})`;
+    
+    const r = ((this.last / 4.21) ** (1/3));
+    if (this.z > 0.5 * canvasZ) {
+    // 空中 → 三角形
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y - (2 ** 0.5) * r);
+      ctx.lineTo(this.x - r, this.y + r);
+      ctx.lineTo(this.x + r, this.y + r);
+      ctx.closePath();
+      ctx.fill();
+
+    } else if (this.z < -0.5 * canvasZ) {
+    // 地下 → 正方形
+      ctx.fillRect(this.x - r, this.y - r, 2 * r, 2 * r);
+
+    } else {
+    // 地面 → 圓形
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  }
+}
+//==========================================生產者受肉結尾==========================================//
+//
+//
+//==============================================================================================生產者結尾==============================================================================================//
+//
+//
+//==================================================================================================蛋==================================================================================================//
+//
+//
+class Egg {
+//==============================================蛋生成==============================================//
+  constructor(e) {
+    this.x = e.x;
+    this.y = e.y;
+    this.z = e.z;
+    this.attributes = e.attributes;
+    this.hunt = e.hunt;
+    this.parents = e.parents;
+    this.parentSpecies1 = e.parentSpecies1;
+    this.parentSpecies2 = e.parentSpecies2;
+    this.bornAge = 5;
+    this.age = e.age || 0;
+  }
+//============================================蛋生成結尾============================================//
+//
+//
+//==============================================蛋時間==============================================//
+  update() {
+    this.age += 1 / frame;
+    if (!selectedAgent) this.draw();
+    if (selectedAgent && distance(this, selectedAgent) < selectedAgent.vision) this.draw();
+    if (this.age >= this.bornAge) {
+      agents.push(new Agent({
+        x: this.x,
+        y: this.y,
+        z: this.z,
+        attributes: this.attributes,
+        parents: this.parents,
+        parentSpecies1: this.parentSpecies1,
+        parentSpecies2: this.parentSpecies2,
+      }));
+      return "born";
+    }
+  }
+//============================================蛋時間結尾============================================//
+//
+//
+//==============================================蛋受肉==============================================//
+  draw() {
+    const shellR = 4 + (this.attributes?.strength?? 0) / 5;
+    const yolkR = Math.max(0.5, 0.4 + shellR * (this.bornAge - this.age) / this.bornAge);
+//外圈
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, shellR, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgb(158, 158, 255)";
+    ctx.lineWidth = 1;
+    ctx.stroke();
+    
+//內圈
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, yolkR, 0, 2 * Math.PI);
+    ctx.strokeStyle = "rgb(255, 255, 255)";
+    ctx.lineWidth = 0.5;
+    ctx.stroke();
+  }
+}
+//============================================蛋受肉結尾============================================//
+//
+//
+//================================================================================================蛋結尾================================================================================================//
+//
+//
+//=================================================================================================點點=================================================================================================//
+//
+//
+class Agent {
+//=============================================點點生成=============================================//
+  constructor(a={}) {
+    this.x = a.x;
+    this.y = a.y;
+    this.vx = a.vx || 0;
+    this.vy = a.vy || 0;
+    this.lastX = a.lastX || this.x;
+    this.lastY = a.lastY || this.y;
+    this.shakeX = 0;
+    this.shakeY = 0;
+    this.type = "agent";
+
+    this.attributes = a.attributes || {
+      strength: Math.random() * 10,
+      agility: Math.random() * 10,
+      intelligence: Math.random() * 10, 
+      endurance: Math.random() * 10,
+    };
+    
+    this.abilities = a.abilities || {
+      swim: false,
+    };
+    
+    let s = this.attributes.strength;
+    let i = this.attributes.intelligence;
+    let ag = this.attributes.agility;
+    let e = this.attributes.endurance;
+
+    this.area = 16 * s; //面積
+    this.radius = (this.area/Math.PI)**0.5; //半徑
+    this.surface = 4*Math.PI * (this.radius**2)
+    this.mass = (4.21/3)*Math.PI * (this.radius**3); //體積 & 質量
+
+    this.maxZ = (ag + e - 2*s + 5) / 60 * i * canvasZ + this.radius; //飛行上限
+    this.minZ = -(s + e - 2*ag + 5) / 60 * i * canvasZ - this.radius; //遁地下限
+    if (this.maxZ < this.minZ) {
+      const midZ = (this.maxZ + this.minZ)/2;
+      this.maxZ = midZ;
+      this.minZ = midZ;
+    }
+    this.z = a.z || Math.max(this.minZ, Math.min(this.maxZ, a.z));
+    this.lastZ = a.lastZ || this.z;
+    this.vz = a.vz || 0;
+	  
+    if (s > 4 && e > 4 && ag > 4 && Math.abs(s - ag) < 3) this.abilities.swim = true; //游泳
+    this.hunt = a.hunt ?? Math.random();
+    this.hunted = a.hunted ?? false;
+
+    this.abilities.ignoreWat = this.abilities.swim;
+
+    this.maxSatiety = this.mass / 3;
+    this.satiety = a.satiety || this.maxSatiety * 2/3;
+    this.starve = 2/200 * (this.mass/1000 + i/10); //每幀飢餓速度
+
+    this.speed = 0.22 * Math.max(0.01, ((s*ag/e) / 25) / (this.mass/1000)); //加速度值
+    this.moving = a.moving || 0; //速度值
+    this.wanderTimer = s+ag+i+e;
+
+    this.maxHeat = e * 25;//最高體溫(疲勞度)
+    this.heat = a.heat || this.maxHeat * 3/5; //初始體溫
+    this.heating = 1; //實際體溫增加速度 = heating*0.5*重量*(實際速度**2)*離地
+    this.cooling = (0.0208 * this.surface / this.mass); //實際體溫散失速度 = cooling*海拔
+    this.speedFactor = 1; //過熱時調整速度用
+    this.heightFactor = 1; //離開適應區調整速度用
+
+    this.age = a.age || 0.208;
+    this.maxAge = 1 + this.mass; //壽命
+
+    this.territory = this.radius + this.mass * ((s*s*ag/e)**(1/2)) / 25; //領地
+    this.vision = 40 + this.radius + i * 50; //視野
+    this.target = a.target || null; //設定目標用
+    this.lastTarget = null;
+
+    this.mode = "eat"; //eat/mate/escape
+    this.prevMode = "eat";
+    this.cooldown = a.cooldown || 0; //交配冷卻
+
+    this.parents = [{}, {}]; //記錄親代
+    this.id = a.id || Math.random().toString(36).slice(2); //幾乎獨一無二的36碼id
+    this.species = `${this.maxZ > 0.5 * canvasZ ? "F":"N"}${this.minZ < -0.5 * canvasZ ? "D":"N"}${this.abilities.swim? "S":"N"}${this.hunt>0.5? "H":"N"}`; //同種才能交配
+    this.parentSpecies1 = a.parentSpecies1 || "NNNN";
+    this.parentSpecies2 = a.parentSpecies2 || "NNNN";
+    this.newSpecies = !(this.species === this.parentSpecies1 || this.species === this.parentSpecies2);
+    this.COD = null; 
+    this.ate = false;
+  }
+//===========================================點點生成結尾===========================================//
+//
+//
+//=============================================點點時間=============================================//
+  update() {
+
+//年齡
+    this.age += 1/frame;
+
+//計算每幀移動量
+    this.moving = Math.hypot(this.lastX - this.x, this.lastY - this.y, this.lastZ - this.z);
+    this.maxAge -= 0.0001*0.5*this.mass*(this.moving**1) * (1 + (this.z/canvasZ)**2);
+
+//熱
+    this.heat -= this.heat * 0.002023 + this.cooling * (1 + this.z/canvasZ);
+    this.heat += this.heating * 0.5 *(this.moving ** 2) * (1 + (this.z/canvasZ)**2);
+
+    if (this.heat > this.maxHeat * 2/3) this.speedFactor = (this.maxHeat - this.heat) / (this.maxHeat * 2/3);
+    if (this.heat <= this.maxHeat * 2/3) {
+      this.speedFactor = 1;
+      this.shakeX = 0;
+      this.shakeY = 0;
+    }
+    if (this.heat < this.maxHeat/20) {
+      let dirX = (Math.random() - 0.5) >=0? 1: -1;
+      let dirY = (Math.random() - 0.5) >=0? 1: -1;
+      let amount = Math.random();
+
+      this.shakeX = dirX * amount * 0.5*this.radius;
+      this.shakeY = dirY * (1-amount) * 0.5*this.radius;
+      const shakingMove = Math.hypot(this.shakeX, this.shakeY);
+      this.satiety -= 0.00005 * 0.5*this.mass*(shakingMove**2) * (1 + (this.z/canvasZ)**2);
+      this.heat += this.heating * 0.5 *(shakingMove ** 2) * (1 + (this.z/canvasZ)**2) ;
+    };
+
+//位置
+    if (this.z > this.maxZ) this.heightFactor = 1-0.5*(this.z-this.maxZ)/canvasZ;
+    else if (this.z < this.minZ) this.heightFactor = 1-0.5*(this.minZ-this.z)/canvasZ;
+    else this.heightFactor = 1;
+
+//飢餓
+    this.satiety -= this.starve + 0.00005 * 0.5*this.mass*(this.moving**2) * (1 + (this.z/canvasZ)**2 );
+
+//死亡	
+    if (this.satiety <= 0) { this.COD = "hunger"; return false;}
+    if (this.heat > this.maxHeat) { this.COD = "hot"; return false;}
+    if (this.heat <= 0) { this.COD = "cold"; return false;}
+    if (this.age >= this.maxAge) { this.COD = "old"; return false;}
+    if (this.ate) { this.COD = "eat"; return false;}
+    if (this.cooldown > 0) this.cooldown -= 1/frame;
+    
+    this.find();
+    if (!selectedAgent) this.draw();
+    if (selectedAgent && distance(this, selectedAgent) <= selectedAgent.vision) this.draw();
+
+    return true;
+  }
+//===========================================點點時間結尾===========================================//
+//
+//
+//=============================================點點眼腦=============================================//
+//
+//
+  find() {
+//==================紀錄上次狀態==================//
+    this.lastTarget = this.target;
+    if (this.target && this.target.type !== "wander" && !agents.includes(this.target) && !foods.includes(this.target)) {
+      this.target = null;
+    }
+//================紀錄上次狀態結尾================//
+//
+//
+//=====================找威脅=====================//
+    const threats = [];
+    for (const other of agents) {
+      if (!isThreatAgent(this, other) && other.target !== this && other.mode !== "eat") continue;
+      
+      const d = distance(this, other);
+      if (d === 0) continue;
+      if (d < other.territory * (1 - Math.min(1, other.satiety/other.maxSatiety)) && d < other.vision && d < this.vision) threats.push(other);
+    }
+
+    if (this === selectedAgent) {
+      for (const t of threats) {
+        ctx.beginPath();
+        ctx.moveTo(this.x, this.y);
+        ctx.lineTo(t.x, t.y);
+        ctx.strokeStyle = `rgba(200, 120, 120, ${t.type === "agent"? 0.5 + 0.2 * Math.min(t.vision, t.territory) / distance(this, t) : 0.5 + 0.2 * t.radius / distance(this, t)})`;
+        ctx.lineWidth = 1;
+        ctx.stroke();
+      }
+    }
+//===================找威脅結尾===================//
+//
+//
+//=====================狀態機=====================//
+  if (this.satiety/this.maxSatiety > 5/6 && this.age >= 3 && this.cooldown <= 0) this.mode = "mate";
+  else if (this.satiety/this.maxSatiety < 2/3 || this.age <3) this.mode = "eat";
+//===================狀態機結尾===================//
+//
+//
+    let target = null;
+//=====================找食物=====================//
+    if (this.mode === "eat") {
+      let mostValue = -1;
+      for (const f of [...agents, ...foods]) {
+        const d = distance(this, f);
+        if (f.species && f.species === this.species) continue;
+	if (f.territory && f.territory > this.territory) continue;
+        if (this.vision < d) continue;
+        if (f.mass && f.mass > this.mass * 5) continue;
+        
+        let guarded = false;
+        if (guarded) continue;
+          
+        let v = 0;
+        const nutrition = (f.type === "food")? (1 - this.hunt)*f.last : this.hunt*f.satiety;
+        if (f.type==="food") v = nutrition / d;
+        if (f.type==="agent") v = nutrition / d * (this.speed-f.speed);
+	if (v < 0 || v <= mostValue) continue;
+        if (v > mostValue) {
+          target = f;
+          mostValue = v;
+        } else continue;
+      }
+//===================找食物結尾===================//
+//
+//
+//=====================找交配=====================//
+    } else if (this.mode === "mate") {
+      let mostClose = null;
+      for (const partner of agents) {
+        if (partner === this) continue;
+        if (partner.target === this && partner.mode === "eat") continue; 
+        if (distance(this, partner) > this.vision) continue;
+        if (partner.mode !== "mate") continue; // 只找同樣在交配模式
+        if (this.species !== partner.species && this.parentSpecies1 !== partner.species && this.parentSpecies2 !== partner.species) continue; //新物種可以跨物種
+
+        const d = distance(this, partner);
+        if (mostClose === null || d < mostClose) {
+          target = partner;
+          mostClose = d;
+        } else continue;
+      }
+    }
+//===================找交配結尾===================//
+//
+//
+//======================遊蕩======================//
+    if (!target && !this.target && this.lastTarget && this.heat/this.maxHeat < 1/3 && this.satiety > this.maxSatiety/2) {
+      this.target = {
+        x: this.lastTarget.x,
+        y: this.lastTarget.y,
+        z: this.lastTarget.z,
+        type: "wander",
+        radius: 5,
+      }
+    } else if (!target && !this.target && !this.lastTarget && this.heat/this.maxHeat < 1/3 && this.satiety > this.maxSatiety/2) {
+      this.target = {
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        z: this.minZ + Math.random() * (this.maxZ - this.minZ),
+        type: "wander",
+        radius: 5,
+      }
+    } else if (!this.target || this.target.type !== "wander") this.target = target;
+//====================遊蕩結尾====================//
+//
+//
+    this.direction(threats, this.target);
+  }
+//====================決定方向====================//
+  direction(threats = [], target = null) {
+    let ex = 0;
+    let ey = 0;
+    let ez = 0;
+    if (target) {
+      if (target.type === "wander" && (this.heat/this.maxHeat > 0.5 || this.satiety < this.maxSatiety * 1/3)) {
+        this.target = null;
+        const drag = 0.05;
+        this.vx *= 1 - drag;
+        this.vy *= 1 - drag;
+        this.vz *= 1 - drag;
+        this.move(null, this.vx, this.vy, this.vz);
+        return;
+      }
+      if (target.type === "wander") this.speedFactor /= 2;
+      const d = distance(this, target);
+      const dx = (target.x - this.x);
+      const dy = (target.y - this.y);
+      const dz = (target.z - this.z);
+      const d2D = Math.max(1, Math.hypot(dx, dy));
+      const angle = Math.atan2(dy, dx);
+      ex += d2D*Math.cos(angle)/d/d;
+      ey += d2D*Math.sin(angle)/d/d;
+      ez += dz/d/d;
+    }
+
+    if (threats.length !== 0) {
+      if (this.target && this.target.type === "wander") this.target = null;
+      for (const t of threats) {
+        const d = distance(this, t);
+        const dx = this.x - t.x;
+        const dy = this.y - t.y;
+        if (this.target) {
+          const fx = (this.x - this.target.x);
+          const fy = (this.y - this.target.y);
+          const cross = fx * dy - fy * dx;
+          const dot = fx * dx + fy * dy;
+          let tx = cross >= 0? -dy : dy;
+          let ty = cross >= 0? dx : -dx;
+          if (dot > 0) {
+            ex += (tx * Math.min(0.9, d / (Math.min(t.vision, t.territory) + this.radius)) + dx * Math.max(0.1, 1- d / (Math.min(t.vision, t.territory) + this.radius)))/d/d;
+            ey += (ty * Math.min(0.9, d / (Math.min(t.vision, t.territory) + this.radius)) + dy * Math.max(0.1, 1- d / (Math.min(t.vision, t.territory) + this.radius)))/d/d;
+          } else {
+            ex += dx/d/d;
+            ey += dy/d/d;
+          } 
+        } else {
+          this.target = null;
+          ex += dx/d/d;
+          ey += dy/d/d;
+        }
+      }
+    }
+    
+    if (ex !== 0 || ey !== 0 || ez !== 0) {
+      this.vx += ex / Math.hypot(ex, ey, ez) * this.speed * this.speedFactor * this.heightFactor;
+      this.vy += ey / Math.hypot(ex, ey, ez) * this.speed * this.speedFactor * this.heightFactor;
+      this.vz += ez / Math.hypot(ex, ey, ez) * this.speed * this.speedFactor * this.heightFactor;
+    }
+    const drag = (this.target || threats.length > 0)? 0.05 : 0.05 * (1 + this.attributes.agility/this.attributes.strength);
+    this.vx *= 1 - drag;
+    this.vy *= 1 - drag;
+    this.vz *= 1 - drag;
+    this.move(target, this.vx, this.vy, this.vz);
+  }
+//==================決定方向結尾==================//
+//
+//
+//===========================================點點眼腦結尾===========================================//
+//
+//
+//=============================================點點身體=============================================//
+//
+//
+//======================移動======================//
+  move(target=null, vx, vy, vz) {
+    if (target) {
+      const d = distance(this, target);
+      if (d <= this.radius + target.radius || d === 0) {
+        if (this.mode === "eat" && target.type !== "wander") this.eat(target);
+        if (this.mode === "mate" && target.type !== "wander") this.mate(target);
+        this.target = null;
+        this.lastTarget = null;
+      }
+    }
+    this.lastX = this.x;
+    this.lastY = this.y;
+    this.lastZ = this.z;
+    this.x += vx;
+    this.y += vy;
+    this.z += vz;
+
+  }
+//====================移動結尾====================//
+//
+//
+//=======================吃=======================//
+  eat(food) {
+    if (food.type === "food") {
+      let bite = Math.max(0, this.maxSatiety - this.satiety);
+      this.satiety += 1.2 * (1-this.hunt) * Math.min(food.last * food.nutrition, bite);
+      food.last -= Math.max(0, Math.min(food.last, bite / food.nutrition));
+      food.radius = ((food.last / 4.21) ** 1/3) * 2.08;
+      this.target = null;
+    }
+    if (food.type === "agent") {
+      this.target = null;
+      this.satiety += 1.2 * this.hunt*food.satiety;
+      food.ate = true;
+      this.hunted = true;
+    }
+  }
+//=====================吃結尾=====================//
+//
+//
+//======================交配======================//
+  mate(partner) {
+    this.cooldown = 0.5 + this.maxAge / 100;
+    partner.cooldown = 0.5 + partner.maxAge / 100;
+    this.satiety -= this.maxSatiety * 0.1;
+    partner.satiety -= partner.maxSatiety * 0.1;
+    this.mode = "eat";
+    partner.mode = "eat";
+    this.target = null;
+    partner.target = null;
+    const father = this.attributes;
+    const mother = partner.attributes;
+    const mutation = [1, 1, 1, 1, 1];
+    for (let i= 0; i<mutation.length; i++) {
+      while (true) {
+        let r = Math.random();
+        let value = random(-1, 1);
+        let p = -value*value+1;
+        if (r<p) {
+          mutation[i] = 1+value;
+          break;
+        }
+      }
+    }
+    let childAttrs = null;
+    if (father && mother) {
+      childAttrs = {
+        strength: (father.strength + mother.strength) * 0.5 * mutation[0],
+        intelligence: (father.intelligence + mother.intelligence) * 0.5 * mutation[1],
+        agility: (father.agility + mother.agility) * 0.5 * mutation[2],
+        endurance: (father.endurance + mother.endurance) * 0.5 * mutation[3],
+      }
+    } else return;
+
+    if (agents.length + eggs.length > MAX_AGENTS) return;
+    const child = new Egg({
+      x: this.x + random(-15, 15),
+      y: this.y + random(-15, 15),
+      z: this.z + random(-15, 15),
+      attributes: childAttrs,
+      hunt: Math.min(0.99, Math.max(0.01, (this.hunt+partner.hunt) * 0.5 * mutation[4])),
+      parents: [this, partner],
+      parentSpecies1: this.species,
+      parentSpecies2: partner.species,
+    });
+    eggs.push(child);
+  }
+//====================交配結尾====================//
+//
+//
+//===========================================點點身體結尾===========================================//
+//
+//
+//=============================================點點受肉=============================================//
+//
+//
+  draw() {
+//====================點點本體====================//
+    if (this.x && this.y && this.radius) {
+      ctx.beginPath();
+      ctx.arc(this.x + this.shakeX, this.y + this.shakeY, this.radius, 0, Math.PI * 2);
+
+      let sat = 30 + 30 * Math.min(1, this.satiety / this.maxSatiety);
+      let light = 25 + 55 * Math.min(1, this.satiety / this.maxSatiety);
+      let breath = 5.08 * Math.sin(this.age * 5.08);
+
+      ctx.fillStyle = `hsl(${normalHue}, ${sat/60*normalSaturate}%, ${light/80*normalBright + breath}%)`;
+      if (this.hunted) ctx.fillStyle = `hsl(${huntHue}, ${sat/60*huntSaturate}%, ${light/80*huntBright + breath}%)`;
+      ctx.fill();
+    } else console.log ("thisFalse");
+//==================點點本體結尾==================//
+//
+//
+//====================點點注視====================//
+//點點框
+    if (this === selectedAgent) {
+      ctx.beginPath();
+      ctx.arc(this.x + this.shakeX, this.y + this.shakeY, this.radius + 2, 0, Math.PI * 2);
+
+      ctx.strokeStyle = "yellow";
+      ctx.lineWidth = 2;
+      ctx.stroke();
+    }
+
+//點點目標
+    if (this.target  && this === selectedAgent && this.target.x && this.target.y && (this.target.type === "wander" || foods.includes(this.target) || agents.includes(this.target))) {
+      ctx.beginPath();
+      ctx.moveTo(this.x, this.y);
+      ctx.lineTo(this.target.x, this.target.y);
+      ctx.strokeStyle = (this.mode === "eat")? "#6f6" : (this.mode === "escape")? "#ffcc00" : (this.target.type ==="wander")? "white" : "#f6f";
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    } else if (this.target && (!this.target.x || !this.target.y)) console.log ("targetFalse");
+
+    if (this === selectedAgent) {
+//點點領地
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.territory * (1 - Math.min(1, this.satiety / this.maxSatiety)), 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(255,180,180,0.2)';
+      ctx.stroke();
+
+//點點視野
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.vision, 0, Math.PI * 2);
+      ctx.strokeStyle = 'rgba(180,255,180,0.2)';
+      ctx.stroke();
+    }
+//==================點點注視結尾==================//
+//
+//
+//====================點點種族====================//
+    ctx.strokeStyle = `rgba(0,0,0,${0.208 + this.heat * 0.792 / 120})`;//深度隨熱度變化
+    ctx.lineWidth = 0.5;
+
+    const r = this.radius;
+    const x = this.x + this.shakeX;
+    const y = this.y + this.shakeY;
+  // 飛行：同心三角形
+    if (this.maxZ > 0.5 * canvasZ) {
+      drawFly(ctx, x, y, r * 0.45);
+    }
+
+  // 遁地：正方形
+    if (this.minZ < -0.5 * canvasZ) {
+      drawDig(ctx, x, y, r * 0.45);
+    }
+
+  // 游泳：波浪曲線
+    if (this.abilities.swim) {
+      drawSwim(ctx, x, y + r * 0.5, r * 0.7);
+      drawSwim(ctx, x, y - r * 0.5, r * 0.7);
+    }
+
+  // 無：圓圈
+    if (this.maxZ <= 0.5 * canvasZ && this.minZ >= -0.5 * canvasZ && !this.abilities.swim) {
+      ctx.beginPath();
+      ctx.arc(x, y, 0.5 * r, 0, Math.PI * 2);
+      let hue = Math.min(120, this.satiety);
+      ctx.stroke();
+    }
+//==================點點種族結尾==================//
+//
+//
+  }
+//===========================================點點受肉結尾===========================================//
+//
+//
+}
+//===============================================================================================點點結尾===============================================================================================//
+function isThreatAgent(agent, other) {
+
+  if (other.hunt > agent.hunt && other.target === agent && other.mode === "eat") return true;
+  if (other.mode === "mate" && other.target === agent) return false;
+
+//物理限制
+  if (other === agent) return false;
+
+//行為限制
+  if (other.hunt < agent.hunt) return false;
+  if (other.mass / agent.mass >= Math.max(1, other.maxSatiety/other.satiety) && other.mode !== "eat") return false;
+
+//領地比較
+  if (other.territory <= agent.territory) return false;
+
+  return true;
+}
+//
+//
+//================================================================================================死點點================================================================================================//
+//
+//
+class Deadagent {
+//============================================死點點生成============================================//
+  constructor(a={}) {
+    this.x = a.x*1;
+    this.y = a.y*1;
+    this.abilities = a.abilities;
+    this.maxZ = a.maxZ*1;
+    this.minZ = a.minZ*1;
+    this.radius = a.radius*1;
+    this.vx = a.vx*1;
+    this.vy = a.vy*1;
+    let sat = 30 + 30 * Math.min(1, a.satiety / a.maxSatiety);
+    let light = 25 + 55 * Math.min(1, a.satiety / a.maxSatiety);
+    let breath = 5.08 * Math.sin(a.age * 5.08);
+    this.color = a.hunted? [huntHue, sat/60*huntSaturate, light/80*huntBright + breath, 1] : [normalHue, sat/60*normalSaturate, light/80*normalBright + breath, 1];
+    this.originColor = a.hunted? [huntHue, sat/60*huntSaturate, light/80*huntBright + breath, 1] : [normalHue, sat/60*normalSaturate, light/80*normalBright + breath, 1];
+    this.hunted = a.hunted;
+    this.COD = a.COD;
+    this.timer = 0;
+  }
+//==========================================死點點生成結尾==========================================//
+//
+//
+//============================================死點點時間============================================//
+  update () {
+    if (this.COD === "eat") {
+      for (let i=0; i<Math.floor(Math.random()*9); i++) {
+        spawnParticle("blood", this.x, this.y, {
+          x: 0,
+          y: 0,
+        });
+      }
+      return true;
+    }
+    if (this.COD === "hunger") {
+      this.radius *= 0.99;
+      this.timer ++;
+      if (this.timer % 9 === 0) {
+        spawnParticle("steam", this.x, this.y, {
+          x: 0,
+          y: 0,
+        });
+      }
+      if (this.timer >= 60) return true;
+    }
+    if (this.COD === "hot") {
+      this.color = [
+        this.originColor[0]<180? this.originColor[0]*((60-this.timer)/60):this.originColor[0]+(360-this.originColor[0])*this.timer/60, 
+        this.originColor[1]*((60-this.timer/3)/60), 
+        this.originColor[2]*((60-this.timer/2)/60),
+        this.originColor[3]*((60-this.timer/2)/60),
+      ];
+      this.timer ++;
+      if (this.timer >= 60) return true;
+    }
+    if (this.COD === "cold") {
+      this.color = [
+        this.originColor[0]+(240-this.originColor[0])*this.timer/60, 
+        this.originColor[1]*((60-this.timer/3)/60), 
+        this.originColor[2]+(100-this.originColor[2])*this.timer/120,
+        this.originColor[3]*((60-this.timer)/60),
+      ];
+      if (this.color[0] < 0) this.color[0]+=360;
+      this.timer ++;
+      if (this.timer >= 60) return true;
+    }
+    if (this.COD === "old") {
+      this.color = [
+        this.originColor[0], 
+        this.originColor[1]*((120-this.timer)/120), 
+        this.originColor[2]+(50-this.originColor[2])*this.timer/120,
+        this.originColor[3]*((120-this.timer)/120),
+      ];
+      this.timer ++;
+      if (this.timer >= 120) return true;
+    }
+    this.x+=this.vx;
+    this.y+=this.vy;
+    this.vx*=0.95;
+    this.vy*=0.95;
+  }
+//==========================================死點點時間結尾==========================================//
+//
+//
+//============================================死點點受肉============================================//
+  draw() {
+//====================點點本體====================//
+    if (this.x && this.y && this.radius) {
+      ctx.beginPath();
+      ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+      ctx.fillStyle = `hsla(${this.color[0]},${this.color[1]}%,${this.color[2]}%, ${this.color[3]})`;
+      ctx.fill();
+    } else console.log ("thisFalse");
+//==================點點本體結尾==================//
+//
+//
+//====================點點種族====================//
+    ctx.strokeStyle = `rgba(0,0,0,0.208)`;//深度隨熱度變化
+    ctx.lineWidth = 0.5;
+
+    const r = this.radius;
+    const x = this.x;
+    const y = this.y;
+  // 飛行：同心三角形
+    if (this.maxZ > 0.5 * canvasZ) {
+      drawFly(ctx, x, y, r * 0.45);
+    }
+
+  // 遁地：正方形
+    if (this.minZ < -0.5 * canvasZ) {
+      drawDig(ctx, x, y, r * 0.45);
+    }
+
+  // 游泳：波浪曲線
+    if (this.abilities.swim) {
+      drawSwim(ctx, x, y + r * 0.5, r * 0.7);
+      drawSwim(ctx, x, y - r * 0.5, r * 0.7);
+    }
+
+  // 無：圓圈
+    if (this.maxZ <= 0.5 * canvasZ && this.minZ >= -0.5 * canvasZ && !this.abilities.swim) {
+      ctx.beginPath();
+      ctx.arc(x, y, 0.5 * r, 0, Math.PI * 2);
+      let hue = Math.min(120, this.satiety);
+      ctx.stroke();
+    }
+//==================點點種族結尾==================//
+  }
+//==========================================死點點受肉結尾==========================================//
+}
+
+
+//==============================================================================================死點點結尾==============================================================================================//
+//
+//
+//===============================================================================================粒子特效===============================================================================================//
+//
+//
+class Particle {
+//===========================================粒子特效生成===========================================//
+  constructor(opt){
+    this.x = opt.x;
+    this.y = opt.y;
+
+    this.vx = opt.vx || 0;
+    this.vy = opt.vy || 0;
+
+    this.radius = opt.radius || 2;
+    this.color = opt.color || "white";
+    this.maxLife = opt.life || 30;
+    this.life = opt.life || 30;
+    this.type = opt.type;
+  }
+//=========================================粒子特效生成結尾=========================================//
+//
+//
+//===========================================粒子特效時間===========================================//
+  update(){
+    this.x += this.vx;
+    this.y += this.vy;
+
+    this.vx *= 0.96;
+    this.vy *= 0.96;
+
+    this.life--;
+
+    return this.life > 0;
+  }
+//=========================================粒子特效時間結尾=========================================//
+//
+//
+//===========================================粒子特效受肉===========================================//
+  draw(){
+    ctx.fillStyle = `hsla(${this.color[0]}, ${this.color[1]}%, ${this.color[2]}%, ${this.color[3]*this.life/this.maxLife})`;
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+    ctx.fill();
+  }
+//=========================================粒子特效受肉結尾=========================================//
+//
+//
+}
+//=============================================================================================粒子特效結尾=============================================================================================//
+//
+//
+//================================================================================================創世紀================================================================================================//
+//
+//
+//===============================================參數===============================================//
+const agents = [];
+const deadagents = [];
+const particles = [];
+let selectedAgent = null;
+const eggs = [];
+const foods = [];
+let MAX_AGENTS = window.innerWidth*window.innerHeight/20000;
+let FOOD_COUNT = window.innerWidth*window.innerHeight/7500;
+
+const scale = 0.002;
+const frame = 30;
+const canvasZ = 1/2 * Math.min(canvas.width, canvas.height);
+
+let normalHue = 210;
+let normalSaturate = 60;
+let normalBright = 70;
+
+let huntHue = 30;
+let huntSaturate = 60;
+let huntBright = 70;
+
+let terrainHue = 210;
+let terrainSaturate = 40;
+let terrainBright = 50;
+
+let mouseDot = {
+  x: 0,
+  y: 0,
+  r: 5
+};
+//=============================================參數結尾=============================================//
+//
+//
+//=============================================載入紀錄=============================================//
+function loadWorld() {
+  const raw = localStorage.getItem("dianEvolutionSave");
+  if (!raw) return false;
+
+  infoShift.style.background = "transparent";
+  infoDiv.style.display = "none";
+  artControl.style.display = "none";
+
+  const data = JSON.parse(raw);
+  terrainInput.value = data.seed;
+  normalHue = data.normalHue;
+  normalSaturate = data.normalSaturate;
+  normalBright = data.normalBright;
+
+  huntHue = data.huntHue;
+  huntSaturate = data.huntSaturate;
+  huntBright = data.huntBright;
+
+  terrainHue = data.terrainHue;
+  terrainSaturate = data.terrainSaturate;
+  terrainBright = data.terrainBright;
+
+  agents.length = 0;
+  foods.length = 0;
+  eggs.length = 0;
+
+  for (const a of data.agents) {
+    agents.push(new Agent(a)); 
+  }
+  selectedAgent = agents.find(a => a.id === data.selectedAgentId) || null;
+  for (const a of agents) {
+    let parentsId = data.agents.find(da => da.id === a.id)?.parents;
+    if (!parentsId || !parentsId[0] || !parentsId[1]) {
+      a.parents = [{}, {}];
+      continue;
+    }
+    a.parents = [agents.find(pa => pa.id === parentsId[0]), agents.find(pa => pa.id === parentsId[1])];
+  }
+
+  for (const f of data.foods) {
+    foods.push(new Food(f));
+  }
+
+  for (const e of data.eggs) {
+    eggs.push(new Egg(e));
+  }
+  return true;
+}
+loadWorld();
+//===========================================載入紀錄結尾===========================================//
+//
+//
+//===============================================地形===============================================//
+function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  canvasTerrain.width = window.innerWidth;
+  canvasTerrain.height = window.innerHeight;
+
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctxTerrain.clearRect(0, 0, canvasTerrain.width, canvasTerrain.height);
+
+  const cell = 1;
+  for (let x = 0.1; x < canvasTerrain.width; x += cell) {
+    for (let y = 0.1; y < canvasTerrain.height; y += cell) {
+      const terrainZ = noise(x * scale, y * scale, terrainInput.value);
+      ctxTerrain.fillStyle = `hsl(${terrainHue}, ${terrainZ * terrainSaturate}%, ${terrainZ * terrainBright}%)`;
+      ctxTerrain.fillRect(x, y, cell, cell);
+    }
+  }
+  MAX_AGENTS = window.innerWidth*window.innerHeight/20000;;
+  FOOD_COUNT = window.innerWidth*window.innerHeight/7500;
+}
+
+
+// 一開始先跑一次
+resizeCanvas();
+window.addEventListener('resize', resizeCanvas);
+//=============================================地形結尾=============================================//
+//
+//
+//===============================================食物===============================================//
+if (foods.length === 0) for (let i=0; i<1/5*FOOD_COUNT; i++) foods.push(new Food({x: Math.random() * canvas.width, y: Math.random() * canvas.height, age: Math.random()*frame*59}));
+//=============================================食物結尾=============================================//
+//
+//
+//===============================================操作===============================================//
+//
+//
+//====================操作按鍵====================//
+//監視器開關
+infoShift.addEventListener("click", () => {
+  if (infoDiv.style.display === "none") {
+    infoShift.style.background = "rgba(255, 255, 255, 0.1)";
+    infoDiv.style.display = "block";
+    artControl.style.display = "block";
+  } else {
+    infoShift.style.background = "transparent";
+    infoDiv.style.display = "none";
+    artControl.style.display = "none";
+  }
+});
+
+//世界重來
+restart.addEventListener("click", () => {
+  const ok = confirm("⚠️ 世界將會重置，所有點點都會消失。\n\n真的要重新開始嗎？");
+
+  if (!ok) return;
+  restarting = true;
+  localStorage.removeItem("dianEvolutionSave");
+  location.reload();
+});
+
+//選擇點點
+document.addEventListener("keydown", (e) => {
+
+  let index = agents.indexOf(selectedAgent);
+  if (!selectedAgent) index = -1;
+
+  if (e.key === "ArrowDown") {
+    selectedAgent = agents[(index + 1) % agents.length];
+  } else if (e.key === "ArrowUp") {
+    selectedAgent = agents[(index - 1 + agents.length) % agents.length];
+  }
+  if (e.key === "ArrowLeft") selectedAgent = null;
+  console.log(selectedAgent);
+});
+
+//地形操作
+terrainBtn.addEventListener("click", () => {
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctxTerrain.clearRect(0, 0, canvasTerrain.width, canvasTerrain.height);
+
+  const cell = 1;
+  for (let x = 0.1; x < canvasTerrain.width; x += cell) {
+    for (let y = 0.1; y < canvasTerrain.height; y += cell) {
+      const terrainZ = noise(x * scale, y * scale, terrainInput.value);
+      ctxTerrain.fillStyle = `hsl(${terrainHue}, ${terrainZ * terrainSaturate}%, ${terrainZ * terrainBright}%)`;
+      ctxTerrain.fillRect(x, y, cell, cell);
+    }
+  }
+});
+
+//色環操作
+document.querySelectorAll('.colorRing').forEach(canvas => {
+  canvas.addEventListener('mousedown', (e) => {
+    const x= e.offsetX-25;
+    const y= e.offsetY-25;
+    let angle = Math.atan2(y, x)*180/Math.PI;
+    angle = angle<0? angle+360 : angle;
+    if (canvas.id === "草食") {normalHue = angle; normalDemoPhase = 0;}
+    if (canvas.id === "肉食") {huntHue = angle; huntDemoPhase = 0;}
+    if (canvas.id === "地形") {
+      terrainHue = angle;
+      let n = 0;
+      for (const ch of terrainInput.value) n += ch.codePointAt(0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctxTerrain.clearRect(0, 0, canvasTerrain.width, canvasTerrain.height);
+
+      const cell = 1;
+      for (let x = 0.1; x < canvasTerrain.width; x += cell) {
+        for (let y = 0.1; y < canvasTerrain.height; y += cell) {
+          const terrainZ = noise(x * scale, y * scale, terrainInput.value);
+          ctxTerrain.fillStyle = `hsl(${terrainHue}, ${terrainZ * terrainSaturate}%, ${terrainZ * terrainBright}%)`;
+          ctxTerrain.fillRect(x, y, cell, cell);
+        }
+      }
+    }
+    drawColorRing();
+    drawBrightBar();
+    drawSaturateBar();
+  });
+});
+
+//飽和度操作
+document.querySelectorAll('.saturateBar').forEach(canvas => {
+  canvas.addEventListener('mousedown', (e) => {
+    const y= Math.min(50,Math.max(0, 55-e.offsetY));
+    if (canvas.id === "草食") {normalSaturate = y*2; normalDemoPhase = 0;}
+    if (canvas.id === "肉食") {huntSaturate = y*2; huntDemoPhase = 0;}
+    if (canvas.id === "地形") {
+      terrainSaturate = y*2;
+      let n = 0;
+      for (const ch of terrainInput.value) n += ch.codePointAt(0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctxTerrain.clearRect(0, 0, canvasTerrain.width, canvasTerrain.height);
+
+      const cell = 1;
+      for (let x = 0.1; x < canvasTerrain.width; x += cell) {
+        for (let y = 0.1; y < canvasTerrain.height; y += cell) {
+          const terrainZ = noise(x * scale, y * scale, terrainInput.value);
+          ctxTerrain.fillStyle = `hsl(${terrainHue}, ${terrainZ * terrainSaturate}%, ${terrainZ * terrainBright}%)`;
+          ctxTerrain.fillRect(x, y, cell, cell);
+        }
+      }
+    }
+    drawColorRing();
+    drawBrightBar();
+    drawSaturateBar();
+  });
+});
+
+//亮度條操作
+document.querySelectorAll('.brightBar').forEach(canvas => {
+  canvas.addEventListener('mousedown', (e) => {
+    const y= Math.min(50,Math.max(0, 55-e.offsetY));
+    if (canvas.id === "草食") {normalBright = y*2; normalDemoPhase = 0;}
+    if (canvas.id === "肉食") {huntBright = y*2; huntDemoPhase = 0;}
+    if (canvas.id === "地形") {
+      terrainBright = y*2;
+      let n = 0;
+      for (const ch of terrainInput.value) n += ch.codePointAt(0);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctxTerrain.clearRect(0, 0, canvasTerrain.width, canvasTerrain.height);
+
+      const cell = 1;
+      for (let x = 0.1; x < canvasTerrain.width; x += cell) {
+        for (let y = 0.1; y < canvasTerrain.height; y += cell) {
+          const terrainZ = noise(x * scale, y * scale, terrainInput.value);
+          ctxTerrain.fillStyle = `hsl(${terrainHue}, ${terrainZ * terrainSaturate}%, ${terrainZ * terrainBright}%)`;
+          ctxTerrain.fillRect(x, y, cell, cell);
+        }
+      }
+    }
+    drawColorRing();
+    drawBrightBar();
+    drawSaturateBar();
+  });
+});
+
+//滑鼠移動
+canvas.addEventListener("mousemove", e => {
+  mouseDot.x = e.offsetX;
+  mouseDot.y = e.offsetY;
+});
+//==================操作按鍵結尾==================//
+//
+//
+//====================操作介面====================//
+let normalDemoPhase = 0;
+let huntDemoPhase = 0;
+let terrainDemoPhase = 0.5*Math.PI;
+//色環
+function drawColorRing() {
+  document.querySelectorAll('.colorRing').forEach(canvas => {
+    canvas.width = 54;
+    canvas.height = 54;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i=0; i<360; i++) {
+      const start = (i-1)*Math.PI/180;
+      const end = i*Math.PI/180;
+      ctx.beginPath();
+      if (canvas.id === "草食") ctx.strokeStyle = `hsl(${i},${normalSaturate}%,${normalBright}%)`;
+      if (canvas.id === "肉食") ctx.strokeStyle = `hsl(${i},${huntSaturate}%,${huntBright}%)`;
+      if (canvas.id === "地形") ctx.strokeStyle = `hsl(${i},${terrainSaturate}%,${terrainBright}%)`;
+      ctx.lineWidth = 5;
+      ctx.arc(27, 27, 22, start, end);
+      ctx.stroke();
+    }
+    ctx.beginPath();
+    
+    let angle = 0;
+    if (canvas.id === "草食") {
+      angle = normalHue/180*Math.PI;
+      ctx.fillStyle = `hsl(${normalHue},${normalSaturate}%,${normalBright}%)`;
+    }
+    if (canvas.id === "肉食") {
+      angle = huntHue/180*Math.PI;
+      ctx.fillStyle = `hsl(${huntHue},${huntSaturate}%,${huntBright}%)`;
+    }
+    if (canvas.id === "地形") {
+      angle = terrainHue/180*Math.PI;
+      ctx.fillStyle = `hsl(${terrainHue},${terrainSaturate}%,${terrainBright}%)`;
+    }
+    ctx.arc(27 + 22 * Math.cos(angle), 27 + 22 * Math.sin(angle), 5, 0, 2*Math.PI);
+    ctx.fill();
+  });
+}
+drawColorRing();
+
+//demo點點
+function drawDemoDian() {
+  document.querySelectorAll('.colorRing').forEach(canvas => {
+    const ctx = canvas.getContext('2d');
+    ctx.beginPath();
+    ctx.clearRect(15, 15, canvas.width-30, canvas.height-30);
+    if (canvas.id === "草食") ctx.fillStyle = `hsl(${normalHue},${normalSaturate*(0.5+0.25*(Math.sin(normalDemoPhase)+1))}%,${normalBright*(0.5+0.25*(Math.sin(normalDemoPhase)+1))}%)`;
+    if (canvas.id === "肉食") ctx.fillStyle = `hsl(${huntHue},${huntSaturate*(0.5+0.25*(Math.sin(huntDemoPhase)+1))}%,${huntBright*(0.5+0.25*(Math.sin(huntDemoPhase)+1))}%)`;
+    ctx.arc(27, 27, 10, 0, 2*Math.PI);
+    ctx.fill();
+
+    if (canvas.id !== "地形") {
+      ctx.beginPath();
+      ctx.strokeStyle = "hsla(0, 0%, 0%, 0.2)";
+      ctx.lineWidth = 1;
+      ctx.arc(27, 27, 7, 0, 2*Math.PI);
+      ctx.stroke();
+
+      ctx.beginPath();
+      ctx.strokeStyle = "hsla(0, 0%, 0%, 0.1)";
+      ctx.lineWidth = 3;
+      ctx.arc(27, 27, 6, 0, 2*Math.PI);
+      ctx.stroke();
+    }
+
+    if (canvas.id === "地形") {
+      for (y = 20; y > 0; y--) {
+        ctx.beginPath();
+        ctx.strokeStyle = `hsl(${terrainHue},${y/20*terrainSaturate}%,${y/20*terrainBright}%)`;
+        ctx.lineWidth = 1;
+        ctx.moveTo(27+10*Math.cos((y/20-0.5)*Math.PI), 27+10*Math.sin((y/20-0.5)*Math.PI));
+        ctx.lineTo(27-10*Math.cos((y/20-0.5)*Math.PI), 27+10*Math.sin((y/20-0.5)*Math.PI)); 
+        ctx.stroke();
+      }
+    }
+  });
+}
+drawDemoDian();
+
+//亮度條
+function drawBrightBar () {
+  document.querySelectorAll('.brightBar').forEach(canvas => {
+    canvas.width = 10;
+    canvas.height = 60;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i=5; i<55; i++) {
+      const start = i-1;
+      const end = i;
+      ctx.beginPath();
+      ctx.moveTo(5,start);
+      ctx.lineTo(5,end);
+      if (canvas.id === "草食") ctx.strokeStyle = `hsl(${normalHue},${normalSaturate}%,${100-i*2}%)`;
+      if (canvas.id === "肉食") ctx.strokeStyle = `hsl(${huntHue},${huntSaturate}%,${100-i*2}%)`;
+      if (canvas.id === "地形") ctx.strokeStyle = `hsl(${terrainHue},${terrainSaturate}%,${100-i*2}%)`;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    let y = 0;
+    if (canvas.id === "草食") {
+      y = 55-normalBright/2;
+      ctx.fillStyle = `hsl(${normalHue},${normalSaturate}%,${normalBright}%)`;
+    }
+    if (canvas.id === "肉食") {
+      y = 55-huntBright/2;
+      ctx.fillStyle = `hsl(${huntHue},${huntSaturate}%,${huntBright}%)`;
+    }
+    if (canvas.id === "地形") {
+      y = 55-terrainBright/2;
+      ctx.fillStyle = `hsl(${terrainHue},${terrainSaturate}%,${terrainBright}%)`;
+    }
+    ctx.arc(5, y, 5, 0, 2*Math.PI);
+    ctx.fill();
+    
+  });
+}
+drawBrightBar();
+
+
+
+//飽和條
+function drawSaturateBar() {
+  document.querySelectorAll('.saturateBar').forEach(canvas => {
+    canvas.width = 10;
+    canvas.height = 60;
+    const ctx = canvas.getContext('2d');
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    for (let i=5; i<55; i++) {
+      const start = i-1;
+      const end = i;
+      ctx.beginPath();
+      ctx.moveTo(5,start);
+      ctx.lineTo(5,end);
+      if (canvas.id === "草食") ctx.strokeStyle = `hsl(${normalHue},${100-i*2}%,${normalBright}%)`;
+      if (canvas.id === "肉食") ctx.strokeStyle = `hsl(${huntHue},${100-i*2}%,${huntBright}%)`;
+      if (canvas.id === "地形") ctx.strokeStyle = `hsl(${terrainHue},${100-i*2}%,${terrainBright}%)`;
+      ctx.lineWidth = 5;
+      ctx.stroke();
+    }
+
+    ctx.beginPath();
+    let y = 0;
+    if (canvas.id === "草食") {
+      y = 55-normalSaturate/2;
+      ctx.fillStyle = `hsl(${normalHue},${normalSaturate}%,${normalBright}%)`;
+    }
+    if (canvas.id === "肉食") {
+      y = 55-huntSaturate/2;
+      ctx.fillStyle = `hsl(${huntHue},${huntSaturate}%,${huntBright}%)`;
+    }
+    if (canvas.id === "地形") {
+      y = 55-terrainSaturate/2;
+      ctx.fillStyle = `hsl(${terrainHue},${terrainSaturate}%,${terrainBright}%)`;
+    }
+    ctx.arc(5, y, 5, 0, 2*Math.PI);
+    ctx.fill();
+  });
+}
+drawSaturateBar();
+//==================操作介面結尾==================//
+//
+//
+//=============================================操作結尾=============================================//
+//
+//
+//==============================================================================================創世紀結尾==============================================================================================//
+//
+//
+//===============================================================================================世界時間===============================================================================================//
+let lastTime = 0;
+const FRAME_INTERVAL = 1000 / frame; //fps
+function loop(timestamp) {
+  if (timestamp - lastTime < FRAME_INTERVAL) {
+    requestAnimationFrame(loop);
+    return; // 跳過這次更新
+  }
+  normalDemoPhase = normalDemoPhase + 0.05;
+  huntDemoPhase = huntDemoPhase + 0.05;
+  drawDemoDian();
+
+  lastTime = timestamp;
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+  // 維持點點數量
+  if (agents.length + eggs.length <= 5 && foods.length >= 40) {
+    for (let i = 0; i < MAX_AGENTS/2; i++) {
+      agents.push(new Agent({
+      x: Math.random() * canvas.width,
+      y: Math.random() * canvas.height,
+      z: (Math.random() - 0.5) * 2 * canvasZ,
+      }));
+    }
+  }
+  
+  // 隨機生成食物
+  if (Math.random() < 0.02 + (foods.length/FOOD_COUNT)*0.3 && foods.length < FOOD_COUNT) {
+    foods.push(new Food({x: Math.random() * canvas.width, y: Math.random() * canvas.height }));
+  }
+
+  // 更新食物
+  for (let i = foods.length - 1; i >= 0; i--) {
+    const f = foods[i];
+    f.age++; 
+    if (f.age >= f.maxAge || f.last <= 0) {
+      foods.splice(i, 1);
+      continue;
+    }
+    if (!selectedAgent) f.draw();
+    if (selectedAgent && distance(selectedAgent, f) <= selectedAgent.vision) f.draw();
+  }
+
+//更新點點
+  for (let i = agents.length - 1; i >= 0; i--) {
+    const alive = agents[i].update();
+    if (!alive) {
+      deadagents.push(new Deadagent(agents[i]));
+      agents.splice(i, 1);
+    }
+  }
+
+
+//更新死點點
+  for (let i = deadagents.length - 1; i >= 0; i--) {
+    const over = deadagents[i].update();
+    if (over) {
+      deadagents.splice(i, 1);
+    } else {
+      deadagents[i].draw();
+    }
+  }
+
+//更新粒子
+  for(let i = particles.length - 1; i >= 0; i--){
+    if(!particles[i].update()){
+      particles.splice(i, 1);
+    } else particles[i].draw();
+  }
+  
+//更新蛋蛋
+  for (let i = eggs.length - 1; i >= 0; i--) {
+    const egg = eggs[i].update();
+    if (egg === "born") eggs.splice(i, 1);
+  }
+
+//滑鼠
+ctx.beginPath();
+ctx.arc(mouseDot.x, mouseDot.y, mouseDot.r, 0, Math.PI * 2);
+ctx.fillStyle = `hsl(${normalHue}, ${0.5*normalSaturate}%, ${0.5*normalBright}%)`;
+ctx.fill();
+
+//點點監視器  
+  if (infoDiv.style.display === "block") {
+    infoDiv.innerHTML = `<b>生存點點狀態${agents.length}+${eggs.length}/${Math.floor(MAX_AGENTS)+1} ${foods.length}/${Math.floor(FOOD_COUNT)+1}</b><br><br>`;
+    agents.forEach((a, i)=> {
+      const isMax = i === MAX_AGENTS - eggs.length - 1;
+      const color = isMax? "red" : a===selectedAgent? "yellow" : "inherit";
+
+      let height = [ "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-", "-" ];
+      const minZ = Math.min(20, Math.max(0, Math.round((1 + a.minZ/canvasZ)*10)));
+      const maxZ = Math.min(20, Math.max(0, Math.round((1 + a.maxZ/canvasZ)*10)));
+      const nowZ = Math.min(20, Math.max(0, Math.round((1 + a.z/canvasZ)*10)));
+      height[minZ] = "|";
+      height[maxZ] = "|";
+      if (maxZ === minZ) height[minZ] = "x";
+      if (nowZ === minZ || nowZ === maxZ) {
+        height[nowZ] = "x";
+      } else {
+        height[nowZ] = "o";
+      }
+      const heightDisplay = height.join("");
+ 
+      infoDiv.innerHTML += 
+        `<span style = "color:${color}"
+          onpointerdown = "
+            selectedAgent = (selectedAgent ===agents[${i}])? null : agents[${i}];
+            console.log(selectedAgent);
+        ">
+
+        ${a.species}` +  
+        ` ${heightDisplay} ` + 
+        `${Math.round(a.attributes.strength)} ${Math.round(a.attributes.intelligence)} ${Math.round(a.attributes.agility)} ${Math.round(a.attributes.endurance)}` + 
+        `-${Math.round((a.satiety/a.maxSatiety).toFixed(3)*100)}%` + 
+        `.${Math.round(a.age)}/${Math.round(a.maxAge)}` + 
+        `</span><br>`;
+    });
+
+//點點統計
+    const c = document.createElement('canvas');
+    c.id = 'foodStatistic';
+    c.width = 200;
+    c.height = 50;
+    infoDiv.appendChild(c);
+    const ctxFood = c.getContext('2d');
+
+    ctxFood.beginPath();
+    ctxFood.strokeStyle = "white";
+    ctxFood.moveTo(40, 10);
+    ctxFood.lineTo(40, 50);
+    ctxFood.moveTo(40, 50);
+    ctxFood.lineTo(200, 50);
+    ctxFood.moveTo(200, 50);
+    ctxFood.lineTo(200, 10);
+    ctxFood.moveTo(200, 10);
+    ctxFood.lineTo(40, 10);
+    ctxFood.lineWidth = 1;
+    ctxFood.stroke();
+
+    const foodY = [];
+    const agentY = [];
+    let maxCount = 0;
+    for (let i=0; i<21; i++) {
+      let x = (i-10)/10;
+      let nextX = (i-9)/10;
+      let count = foods.filter(f => f.z >= x*canvasZ && f.z < nextX*canvasZ).length;
+      foodY.push(count);
+      if (count > maxCount) maxCount = count;
+    }
+    for (let i=0; i<21; i++) {
+      let x = (i-10)/10;
+      let nextX = (i-9)/10;
+      let count = agents.filter(a => a.z >= x*canvasZ && a.z < nextX*canvasZ).length;
+      agentY.push(count);
+      if (count > maxCount) maxCount = count;
+    }
+
+    for (let i=0; i<21; i++) {
+      let x = i/21;
+      const Y = (1-foodY[i]/maxCount)*40;
+      const aY = (1-agentY[i]/maxCount)*40;
+      ctxFood.beginPath();
+      ctxFood.fillStyle = "white";
+      ctxFood.fillRect(x*160+40,Y+10, 8,40-Y);
+      ctxFood.beginPath();
+      ctxFood.fillStyle = `hsla(${normalHue},${normalSaturate}%,${normalBright}%, 0.7)`;
+      ctxFood.fillRect(x*160+40,aY+10, 8,40-aY);
+    }
+    ctxFood.fillStyle = "white";
+    ctxFood.font = "14px monospace"; 
+    ctxFood.fillText("FOOD", 0, 25); 
+    ctxFood.fillStyle = `hsl(${normalHue},${normalSaturate}%,${normalBright}%)`;
+    ctxFood.fillText("DIAN", 0, 45); 
+  }
+
+  
+
+  requestAnimationFrame(loop);
+}
+loop();
+//=============================================================================================世界時間結尾=============================================================================================//
+</script>
+</body>
+
+</html>
