@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dian Universe</title>
+
+<style>
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+body{
+  font-family:sans-serif;
+  background:
+    radial-gradient(circle at top, #1f3b52 0%, #0d1520 40%, #05080d 100%);
+  color:white;
+  min-height:100vh;
+  overflow:hidden;
+}
+
+#bg{
+  position:fixed;
+  inset:0;
+  z-index:-1;
+}
+
+.container{
+  min-height:100vh;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+  align-items:center;
+  padding:40px;
+}
+
+.title{
+  font-size:clamp(40px, 8vw, 90px);
+  font-weight:900;
+  letter-spacing:4px;
+  margin-bottom:12px;
+  text-shadow:
+    0 0 20px rgba(100,200,255,0.5),
+    0 0 60px rgba(100,200,255,0.2);
+}
+
+.subtitle{
+  opacity:0.7;
+  margin-bottom:50px;
+  text-align:center;
+}
+
+.grid{
+  width:min(1000px,100%);
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+  gap:24px;
+}
+
+.card{
+  position:relative;
+  padding:28px;
+  border-radius:24px;
+  background:rgba(255,255,255,0.08);
+  border:1px solid rgba(255,255,255,0.12);
+  backdrop-filter:blur(10px);
+
+  text-decoration:none;
+  color:white;
+
+  transition:
+    transform .2s,
+    background .2s,
+    border .2s;
+}
+
+.card:hover{
+  transform:translateY(-8px) scale(1.02);
+  background:rgba(255,255,255,0.13);
+  border:1px solid rgba(120,220,255,0.5);
+}
+
+.card h2{
+  margin-bottom:10px;
+  font-size:28px;
+}
+
+.card p{
+  opacity:0.7;
+  line-height:1.5;
+}
+
+.badge{
+  position:absolute;
+  top:16px;
+  right:16px;
+  font-size:12px;
+  padding:4px 10px;
+  border-radius:999px;
+  background:#00bfff33;
+  border:1px solid #6ddcff66;
+}
+
+.footer{
+  margin-top:50px;
+  opacity:0.4;
+  font-size:14px;
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="bg"></canvas>
+
+<div class="container">
+
+  <div class="title">
+    DIAN UNIVERSE
+  </div>
+
+  <div class="subtitle">
+    點點文明觀測中心
+  </div>
+
+  <div class="grid">
+
+    <a class="card" href="https://dianEvolution.onrender.com">
+      <div class="badge">ONLINE</div>
+      <h2>🌱 Evolution</h2>
+      <p>
+        觀察點點族群演化、生存、繁殖與滅絕。
+      </p>
+    </a>
+
+    <a class="card" href="https://dianBehave.onrender.com">
+      <div class="badge">ONLINE</div>
+      <h2>🧠 Behave</h2>
+      <p>
+        行為模式、意圖系統與群體互動實驗。
+      </p>
+    </a>
+
+    <a class="card" href="/dianBeadReincarnate">
+      <div class="badge">WIP</div>
+      <h2>💀 Reincarnate</h2>
+      <p>
+        死亡、食物循環與轉生系統觀測。
+      </p>
+    </a>
+
+  </div>
+
+  <div class="footer">
+    Atlantis Dian Research Institute
+  </div>
+
+</div>
+
+<script>
+const canvas = document.getElementById("bg");
+const ctx = canvas.getContext("2d");
+
+let w,h;
+let particles=[];
+
+function resize(){
+  w=canvas.width=window.innerWidth;
+  h=canvas.height=window.innerHeight;
+}
+window.addEventListener("resize",resize);
+resize();
+
+for(let i=0;i<120;i++){
+  particles.push({
+    x:Math.random()*w,
+    y:Math.random()*h,
+    r:Math.random()*2+1,
+    vx:(Math.random()-0.5)*0.3,
+    vy:(Math.random()-0.5)*0.3
+  });
+}
+
+function loop(){
+  ctx.clearRect(0,0,w,h);
+
+  for(const p of particles){
+
+    p.x+=p.vx;
+    p.y+=p.vy;
+
+    if(p.x<0)p.x=w;
+    if(p.x>w)p.x=0;
+    if(p.y<0)p.y=h;
+    if(p.y>h)p.y=0;
+
+    ctx.beginPath();
+    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    ctx.fillStyle="rgba(120,220,255,0.7)";
+    ctx.fill();
+  }
+
+  requestAnimationFrame(loop);
+}
+
+loop();
+</script>
+
+</body>
+</html>
