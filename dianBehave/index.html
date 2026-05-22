@@ -10,21 +10,51 @@
   #plantCanvas { position:absolute; background:transparent;}
   #foodCanvas { position:absolute; background:transparent;}
   #normalCanvas { position:absolute; background:transparent;}
-  #infoCanvas { position:absolute; background:gray;}
+  .infoCanvas { 
+    background:hsla(240, 10%, 30%, 0.2);
+    margin:5px;
+  }
+  #infoDiv {
+    position:absolute; 
+    background:hsla(240, 10%, 10%, 0.08);
+    backdrop-filter:blur(3px);
+    border:1px solid rgba(120,220,255,0.3);
+    border-radius:10px;
+    width:360px;
+    max-height:640px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+  }
+  #textDiv {
+    position:absolute; 
+    background:transparent;
+    width:360px;
+  }
+  
 </style>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
-<canvas id="infoCanvas"></canvas>
+
 <canvas id="plantCanvas"></canvas>
 <canvas id="foodCanvas"></canvas>
 <canvas id="normalCanvas"></canvas>
 <canvas id="canvas"></canvas>
+<div id="infoDiv">
+  <div id="textInfo"></div>
+  <canvas width="320" height="135" class="infoCanvas" id="plantInfoCanvas"></canvas>
+  <canvas width="320" height="135" class="infoCanvas" id="normalInfoCanvas"></canvas>
+  <canvas width="320" height="135" class="infoCanvas" id="hunterInfoCanvas"></canvas>
+</div>
 <script>
 /*============================================================
 初始化
 ============================================================*/
 /*物件定義============================*/
+const infoDiv = document.getElementById("infoDiv");
+infoDiv.style.display = "none";
+const textInfo = document.getElementById("textInfo");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
 const plantCanvas = document.getElementById("plantCanvas");
@@ -35,8 +65,16 @@ const normalCanvas = document.getElementById("normalCanvas");
 const normalCtx = normalCanvas.getContext("2d");
 const bgCanvas = document.getElementById("bgCanvas");
 const bgCtx = bgCanvas.getContext("2d");
-const infoCanvas = document.getElementById("infoCanvas");
-const infoCtx = infoCanvas.getContext("2d");
+
+const infoCtx = [
+  null,
+  document.getElementById("plantInfoCanvas").getContext("2d"),
+  null,
+  document.getElementById("normalInfoCanvas").getContext("2d"),
+  document.getElementById("hunterInfoCanvas").getContext("2d"),
+];
+
+
 
 /*區塊常數============================*/
 const size = 20;
@@ -153,8 +191,10 @@ class producer {
     for(let i=0; i<cache.length; i+=2) {
       const dx = cache[i];
       const dy = cache[i+1];
-      const dist2 = Math.max( 0.25, dx*dx + dy*dy );
+      const dist2 = Math.max( 0.25, dx*dx + dy*dy ); 
       const key = this.cell+100000*cache[i]+cache[i+1];
+      
+
       signalMap[plant].set(
         key,
         (signalMap[plant].get(key)||0) + 10/dist2/size/size
@@ -336,7 +376,7 @@ class normalDian {
 
 /*狀態數值==========*/
     this.hp = 100;
-    this.erg = 50;
+    this.erg = 100;
     this.age = 0;
     this.vision = [];
     for(let d=0; d<4; d++) {
@@ -379,7 +419,7 @@ class normalDian {
     this.type = 3;
     this.newGen = false;
     this.maxHp = 100;
-    this.maxErg = 100;
+    this.maxErg = 200;
     this.maxSpeed = 5;
     this.maxAge = 5000;
     this.atk = 5;
@@ -631,10 +671,10 @@ class normalDian {
     const ny = this.y+this.vy;
     this.x = nx;
     this.y = ny;
-    if(nx>w) this.x=w;
-    if(nx<0) this.x=0;
-    if(ny>h) this.y=h;
-    if(ny<0) this.y=0;
+    if(nx>w) this.x-=w;
+    if(nx<0) this.x+=w;
+    if(ny>h) this.y-=h;
+    if(ny<0) this.y+=h;
     this.erg -= 0.25*Math.hypot(this.vx, this.vy)/this.maxSpeed + 0.25;
     if(this.erg < 0) {
       this.hp += this.erg;
@@ -665,7 +705,7 @@ class normalDian {
 /*繁殖==============*/
   clone() {
     if(this.mode !== "clone") return;
-    if(this.erg < this.maxErg) {
+    if(this.erg*2 < this.maxErg) {
       this.score.clone -= 0.05;
       return;
     }
@@ -694,6 +734,7 @@ class normalDian {
 
 /*進食==============*/
   food() {
+
     if(this.erg >= this.maxErg || this.mode !== "eat") return;
       this.erg -= 1/20;
       const target = this.vision[3][plant-1].closest;
@@ -726,20 +767,19 @@ class normalDian {
         this.score.wander += target.hp/10*this.wanderCredit;
         target.hp = 0;
       }
-//渲染
-    ctx.beginPath();
-    ctx.moveTo(this.x+dx*0.2, this.y+dy*0.2);
-    ctx.lineTo(target.x-dx*0.2, target.y-dy*0.2);
-    ctx.lineWidth = 2;
-    ctx.strokeStyle = `hsl(80, 20%, 60%)`;
-    ctx.stroke();
+
     this.sick();
+
+
   }
 
 /*攻擊==============*/
   fight() {
+
+
     if(this.fightCooldown > 0) this.fightCooldown--;
     if(this.fightCooldown > 0 || this.mode !== "fight") return false;
+
     this.erg -= this.atk/20;
     let closest = null;
     let minDist2 = this.maxSpeed*this.maxSpeed;
@@ -750,6 +790,8 @@ class normalDian {
     }
     if(!closest) {
       this.score.fight--;
+
+
       return false;
     }
     const dx = closest.x-this.x;
@@ -762,10 +804,12 @@ class normalDian {
     this.score.fight += this.atk;
     this.score.wander += this.atk*this.wanderCredit;
     this.fightCooldown = 20;
+
   }
 
 /*探索==============*/
   wander() {
+
     if(this.mode === "wander" && this.wandering === false) {
       this.wandering = true;
       this.wanderStart = {x:this.x, y:this.y};
@@ -815,6 +859,18 @@ class normalDian {
     ctx.arc(this.x+eye2X, this.y+eye2Y, 1, 0, 2*Math.PI);
     ctx.fill();
 
+//渲染
+    let h;
+    if(this.mode==="clone") return;
+    if(this.mode==="eat") h = 120;
+    if(this.mode==="fight") h = 0;
+    if(this.mode==="wander") h = 300;
+
+
+    ctx.beginPath();
+    ctx.arc(this.x, this.y, 1, 0, 2*Math.PI);
+    ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
+    ctx.fill();
   }
 
 /*時間==============*/
@@ -1154,12 +1210,13 @@ window.addEventListener('resize', ()=>{
   resize();
 });
 
-
 function resize() {
 /*畫布==============*/
-  const infoWidth = 0;
-  w = window.innerWidth-infoWidth;
+  w = window.innerWidth;
   h = window.innerHeight;
+  infoDiv.style.left = "50%";
+  infoDiv.style.top = "50%";
+  infoDiv.style.transform = "translate(-50%,-50%)"; 
 
   const layers = [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas];
   for(const c of layers) {
@@ -1169,11 +1226,7 @@ function resize() {
     c.height = h;
   }
   bgCtx.clearRect(0, 0, w, h);
-  infoCanvas.style.position = "absolute";
-  infoCanvas.style.top = "0px";
-  infoCanvas.style.left = w+"px";
-  infoCanvas.height = h;
-  infoCanvas.width = infoWidth;
+
 
 
 /*區塊==============*/
@@ -1266,7 +1319,20 @@ window.addEventListener("keydown", (e) => {
     }
   }
 /*幀率============================*/
-  if (e.code === "KeyF") showFps = !showFps;
+  if (e.code === "KeyF") {
+    const display = infoDiv.style.display;
+    if(display === "none") {
+
+      infoDiv.style.display = "block";
+    } else if(display === "block" && infoShow === "min"){
+      infoShow = "hour";
+    } else if(display === "block" && infoShow === "hour"){
+      infoDiv.style.display = "none";
+      infoShow = "min";
+    }
+    console.log(infoShow);
+    showFps = !showFps;
+  }
 });
 
 /*============================================================
@@ -1576,22 +1642,106 @@ let fps = 0;
 let lastTime = performance.now();
 let frames = 0;
 let showFps = false;
-
+let infoShow = "min";
+const counts = [[],[],[],[],[]];
+const hourCounts = [[],[],[],[],[]];
+const infoPadding = 12.5;
 function loop() {
-  if(showFps) {
-    frames++;
-    const now = performance.now();
-    const delta = now - lastTime;
-    if (delta >= 1000) {
-      fps = (frames * 1000) / delta;
 
-      frames = 0;
-      lastTime = now;
+//資訊卡
+  frames++;
+  const now = performance.now();
+  const delta = now - lastTime;
+  if (delta >= 1000) {
+    fps = (frames * 1000) / delta;
 
-      console.log("FPS:", fps.toFixed(1));
+    counts[plant].push(agents[plant].length),
+    counts[normal].push(agents[normal].length),
+    counts[hunter].push(agents[hunter].length),
+
+    frames = 0;
+    lastTime = now;
+
+    textInfo.innerHTML = "";
+    for(const c of infoCtx) {
+      if(c===null) continue;
+      c.clearRect(0,0,320,135);
     }
+
+    textInfo.innerHTML =
+      `fps: ${Math.round(fps)}<br>`+
+      `plant: ${agents[plant].length}<br>`+
+      `normal: ${agents[normal].length}<br>`+
+      `hunter: ${agents[hunter].length}<br>`+
+      `generation: ${generation}`;
+
+    for(let t=1; t<=4; t++) {
+      if(t===2) continue;
+      const iCtx = infoCtx[t];
+      iCtx.beginPath();
+      iCtx.moveTo(infoPadding, infoPadding-2);
+      iCtx.lineTo(320-infoPadding, infoPadding-2);
+      iCtx.lineTo(320-infoPadding, 135-infoPadding);
+      iCtx.lineTo(infoPadding, 135-infoPadding);
+      iCtx.closePath();
+      iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
+      iCtx.lineWidth = 1;
+      iCtx.stroke();
+
+      const minL = counts[t].length;
+      if(counts[t].length>120) {
+        let avg = 0;
+        for(let i=0; i<60; i++) {
+          avg += counts[t][i];
+        }
+        avg /= 60;
+        hourCounts[t].push(avg);
+        if(hourCounts[t].length>60) hourCounts[t].shift();
+        counts[t].splice(0,60);
+      }
+      let max = 0;
+      for(let i=0; i<60; i++) {
+        let value;
+        if(infoShow === "min") {
+          value = counts[t][Math.max(0,minL-60)+i];
+          if(value>max) max = value;
+        } else if(infoShow === "hour") {
+          value = hourCounts[t][i];
+          if(value>max) max = value;
+        }
+      }
+
+      iCtx.beginPath();
+      let lastX;
+
+      for(let i=0; i<60; i++) {
+        let value;
+        if(infoShow === "min") value = counts[t][Math.max(0,minL-60)+i];
+        if(infoShow === "hour") value = hourCounts[t][i];
+        if(!value) continue;
+        if(i===0) iCtx.moveTo(infoPadding, infoPadding+(135-2*infoPadding)*(max-value)/max);
+        else iCtx.lineTo(infoPadding+i*5, infoPadding+(135-2*infoPadding)*(max-value)/max);
+        lastX = infoPadding+i*5;
+      }
+
+      if(t===plant) {
+        iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
+        iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
+      } else if(t===normal) {
+        iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
+        iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
+      }
+      iCtx.lineWidth = 2;
+      iCtx.stroke();
+
+      iCtx.lineTo(lastX, 135-infoPadding);
+      iCtx.lineTo(infoPadding, 135-infoPadding);
+      iCtx.closePath();
+      iCtx.fill();
+    }
+    
   }
-  infoCtx.clearRect(0, 0, infoCanvas.width, infoCanvas.height);
+
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
 
@@ -1755,9 +1905,6 @@ function loop() {
         if(Math.random()<0.1) p.clone();
       }
     }
-
-
-    console.log(`🌱 第${generation}代世界誕生`);
   }
 
   if(Math.random() <= 0.005) {
