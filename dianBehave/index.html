@@ -77,20 +77,31 @@ const infoCtx = [
 
 
 /*區塊常數============================*/
-const size = 20;
+
+const sizeX = window.innerWidth/64;
+const sizeY = window.innerHeight/32;
+const size = Math.hypot(sizeX,sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
 
 /*格線顯示==========*/
-let grid = false;
+let grid = true;
 /*區塊資料============================*/
 const grids = [];  //grids[key] = agents
 const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
 let w = window.innerWidth;
 let h = window.innerHeight;
+let maxGridX = 64;
+let maxGridY = 32;
 /*視窗大小============================*/
 resize();
+for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+  c.style.left = "0px";
+  c.style.top = "0px";
 
+  c.width = w;
+  c.height = h;
+}
 /*生命資料============================*/
 let agents = [[],[],[],[],[],[]];
 const none = 0;
@@ -170,7 +181,7 @@ class producer {
 /*繁殖================================*/
   clone() {
     const n = new producer(this);
-    const nKey = toCell(n.x,n.y);
+    const nKey = toKey(n.x,n.y);
     let hasPlant = 0;
     for(const a of getCell(nKey)) {
       if(a.type === 1) {
@@ -187,13 +198,17 @@ class producer {
 /*信號場===============================*/
   signal() {
     const range = Math.ceil(this.maxVision/size);
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
     const cache = rangeCache[range] || createNearCache(range);
     for(let i=0; i<cache.length; i+=2) {
       const dx = cache[i];
       const dy = cache[i+1];
-      const dist2 = Math.max( 0.25, dx*dx + dy*dy ); 
-      const key = this.cell+100000*cache[i]+cache[i+1];
-      
+      const dist2 = Math.max( 0.25, dx*dx + dy*dy );
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
 
       signalMap[plant].set(
         key,
@@ -209,13 +224,18 @@ class producer {
     if(this.age >= 5000) {
       const range = Math.ceil((this.age-5000)/120);
       const cache = rangeCache[range] || createNearCache(range);
+      const thisKey = this.cell;
+      const cx = keyToCellX(thisKey);
+      const cy = keyToCellY(thisKey);
       let count = cache.length/2;
       const value = this.hp*0.002/count;
       for(let i=0; i<cache.length; i+=2) {
         const dx = cache[i];
         const dy = cache[i+1];
-        const dist2 = dx*dx + dy*dy ;
-        const key = this.cell+100000*cache[i]+cache[i+1];
+        const dist2 = Math.max( 0.25, dx*dx + dy*dy );
+        const nx = (cx+dx+maxGridX) % maxGridX;
+        const ny = (cy+dy+maxGridY) % maxGridY;
+        const key = cellToKey(nx, ny);
         fertilizerMap.set(key, (fertilizerMap.get(key)||0) + value);
       }
       this.hp *= 0.98;
@@ -249,9 +269,10 @@ class producer {
 }
 
 //初始植物
+
 for(let i=0; i<10; i++) {
   const n = new producer();
-  addToCell(toCell(n.x,n.y), n);
+  addToCell(toKey(n.x,n.y), n);
   agents[n.type].push(n);
 }
 
@@ -286,7 +307,7 @@ class Food {
 
     this.x = parent.x;
     this.y = parent.y;
-    this.cell = toCell(this.x, this.y);
+    this.cell = toKey(this.x, this.y);
     this.cellIdx = null;
 
     this.age = 0;
@@ -304,12 +325,17 @@ class Food {
   grow() {
     const range = Math.ceil(this.age/500);
     const cache = rangeCache[range] || createNearCache(range);
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
     const value = this.hp * 0.04 / cache.length;
     for(let i=0; i<cache.length; i+=2) {
       const dx = cache[i];
       const dy = cache[i+1];
       const dist2 = dx*dx + dy*dy ;
-      const key = this.cell+100000*cache[i]+cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
       fertilizerMap.set(key, (fertilizerMap.get(key)||0) + value);
     }
     this.hp*= 0.98;
@@ -320,13 +346,17 @@ class Food {
   signal() {
     const range = Math.ceil(this.maxVision/size);
     const cache = rangeCache[range] || createNearCache(range);
-
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
     for(let i=0; i<cache.length; i+=2) {
 
       const dx = cache[i];
       const dy = cache[i+1];
       const dist2 = Math.max( 0.25, dx*dx + dy*dy );
-      const key = this.cell+100000*cache[i]+cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
       signalMap[food].set(
         key,
         (signalMap[food].get(key)||0) + 20/dist2/size/size
@@ -395,7 +425,7 @@ class normalDian {
     this.x = x?? Math.random()*canvas.width;
     this.y = y?? Math.random()*canvas.height;
     this.face = Math.PI*2*Math.random();
-    this.cell = toCell(this.x, this.y);
+    this.cell = toKey(this.x, this.y);
     this.cellIdx = null;
     this.cooldown = 600;
     this.fightCooldown = 0;
@@ -411,6 +441,7 @@ class normalDian {
       born:0,
     }
     this.wandering = false;
+    this.wanderTime = 0;
     this.wanderCredit = 0;
     this.wanderStart = {x:0, y:0};
     this.wanderMove = 0;
@@ -444,13 +475,17 @@ class normalDian {
   signal() {
     const range = Math.ceil(this.maxVision/size);
     const cache = rangeCache[range] || createNearCache(range);
-
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
 
     for(let i=0; i<cache.length; i+=2) {
       const dx = cache[i];
       const dy = cache[i+1];
       const dist2 = Math.max( 0.25, dx*dx + dy*dy );
-      const key = this.cell+100000*cache[i]+cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
       signalMap[normal].set(key, (signalMap[normal].get(key) || 0) + 20/dist2/size/size);
     }
   }
@@ -471,9 +506,17 @@ class normalDian {
     const range = Math.ceil(this.maxVision/size);
     const fx = Math.cos(this.face);
     const fy = Math.sin(this.face);
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
     const cache = rangeCache[range] || createNearCache(range);
     for(let i=0; i<cache.length; i+=2) {
-      const agentInCell = getCell(this.cell+100000*cache[i]+cache[i+1]);
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      const agentInCell = getCell(key);
       if(agentInCell.length === 0 || !agentInCell) continue;
 
       for(const a of agentInCell) {
@@ -680,7 +723,7 @@ class normalDian {
       this.hp += this.erg;
       this.erg =0;
     }
-    const newCell = toCell(this.x, this.y);
+    const newCell = toKey(this.x, this.y);
     if(newCell !== this.cell) addToCell(newCell,this);
   }
 
@@ -721,15 +764,17 @@ class normalDian {
       n = new normalDian(this, this.x+dx, this.y+dy);
     }
 
-    addToCell(toCell(n.x,n.y), n);
+    addToCell(toKey(n.x,n.y), n);
     agents[n.type].push(n);
     this.x -= dx;
     this.y -= dy;
-    this.erg = 50;
+    this.erg -= 50;
     this.cooldown = 120;
+    this.keep = 0;
     this.score.wander += n.erg*this.wanderCredit;
     this.score.born++;
     this.score.clone += n.erg;
+
   }
 
 /*進食==============*/
@@ -757,7 +802,7 @@ class normalDian {
         this.erg += bite;
         target.x -= 0.01*dx;
         target.y -= 0.01*dy;
-        const newCell = toCell(target.x, target.y);
+        const newCell = toKey(target.x, target.y);
         if(newCell !== target.cell) addToCell(newCell,target);
         this.score.eat += bite;
         this.score.wander += bite*this.wanderCredit;
@@ -790,8 +835,6 @@ class normalDian {
     }
     if(!closest) {
       this.score.fight--;
-
-
       return false;
     }
     const dx = closest.x-this.x;
@@ -804,7 +847,7 @@ class normalDian {
     this.score.fight += this.atk;
     this.score.wander += this.atk*this.wanderCredit;
     this.fightCooldown = 20;
-
+    this.keep = 0;
   }
 
 /*探索==============*/
@@ -812,12 +855,14 @@ class normalDian {
 
     if(this.mode === "wander" && this.wandering === false) {
       this.wandering = true;
+      this.wanderTime = 0;
       this.wanderStart = {x:this.x, y:this.y};
       this.wanderMove=1;
     }
 
     if(this.mode === "wander") {
-      this.wanderMove += Math.hypot(this.vx, this.vy);
+      this.wanderTime ++;
+      this.wanderMove += this.vx*this.vx + this.vy*this.vy;
     }
 
     if(this.mode !== "wander" && this.wandering === true) {
@@ -930,7 +975,7 @@ class normalDian {
       recordDeath(this);
       if(!this.newGen) {
         const n = new Food(this);
-        addToCell(toCell(n.x,n.y), n);
+        addToCell(toKey(n.x,n.y), n);
         agents[n.type].push(n);
       }
       return;
@@ -939,7 +984,7 @@ class normalDian {
 //年齡
     this.age ++;
     if(this.cooldown>0) this.cooldown --;
-    this.wanderCredit *= 0.98;
+    this.wanderCredit *= 1-0.002*this.wanderTime;
     this.draw();
   }
 }
@@ -1211,39 +1256,23 @@ window.addEventListener('resize', ()=>{
 });
 
 function resize() {
-/*畫布==============*/
-  w = window.innerWidth;
-  h = window.innerHeight;
-  infoDiv.style.left = "50%";
-  infoDiv.style.top = "50%";
-  infoDiv.style.transform = "translate(-50%,-50%)"; 
-
-  const layers = [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas];
-  for(const c of layers) {
-    c.style.left = "0px";
-    c.style.top = "0px";
-    c.width = w;
-    c.height = h;
-  }
-  bgCtx.clearRect(0, 0, w, h);
-
-
-
 /*區塊==============*/
   if(grid) {
-    for(let y=0; y<h; y+=size) {
+    for(let y=0; y<=maxGridY; y+=1) {
       bgCtx.beginPath();
-      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 0.2)";
-      bgCtx.lineWidth = 1;
-      bgCtx.moveTo(0, y);
-      bgCtx.lineTo(w, y);
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      bgCtx.lineWidth = 2;
+      bgCtx.moveTo(0, y*sizeY);
+      bgCtx.lineTo(w, y*sizeY);
+      bgCtx.stroke();
     }
-    for(let x=0; x<w; x+=size) {
+    for(let x=0; x<=maxGridX; x+=1) {
       bgCtx.beginPath();
-      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 0.2)";
-      bgCtx.lineWidth = 1;
-      bgCtx.moveTo(x, 0);
-      bgCtx.lineTo(x, h);
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      bgCtx.lineWidth = 2;
+      bgCtx.moveTo(x*sizeX, 0);
+      bgCtx.lineTo(x*sizeX, h);
+      bgCtx.stroke();
     }
   }
 }
@@ -1299,7 +1328,7 @@ window.addEventListener("keydown", (e) => {
     localStorage.removeItem("dian_world_save");
     for(let i=0; i<10; i++) {
       const n = new producer();
-      addToCell(toCell(n.x,n.y), n);
+      addToCell(toKey(n.x,n.y), n);
       agents[n.type].push(n);
     }
 
@@ -1314,7 +1343,7 @@ window.addEventListener("keydown", (e) => {
     }
     for(let i=0;i<100;i++){
       const d = new normalDian();
-      addToCell(toCell(d.x,d.y), d);
+      addToCell(toKey(d.x,d.y), d);
       agents[d.type].push(d);
     }
   }
@@ -1363,16 +1392,22 @@ function removeFromCell(key, agent) {
   cell.pop();
 }
 /*所在區塊==========*/
-function toCell(x,y) {
-  const cellX = Math.floor(x/size);
-  const cellY = Math.floor(y/size);
-  return cellX*100000+cellY;
+function toKey(x,y) {
+  const cellX = (x / sizeX) | 0;
+  const cellY = (y / sizeY) | 0;
+
+  return cellX | (cellY << 6);
+}
+/*所在區塊==========*/
+function cellToKey(cellX,cellY) {
+  return cellX | (cellY << 6);
 }
 /*區塊解碼==========*/
-function keyToCell(key) {
-  const cellX = Math.floor(key/100000);
-  const cellY = key%100000;
-  return [Math.floor(cellX), Math.floor(cellY)];
+function keyToCellX(key) {
+  return key & (maxGridX-1);
+}
+function keyToCellY(key) {
+  return key >> 6;
 }
 
 /*神經運算============================*/
@@ -1547,11 +1582,10 @@ function softMax(arr=[]) {
 
 /*區塊著色============================*/
 function fillCell(key, color = "hsla(0, 0%, 100%, 1)", layer = bgCtx) {
-  const cell = keyToCell(key);
-  const y = cell[1]*size;
-  const x = cell[0]*size;
+  const y = keyToCellY(key)*sizeY;
+  const x = keyToCellX(key)*sizeX;
   layer.fillStyle = color;
-  layer.fillRect(x, y, size, size);
+  layer.fillRect(x, y, sizeX, sizeY);
 }
 
 /*圖示神經網路========================*/
@@ -1867,7 +1901,7 @@ function loop() {
         const parent = survive[Math.floor(Math.random()*survive.length)];
         const d = new normalDian(parent);
         d.newGen = true;
-        addToCell(toCell(d.x,d.y), d);
+        addToCell(toKey(d.x,d.y), d);
         agents[d.type].push(d);
       }
     }
@@ -1892,11 +1926,11 @@ function loop() {
 
       const d = new normalDian(parent);
       d.newGen = true;
-      addToCell(toCell(d.x,d.y), d);
+      addToCell(toKey(d.x,d.y), d);
       agents[d.type].push(d);
     }
 
-    while(agents[plant].length<1000) {
+    while(agents[plant].length<500) {
       for(const p of agents[plant]) {
         for(let g=0; g<100; g++) if(Math.random()<0.5) {
           p.grow();
@@ -1910,7 +1944,7 @@ function loop() {
   if(Math.random() <= 0.005) {
     const n = new producer();
     n.hp = 5;
-    addToCell(toCell(n.x,n.y), n);
+    addToCell(toKey(n.x,n.y), n);
     agents[n.type].push(n);
   }
   for(const [k,v] of fertilizerMap) {
