@@ -31,12 +31,89 @@
     background:transparent;
     width:360px;
   }
-  
+
+  #brainDiv {
+    position:absolute; 
+    background:hsla(240, 10%, 10%, 0.08);
+    backdrop-filter:blur(3px);
+    border:1px solid rgba(120,220,255,0.3);
+    border-radius:10px;
+    width:800px;
+    min-height:30px;
+    max-height:640px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    display:grid;
+    grid-template-columns: 200px 1fr 200px;
+  }
+  .brainPanel{
+    position:relative; 
+    padding:14px;
+    border-right:1px solid #1d2a36;
+    overflow:auto;
+  }
+  .bar{
+    flex:1;
+    height:8px;
+    background:#1c2a38;
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .fill{
+    height:100%;
+    background:#3ddc97;
+  }
+  #neuroGraph{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:block;
+    inset:0;
+  }
+  #inputGraph{
+    position:absolute;
+    left:10px;
+    top:10px;
+    display:block;
+  }
+  #steeringGraph{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:block;
+    inset:0;
+  }
+  .brainCenter{
+    position:relative;
+    padding:14px;
+  }
+  .header{
+    font-size:13px;
+    margin-bottom:10px;
+    opacity:0.8;
+  }
+  .brainCard{
+    background:hsla(200, 30%, 10%, 0.4);
+    border:1px solid hsla(200, 30%, 40%, 0.4);
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .title{
+    font-size:12px;
+    opacity:0.7;
+    margin-bottom:6px;
+  }
 </style>
 </head>
 <body>
 <canvas id="bgCanvas"></canvas>
-
 <canvas id="plantCanvas"></canvas>
 <canvas id="foodCanvas"></canvas>
 <canvas id="normalCanvas"></canvas>
@@ -47,6 +124,44 @@
   <canvas width="320" height="135" class="infoCanvas" id="normalInfoCanvas"></canvas>
   <canvas width="320" height="135" class="infoCanvas" id="hunterInfoCanvas"></canvas>
 </div>
+<div id="brainDiv">
+  <div class="brainPanel">
+    <div class="header">⚖️ 決策</div>
+    <div class="brainCard" style="position:relative; width:145px; height:145px; background:transparent; border:0px">
+      <canvas id="inputGraph">雷達圖</canvas>
+    </div>
+    <div class="brainCard">
+      <div class="row">
+        <div class="title">🍔</div>
+        <div class="bar"><div class="fill" id="eatBar" style="background:hsla(200,40%,40%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">🧬</div>
+        <div class="bar"><div class="fill" id="cloneBar" style="background:hsla(50,20%,60%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">🥊</div>
+        <div class="bar"><div class="fill" id="fightBar" style="background:hsla(350,40%,50%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">☁️</div>
+        <div class="bar"><div class="fill" id="wanderBar" style="background:hsla(50,5%,60%,0.8);"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="brainCenter">
+    <div class="header">💭 思考</div>
+    <div class="brainCard" style="position:relative">
+      <canvas id="neuroGraph" style="background:red">神經網路圖</canvas>
+    </div>
+  </div>
+  <div class="brainPanel">
+    <div class="header">⚙️ 行動</div>
+    <div class="brainCard" style="position:relative">
+      <canvas id="steeringGraph" style="background:red">方向盤</canvas>
+    </div>
+  </div>
+</div>
 <script>
 /*============================================================
 初始化
@@ -54,6 +169,8 @@
 /*物件定義============================*/
 const infoDiv = document.getElementById("infoDiv");
 infoDiv.style.display = "none";
+const brainDiv = document.getElementById("brainDiv");
+brainDiv.style.display = "none";
 const textInfo = document.getElementById("textInfo");
 const canvas = document.getElementById("canvas");
 const ctx = canvas.getContext("2d");
@@ -65,6 +182,22 @@ const normalCanvas = document.getElementById("normalCanvas");
 const normalCtx = normalCanvas.getContext("2d");
 const bgCanvas = document.getElementById("bgCanvas");
 const bgCtx = bgCanvas.getContext("2d");
+const brainCanvas = [
+  document.getElementById("inputGraph"),
+  document.getElementById("neuroGraph"),
+  document.getElementById("steeringGraph"),
+];
+brainCanvas[0].width = 145;
+brainCanvas[0].height = 145;
+const brainCtx = [
+  document.getElementById("inputGraph").getContext("2d"),
+  document.getElementById("neuroGraph").getContext("2d"),
+  document.getElementById("steeringGraph").getContext("2d"),
+];
+const eatBar = document.getElementById("eatBar");
+const cloneBar = document.getElementById("cloneBar");
+const fightBar = document.getElementById("fightBar");
+const wanderBar = document.getElementById("wanderBar");
 
 const infoCtx = [
   null,
@@ -117,8 +250,15 @@ const eat = 1;
 const clone = 2;
 const fight = 3;
 const wander = 4;
-
 const MAX_POOL = 20;
+
+const color = [
+  {},
+  {h:200, s:40, l:40, a:0.8},
+  {h:40, s:0, l:80, a:0.8},
+  {h:80, s:20, l:60, a:0.8},
+  {h:350, s:40, l:50, a:0.8},
+];
 let generation = 0;
 /*============================================================
 生產者
@@ -184,12 +324,16 @@ class producer {
     const nKey = toKey(n.x,n.y);
     let hasPlant = 0;
     for(const a of getCell(nKey)) {
-      if(a.type === 1) {
+      if(a.type === plant) {
         hasPlant++ ;
         if(hasPlant >=3) break;
       }
     }
-    if(hasPlant < 3 && (n.x>0 && n.y>0 && n.x<canvas.width && n.y<canvas.height)) {
+    if(hasPlant < 3) {
+      if(n.x>w) n.x-=w;
+      if(n.x<0) n.x+=w;
+      if(n.y>h) n.y-=h;
+      if(n.y<0) n.y+=h;
       addToCell(nKey, n);
       agents[n.type].push(n);
     }
@@ -248,9 +392,9 @@ class producer {
       return;
     }
 
-    if(Math.random()<0.5) this.grow();
+    this.grow();
     this.radius = (this.hp**0.3)*0.3;
-    if(this.age > 300 && this.age%200 ===0 && this.hp>500 && Math.random()<0.1) {
+    if(this.age > 300 && this.age%60 ===0 && this.hp>500 && Math.random()<0.2) {
       this.clone();
     }
 
@@ -427,7 +571,6 @@ class normalDian {
     this.face = Math.PI*2*Math.random();
     this.cell = toKey(this.x, this.y);
     this.cellIdx = null;
-    this.cooldown = 600;
     this.fightCooldown = 0;
     this.mode = "";
     this.keep = 0;
@@ -492,7 +635,7 @@ class normalDian {
 /*觀察==============*/
 
   input() {
-//初始化
+//初始化，左後右前
     for(let d=0; d<4; d++) {
       for(let t=0; t<4; t++) {
         const v = this.vision[d][t];
@@ -577,13 +720,16 @@ class normalDian {
     let idx = 0;
     for(let dir=0; dir<4; dir++) {
       for(let type=0; type<4; type++) {
-        if(this.vision[dir][type].minDist !== Infinity) {
+        if(this.vision[dir][type].minDist2 !== Infinity) {
           nodes[idx++].value = 1/(this.vision[dir][type].minDist2+1);
           nodes[idx++].value = this.vision[dir][type].signal;
           nodes[idx++].value = this.vision[dir][type].closestDot;
           nodes[idx++].value = this.vision[dir][type].closestCross;
         } else {
-          idx += 4;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
         }
       }
     }
@@ -636,7 +782,7 @@ class normalDian {
     let idx = 0;
     for(let dir=0; dir<4; dir++) {
       for(let type=0; type<4; type++) {
-        if(this.vision[dir][type].minDist !== Infinity) {
+        if(this.vision[dir][type].minDist2 !== Infinity) {
           nodes[idx++].value = 1/(this.vision[dir][type].minDist2+1);
           nodes[idx++].value = this.vision[dir][type].signal;
           nodes[idx++].value = this.vision[dir][type].closestDot;
@@ -752,7 +898,6 @@ class normalDian {
       this.score.clone -= 0.05;
       return;
     }
-    if(this.cooldown > 0) return;
     const dir = [[0,-1], [0,1], [1,0], [-1,0]];
     const randomDir = dir[Math.floor(Math.random()*4)];
     let dx = randomDir[0]*size/10;
@@ -769,7 +914,6 @@ class normalDian {
     this.x -= dx;
     this.y -= dy;
     this.erg -= 50;
-    this.cooldown = 120;
     this.keep = 0;
     this.score.wander += n.erg*this.wanderCredit;
     this.score.born++;
@@ -904,18 +1048,6 @@ class normalDian {
     ctx.arc(this.x+eye2X, this.y+eye2Y, 1, 0, 2*Math.PI);
     ctx.fill();
 
-//渲染
-    let h;
-    if(this.mode==="clone") return;
-    if(this.mode==="eat") h = 120;
-    if(this.mode==="fight") h = 0;
-    if(this.mode==="wander") h = 300;
-
-
-    ctx.beginPath();
-    ctx.arc(this.x, this.y, 1, 0, 2*Math.PI);
-    ctx.fillStyle = `hsl(${h}, 100%, 50%)`;
-    ctx.fill();
   }
 
 /*時間==============*/
@@ -983,7 +1115,6 @@ class normalDian {
 
 //年齡
     this.age ++;
-    if(this.cooldown>0) this.cooldown --;
     this.wanderCredit *= 1-0.002*this.wanderTime;
     this.draw();
   }
@@ -1359,8 +1490,17 @@ window.addEventListener("keydown", (e) => {
       infoDiv.style.display = "none";
       infoShow = "min";
     }
-    console.log(infoShow);
     showFps = !showFps;
+  }
+
+/*可視化神經======================*/
+  if (e.code === "KeyB") {
+    const display = brainDiv.style.display;
+    if(display === "none") {
+      brainDiv.style.display = "grid";
+    } else if(display === "grid"){
+      brainDiv.style.display = "none";
+    }
   }
 });
 
@@ -1482,11 +1622,11 @@ function recordDeath(dian) {
       } else {
         e.rank = (e.score-min)/total;
       }
-      e.intent.score += e.rank;
+      e.intent.score *= e.rank;
     }
   }
 
-  let intentTotal = 0;
+  let intentTotal = 1;
   for(const e of evolutionPool[intent]) {
     intentTotal += e.score;
   }
@@ -1835,40 +1975,96 @@ function loop() {
 
 
 /*最老草食點點========================*/
-/*
-  normalAgest = agents[3][0];
-  for (const a of agents[3]) {
-    if (a.age > normalAgest.age) normalAgest = a;
+let brainDian;
+for(const a of agents[normal]) {
+  if (!a.dead) {
+    brainDian = a;
   }
-  if(normalAgest) drawBrain(normalAgest.intentBrain);
-  for(let d=0; d<6; d++) {
-    if(!normalAgest) continue;
-    const e = normalAgest.vision[d];
-    if(e.length ===0) continue;
-    let h = 0;
-    if(e[0][0] === 1) h = 120;
-    if(e[0][2] === 1) h = 240;
-    normalCtx.beginPath();
-    const start = Math.PI*(2-3/6-d/3);
-    const end = Math.PI*(2-1/6-d/3);
-    const r = Math.hypot(e[3],e[4]) * normalAgest.maxVision * dbCos30;;
-    normalCtx.arc(normalAgest.x, normalAgest.y, r, start, end);
-    normalCtx.moveTo(normalAgest.x+r*Math.cos(start), normalAgest.y+r*Math.sin(start));
-    normalCtx.lineTo(normalAgest.x, normalAgest.y);
-    normalCtx.lineTo(normalAgest.x+r*Math.cos(end), normalAgest.y+r*Math.sin(end));
-    normalCtx.closePath();
-    normalCtx.fillStyle = `hsla(${h}, 50%, 70%, 0.3)`;
-    normalCtx.fill();
+  if(brainDian) break;
+}
+if(brainDian) {
+  const vision = brainDian.vision;
+  const maxVision = brainDian.maxVision;
+  const face = brainDian.face;
+  const intent = brainDian.currentIntent;
+  const quarH = Math.PI/4;
+  const rightStart = quarH;
+  const backStart = quarH+0.5*Math.PI;
+  const leftStart = quarH+Math.PI;
+  const frontStart = quarH+1.5*Math.PI;
+  const a = brainDian.hp/brainDian.maxHp*0.8+0.2;
+  const r = brainDian.erg/brainDian.maxErg + 2.5;
+  const bCtx = brainCtx[0];
 
-    normalCtx.beginPath();
-    normalCtx.strokeStyle = `hsla(${h}, 70%, 70%, 0.5)`;
-    normalCtx.lineWidth = 1;
-    normalCtx.moveTo(normalAgest.x+r*Math.cos(start), normalAgest.y+r*Math.sin(start));
-    normalCtx.lineTo(normalAgest.x, normalAgest.y);
-    normalCtx.lineTo(normalAgest.x+r*Math.cos(end), normalAgest.y+r*Math.sin(end));
-    normalCtx.stroke();
+  bCtx.clearRect(0,0,180,180);
+  bCtx.beginPath();
+  bCtx.arc(73,73,72, 0, 2*Math.PI);
+  bCtx.strokeStyle = "hsla(240, 20%, 20%, 0.8)";
+  bCtx.lineWidth = 0.5;
+  bCtx.stroke();
+  for(let d=0; d<4; d++) {
+    const dir = vision[d];  //左後右前
+
+    for(let t=0; t<4; t++) {
+      const type = dir[t];
+      if(type.minDist2 === Infinity) continue;
+      const distance = Math.sqrt(type.minDist2)/maxVision;
+      const angle = Math.atan2(type.closestCross, type.closestDot);
+
+      bCtx.beginPath();
+      bCtx.arc(73, 73, 72*distance, face+quarH+(1+d)*Math.PI/2, face+quarH+(2+d)*Math.PI/2);
+      bCtx.lineTo(73,73);
+      bCtx.closePath();
+      const c = color[t+1];
+      bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1,1600*type.signal)})`;
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.moveTo(73, 73);
+      bCtx.lineTo(73+72*distance*Math.cos(angle), 73+72*distance*Math.sin(angle));
+      bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1,1600*type.signal)})`;
+      bCtx.lineWidth = 2;
+      bCtx.stroke();
+    }
   }
-*/
+
+  ctx.beginPath();
+  ctx.arc(brainDian.x, brainDian.y-7, 2, 0, 2*Math.PI);
+  ctx.fillStyle = `hsla(0, 70%, 60%, 1)`;
+  ctx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73,73, r, 0, 2*Math.PI);
+  bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face+quarH),73+r*Math.sin(face+quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face+quarH),73+r*Math.sin(face+quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face-quarH),73+r*Math.sin(face-quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face-quarH),73+r*Math.sin(face-quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  eatBar.style.width = `${intent[0]*100}%`;
+  cloneBar.style.width = `${intent[1]*100}%`;
+  fightBar.style.width = `${intent[2]*100}%`;
+  wanderBar.style.width = `${intent[3]*100}%`;
+}
+
+
 
 //滅絕
   if(agents[normal].length <= 3) {
@@ -1880,7 +2076,7 @@ function loop() {
     if(agents[plant].length <= 10) {
       for(let i=0; i<10; i++) {
         const n = new producer();
-        addToCell(toCell(n.x,n.y), n);
+        addToCell(toKey(n.x,n.y), n);
         agents[n.type].push(n);
       }
       for(let i=0; i<50; i++) {
@@ -1908,7 +2104,7 @@ function loop() {
     if(evolutionPool[intent].length === 0) {
       for(let i=0;i<100;i++){
         const d = new normalDian();
-        addToCell(toCell(d.x,d.y), d);
+        addToCell(toKey(d.x,d.y), d);
         agents[d.type].push(d);
       }
     }
@@ -1932,23 +2128,37 @@ function loop() {
 
     while(agents[plant].length<500) {
       for(const p of agents[plant]) {
-        for(let g=0; g<100; g++) if(Math.random()<0.5) {
-          p.grow();
-          p.age += Math.round(4*Math.random());
+        if(!p.dead) p.update();
+      }
+      for(const [k,v] of fertilizerMap) {
+        let next = v*0.998;
+        if(v>100 && Math.random() <= v/1000) {
+          const n = new producer();
+          n.hp = 5;
+          n.x = (keyToCellX(k) + Math.random())*sizeX;
+          n.y = (keyToCellY(k) + Math.random())*sizeY;
+          addToCell(toKey(n.x,n.y), n);
+          agents[n.type].push(n);
+          next -= 100;
         }
-        if(Math.random()<0.1) p.clone();
+        if(next<1) {fertilizerMap.delete(k); continue;}
+        fertilizerMap.set(k, next);
       }
     }
   }
 
-  if(Math.random() <= 0.005) {
-    const n = new producer();
-    n.hp = 5;
-    addToCell(toKey(n.x,n.y), n);
-    agents[n.type].push(n);
-  }
+
   for(const [k,v] of fertilizerMap) {
-    const next = v*0.998;
+    let next = v*0.998;
+    if(v>100 && Math.random() <= v/1000) {
+      const n = new producer();
+      n.hp = 5;
+      n.x = (keyToCellX(k) + Math.random())*sizeX;
+      n.y = (keyToCellY(k) + Math.random())*sizeY;
+      addToCell(toKey(n.x,n.y), n);
+      agents[n.type].push(n);
+      next -= 100;
+    }
     if(next<1) {fertilizerMap.delete(k); continue;}
     fertilizerMap.set(k, next);
   }
