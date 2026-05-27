@@ -79,10 +79,9 @@
   }
   #steeringGraph{
     position:absolute;
-    width:100%;
-    height:100%;
+    left:10px;
+    top:10px;
     display:block;
-    inset:0;
   }
   .brainCenter{
     position:relative;
@@ -157,8 +156,8 @@
   </div>
   <div class="brainPanel">
     <div class="header">⚙️ 行動</div>
-    <div class="brainCard" style="position:relative">
-      <canvas id="steeringGraph" style="background:red">方向盤</canvas>
+    <div class="brainCard" style="position:relative; width:145px; height:145px; background:transparent; border:0px">
+      <canvas id="steeringGraph">方向盤</canvas>
     </div>
   </div>
 </div>
@@ -187,8 +186,11 @@ const brainCanvas = [
   document.getElementById("neuroGraph"),
   document.getElementById("steeringGraph"),
 ];
+
 brainCanvas[0].width = 145;
 brainCanvas[0].height = 145;
+brainCanvas[2].width = 145;
+brainCanvas[2].height = 145;
 const brainCtx = [
   document.getElementById("inputGraph").getContext("2d"),
   document.getElementById("neuroGraph").getContext("2d"),
@@ -217,17 +219,18 @@ const size = Math.hypot(sizeX,sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
 
 /*格線顯示==========*/
-let grid = true;
+let grid = false;
 /*區塊資料============================*/
 const grids = [];  //grids[key] = agents
 const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
-let w = window.innerWidth;
-let h = window.innerHeight;
+const w = window.innerWidth;
+const h = window.innerHeight;
+const maxDistX = w/2;
+const maxDistY = h/2;
 let maxGridX = 64;
 let maxGridY = 32;
 /*視窗大小============================*/
-resize();
 for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
   c.style.left = "0px";
   c.style.top = "0px";
@@ -235,6 +238,7 @@ for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
   c.width = w;
   c.height = h;
 }
+resize();
 /*生命資料============================*/
 let agents = [[],[],[],[],[],[]];
 const none = 0;
@@ -295,7 +299,7 @@ class producer {
     let biggerPlant = 0;
     const key = this.cell;
     for(const a of getCell(key)) {
-      if(a.hp<this.hp) continue;
+      if(a.hp<=this.hp) continue;
       const dx = a.x-this.x;
       const dy = a.y-this.y;
       const dist2 = dx*dx + dy*dy;
@@ -305,13 +309,17 @@ class producer {
         if(biggerPlant >=3) break;
       }
     }
-    if(this.hp<this.maxHp && biggerPlant<3) this.hp *= 1+Math.random()*0.01;
+    if(this.hp<this.maxHp && biggerPlant<3) {
+      this.hp += Math.random()*5;
+    } else if(biggerPlant>=3){
+      this.hp -= Math.random()*20;
+    }
     const fertilizer = fertilizerMap.get(key);
     if(fertilizer>0) {
       const growth = fertilizer/20;
-      if(Math.random()<fertilizer/1000 && this.age > 300 && this.hp > 500) {
+      if(Math.random()<fertilizer/1000 && this.age > 1000 && this.hp > 1000) {
         this.clone();
-      } else {
+      } else if(this.hp<this.maxHp) {
         this.hp += growth/5;
       }
       fertilizerMap.set(key, fertilizer-growth);
@@ -386,15 +394,15 @@ class producer {
       if(this.hp < 1) this.hp = 0;
     }
 
-    if(this.hp <= 0) {
+    if(this.hp <= 1) {
       removeFromCell(this.cell, this); 
       this.dead = true;
       return;
     }
 
-    this.grow();
+    if(Math.random()<0.47 && this.age<5000) this.grow();
     this.radius = (this.hp**0.3)*0.3;
-    if(this.age > 300 && this.age%60 ===0 && this.hp>500 && Math.random()<0.2) {
+    if(this.age > 1000 && this.age%10 ===0 && this.hp>1000 && Math.random()<0.2) {
       this.clone();
     }
 
@@ -414,7 +422,7 @@ class producer {
 
 //初始植物
 
-for(let i=0; i<10; i++) {
+for(let i=0; i<20; i++) {
   const n = new producer();
   addToCell(toKey(n.x,n.y), n);
   agents[n.type].push(n);
@@ -552,6 +560,16 @@ class normalDian {
     this.hp = 100;
     this.erg = 100;
     this.age = 0;
+
+    this.x = x?? Math.random()*canvas.width;
+    this.y = y?? Math.random()*canvas.height;
+    this.cell = toKey(this.x, this.y);
+    this.cellIdx = null;
+
+    this.face = Math.PI*2*Math.random();
+    this.turnForce = 0;
+    this.frontForce = 0;
+
     this.vision = [];
     for(let d=0; d<4; d++) {
       const arr = [];
@@ -566,28 +584,28 @@ class normalDian {
       }
       this.vision.push(arr);
     }
-    this.x = x?? Math.random()*canvas.width;
-    this.y = y?? Math.random()*canvas.height;
-    this.face = Math.PI*2*Math.random();
-    this.cell = toKey(this.x, this.y);
-    this.cellIdx = null;
-    this.fightCooldown = 0;
+
     this.mode = "";
     this.keep = 0;
     this.currentIntent = [];
+
+    this.fightCooldown = 0;
     this.targetType = 0;
-    this.score = {
-      eat:1,
-      clone:1,
-      fight:1,
-      wander:1,
-      born:0,
-    }
+
     this.wandering = false;
     this.wanderTime = 0;
     this.wanderCredit = 0;
     this.wanderStart = {x:0, y:0};
     this.wanderMove = 0;
+
+    this.score = {
+      eat:0,
+      clone:0,
+      fight:0,
+      wander:0,
+      born:0,
+    }
+
 
 /*基礎數值==========*/
     this.type = 3;
@@ -664,13 +682,17 @@ class normalDian {
 
       for(const a of agentInCell) {
         if(a === this) continue;
-        const dx = a.x-this.x;
-        const dy = a.y-this.y;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w-dx;
+        if(dy > maxDistY) dy = -h+dx;
+        if(dy < -maxDistY) dy = h-dx;
         const dist2 = dx*dx+dy*dy;
         if(dist2 > this.maxVision*this.maxVision) continue;
         const invDist = 1/Math.sqrt(dist2);
 
-        let cross = (fx*dy-fy*dx)*invDist;  //正左負右
+        let cross = (fx*dy-fy*dx)*invDist;  //正右負左
         let dot = (fx*dx+fy*dy)*invDist;    //正前負後
 
         if(cross>0 && Math.abs(dot) <= 0.7071 ) { //0.7071 = 0.5^0.5
@@ -832,6 +854,8 @@ class normalDian {
 //輸出結果
     const turn = nodes[l-2].value;  //轉向
     const move = nodes[l-1].value;  //動力
+    this.turnForce = turn;
+    this.frontForce = move;
     const faceFactor = move<0 ?0.3 :1;
     if(this.mode === "fight") {
       let maxIdx = null;
@@ -1388,6 +1412,14 @@ window.addEventListener('resize', ()=>{
 
 function resize() {
 /*區塊==============*/
+  const nw = window.innerWidth;
+  const nh = window.innerHeight;
+  const left = Math.max(0,(nw-w)/2);
+  const top = Math.max(0,(nh-h)/2);
+  for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+    c.style.left = left+"px";
+    c.style.top = top+"px";
+  }
   if(grid) {
     for(let y=0; y<=maxGridY; y+=1) {
       bgCtx.beginPath();
@@ -1994,16 +2026,20 @@ if(brainDian) {
   const frontStart = quarH+1.5*Math.PI;
   const a = brainDian.hp/brainDian.maxHp*0.8+0.2;
   const r = brainDian.erg/brainDian.maxErg + 2.5;
-  const bCtx = brainCtx[0];
+  const turn = brainDian.turnForce;
+  const front = brainDian.frontForce;
+
+//決策層
+  let bCtx = brainCtx[0];
 
   bCtx.clearRect(0,0,180,180);
   bCtx.beginPath();
   bCtx.arc(73,73,72, 0, 2*Math.PI);
-  bCtx.strokeStyle = "hsla(240, 20%, 20%, 0.8)";
+  bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
   bCtx.lineWidth = 0.5;
   bCtx.stroke();
   for(let d=0; d<4; d++) {
-    const dir = vision[d];  //左後右前
+    const dir = vision[d];  //右後左前
 
     for(let t=0; t<4; t++) {
       const type = dir[t];
@@ -2012,7 +2048,7 @@ if(brainDian) {
       const angle = Math.atan2(type.closestCross, type.closestDot);
 
       bCtx.beginPath();
-      bCtx.arc(73, 73, 72*distance, face+quarH+(1+d)*Math.PI/2, face+quarH+(2+d)*Math.PI/2);
+      bCtx.arc(73, 73, 72*distance, quarH+(d-1)*Math.PI/2, quarH+(d)*Math.PI/2);
       bCtx.lineTo(73,73);
       bCtx.closePath();
       const c = color[t+1];
@@ -2020,10 +2056,8 @@ if(brainDian) {
       bCtx.fill();
 
       bCtx.beginPath();
-      bCtx.moveTo(73, 73);
-      bCtx.lineTo(73+72*distance*Math.cos(angle), 73+72*distance*Math.sin(angle));
-      bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1,1600*type.signal)})`;
-      bCtx.lineWidth = 2;
+      bCtx.arc(73+72*distance*Math.cos(-Math.PI/2+angle), 73+72*distance*Math.sin(-Math.PI/2+angle), 2, 0, 2*Math.PI);
+      bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l+10}%,1)`;
       bCtx.stroke();
     }
   }
@@ -2033,6 +2067,45 @@ if(brainDian) {
   ctx.fillStyle = `hsla(0, 70%, 60%, 1)`;
   ctx.fill();
 
+  bCtx.beginPath();
+  bCtx.arc(73,73, r, 0, 2*Math.PI);
+  bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(quarH-Math.PI/2),73+r*Math.sin(quarH-Math.PI/2), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(quarH-Math.PI/2),73+r*Math.sin(quarH-Math.PI/2), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(Math.PI*1.5-quarH),73+r*Math.sin(Math.PI*1.5-quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(Math.PI*1.5-quarH),73+r*Math.sin(Math.PI*1.5-quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  eatBar.style.width = `${intent[0]*100}%`;
+  cloneBar.style.width = `${intent[1]*100}%`;
+  fightBar.style.width = `${intent[2]*100}%`;
+  wanderBar.style.width = `${intent[3]*100}%`;
+
+//行動層
+  bCtx = brainCtx[2];
+  bCtx.clearRect(0,0,180,180);
+  bCtx.beginPath();
+  bCtx.arc(73,73,72, 0, 2*Math.PI);
+  bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+  bCtx.lineWidth = 0.5;
+  bCtx.stroke();
+ 
   bCtx.beginPath();
   bCtx.arc(73,73, r, 0, 2*Math.PI);
   bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
@@ -2058,10 +2131,34 @@ if(brainDian) {
   bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
   bCtx.fill();
 
-  eatBar.style.width = `${intent[0]*100}%`;
-  cloneBar.style.width = `${intent[1]*100}%`;
-  fightBar.style.width = `${intent[2]*100}%`;
-  wanderBar.style.width = `${intent[3]*100}%`;
+  let px = 73;
+  let py = 73;
+  let ang = face;
+
+  bCtx.beginPath();
+  bCtx.moveTo(px, py);
+
+  for(let i=0; i<36; i++) {
+    const nx = px + Math.cos(ang) * front * 2;
+    const ny = py + Math.sin(ang) * front * 2;
+
+    bCtx.beginPath();
+    bCtx.moveTo(px, py);
+    bCtx.lineTo(nx, ny);
+
+    bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1-i/36})`;
+    bCtx.lineWidth = 1 + i;
+    bCtx.stroke();
+
+    bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1-i/36})`;
+    bCtx.lineWidth = 1 + i/18;
+    bCtx.stroke();
+
+    ang += turn/36;
+    px = nx;
+    py = ny;
+  }	
+
 }
 
 
@@ -2157,7 +2254,7 @@ if(brainDian) {
       n.y = (keyToCellY(k) + Math.random())*sizeY;
       addToCell(toKey(n.x,n.y), n);
       agents[n.type].push(n);
-      next -= 100;
+      next = 100;
     }
     if(next<1) {fertilizerMap.delete(k); continue;}
     fertilizerMap.set(k, next);
