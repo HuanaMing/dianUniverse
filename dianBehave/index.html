@@ -225,10 +225,11 @@ let size = Math.hypot(sizeX,sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
 
 /*格線顯示==========*/
-let grid = true;
+let grid = false;
 
 
 /*區塊資料============================*/
+const rangeCache = [];
 const grids = [];  //grids[key] = agents
 const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
@@ -1433,7 +1434,7 @@ function resize() {
 
   sizeX = w/maxGridX;
   sizeY = h/maxGridY;
-  size = Math.hypot(sizeX,sizeY);
+  size = (sizeX+sizeY)/2;
 
   for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
     c.width = w;
@@ -1465,7 +1466,7 @@ function resize() {
   }
 
 
-
+  rangeCache.length = 0;
   if(grid) {
     bgCtx.clearRect(0,0,w,h);
     for(let y=0; y<=maxGridY; y+=1) {
@@ -1641,18 +1642,18 @@ function toKey(x,y) {
   const cellX = (x / sizeX) | 0;
   const cellY = (y / sizeY) | 0;
 
-  return cellX | (cellY << 6);
+  return cellX | (cellY << 10);
 }
 /*所在區塊==========*/
 function cellToKey(cellX,cellY) {
-  return cellX | (cellY << 6);
+  return cellX | (cellY << 10);
 }
 /*區塊解碼==========*/
 function keyToCellX(key) {
   return key & (maxGridX-1);
 }
 function keyToCellY(key) {
-  return key >> 6;
+  return key >> 10;
 }
 
 /*神經運算============================*/
@@ -1796,7 +1797,7 @@ function pickFromPool(pool) {
 }
 
 /*範圍資料庫=========*/
-const rangeCache = [];
+
 function createNearCache(range) {
   rangeCache[range] = [];
   const cache = rangeCache[range];
@@ -2024,7 +2025,7 @@ function loop() {
 
   ctx.clearRect(0, 0, canvas.width, canvas.height);
   
-
+//信息場
   if(timeStamp%5 === 0) {
     timeStamp = 0;
     for(let t=1; t<5; t++) {
@@ -2049,7 +2050,7 @@ function loop() {
         }
         signalMap[food].clear();
       }
-      if(t===3) {
+      if(t===normal) {
         h= 40;
         normalCtx.clearRect(0, 0, normalCanvas.width, normalCanvas.height);
         for(const [k, v] of type) {
