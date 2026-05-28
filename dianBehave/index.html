@@ -213,33 +213,26 @@ const infoCtx = [
 
 
 /*區塊常數============================*/
-
-const sizeX = window.innerWidth/64;
-const sizeY = window.innerHeight/32;
-const size = Math.hypot(sizeX,sizeY)/2;
+let w = window.innerWidth;
+let h = window.innerHeight;
+let maxDistX = w/2;
+let maxDistY = h/2;
+let maxGridX = 64;
+let maxGridY = 32;
+let sizeX = window.innerWidth/maxGridX;
+let sizeY = window.innerHeight/maxGridY;
+let size = Math.hypot(sizeX,sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
 
 /*格線顯示==========*/
-let grid = false;
+let grid = true;
+
+
 /*區塊資料============================*/
 const grids = [];  //grids[key] = agents
 const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
-const w = window.innerWidth;
-const h = window.innerHeight;
-const maxDistX = w/2;
-const maxDistY = h/2;
-let maxGridX = 64;
-let maxGridY = 32;
-/*視窗大小============================*/
-for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
-  c.style.left = "0px";
-  c.style.top = "0px";
 
-  c.width = w;
-  c.height = h;
-}
-resize();
 /*生命資料============================*/
 let agents = [[],[],[],[],[],[]];
 const none = 0;
@@ -265,6 +258,16 @@ const color = [
   {h:350, s:40, l:50, a:0.8},
 ];
 let generation = 0;
+
+/*視窗大小============================*/
+for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+  c.style.left = "0px";
+  c.style.top = "0px";
+  c.width = w;
+  c.height = h;
+}
+resize();
+
 /*============================================================
 生產者
 ============================================================*/
@@ -1412,16 +1415,59 @@ window.addEventListener('resize', ()=>{
 });
 
 function resize() {
-/*區塊==============*/
-  const nw = window.innerWidth;
-  const nh = window.innerHeight;
-  const left = Math.max(0,(nw-w)/2);
-  const top = Math.max(0,(nh-h)/2);
-  for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
-    c.style.left = left+"px";
-    c.style.top = top+"px";
+
+  w = window.innerWidth;
+  h = window.innerHeight;
+  const cellSize = Math.sqrt(w*h)/64;
+  maxDistX = w/2;
+  maxDistY = h/2;
+
+  maxGridX = 1;
+  while (cellSize*maxGridX*2 <= w) {
+    maxGridX *= 2;
   }
+  maxGridY = 1;
+  while (cellSize*maxGridY*2 <= h) {
+    maxGridY *= 2;
+  }
+
+  sizeX = w/maxGridX;
+  sizeY = h/maxGridY;
+  size = Math.hypot(sizeX,sizeY);
+
+  for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+    c.width = w;
+    c.height = h;
+    c.style.left = "0px";
+    c.style.top = "0px";
+  }
+
+  for(let t=plant; t<=hunter; t++) {
+    for(const a of agents[t]) {
+      if(!a.dead) {
+        a.x = (a.x + w) % w;
+        a.y = (a.y + h) % h;
+        addToCell(toKey(a.x, a.y), a);
+      }
+    }
+  }
+  const nfer = new Map();
+  for(const [k,v] of fertilizerMap) {
+    const cx = keyToCellX(k);
+    const cy = keyToCellY(k);
+    if(cx>=maxGridX || cx<0 || cy>=maxGridY || cy<0) continue;
+    const key = toKey(cx,cy);
+    nfer.set(key, v);
+  }
+  fertilizerMap.clear();
+  for(const [k,v] of nfer) {
+    fertilizerMap.set(k, v);
+  }
+
+
+
   if(grid) {
+    bgCtx.clearRect(0,0,w,h);
     for(let y=0; y<=maxGridY; y+=1) {
       bgCtx.beginPath();
       bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
@@ -1439,6 +1485,7 @@ function resize() {
       bgCtx.stroke();
     }
   }
+
 }
 
 /*存檔============================*/
@@ -1533,6 +1580,31 @@ window.addEventListener("keydown", (e) => {
       brainDiv.style.display = "grid";
     } else if(display === "grid"){
       brainDiv.style.display = "none";
+    }
+  }
+
+/*格線============================*/
+  if (e.code === "KeyG") {
+    grid=!grid;
+    bgCtx.clearRect(0,0,w,h);
+    if(grid) {
+      bgCtx.clearRect(0,0,w,h);
+      for(let y=0; y<=maxGridY; y+=1) {
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+        bgCtx.lineWidth = 2;
+        bgCtx.moveTo(0, y*sizeY);
+        bgCtx.lineTo(w, y*sizeY);
+        bgCtx.stroke();
+      }
+      for(let x=0; x<=maxGridX; x+=1) {
+        bgCtx.beginPath();
+        bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+        bgCtx.lineWidth = 2;
+        bgCtx.moveTo(x*sizeX, 0);
+        bgCtx.lineTo(x*sizeX, h);
+        bgCtx.stroke();
+      }
     }
   }
 });
@@ -1723,11 +1795,12 @@ function pickFromPool(pool) {
   return null;
 }
 
+/*範圍資料庫=========*/
 const rangeCache = [];
 function createNearCache(range) {
   rangeCache[range] = [];
   const cache = rangeCache[range];
-  for(let x=-range; x<=range; x++) {
+  for(let x=Math.max(-maxGridX, -range); x<=Math.max(maxGridX, range); x++) {
     for(let y=-range; y<=range; y++) {
       if(x*x+y*y<range*range) {
         cache.push(x);
