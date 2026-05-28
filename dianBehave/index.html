@@ -1537,6 +1537,9 @@ window.addEventListener("keydown", (e) => {
     }
   }
 });
+window.addEventListener("pointerdown", () => {
+  document.documentElement.requestFullscreen();
+}, { once: true });
 
 /*============================================================
 工具函數
