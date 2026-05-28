@@ -3,13 +3,6 @@
   "name": "dianUniverse",
   "start_url": ".",
   "display": "fullscreen",
-  "icons": [
-    {
-      "src": "/images/icons-vector.svg",
-      "type": "image/svg+xml",
-      "sizes": "512x512"
-    }
-  ],
 
   "background_color": "#3367D6",
   "theme_color": "#3367D6"
