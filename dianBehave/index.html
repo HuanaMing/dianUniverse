@@ -221,7 +221,7 @@ let maxGridX = 64;
 let maxGridY = 32;
 let sizeX = window.innerWidth/maxGridX;
 let sizeY = window.innerHeight/maxGridY;
-let size = Math.hypot(sizeX,sizeY)/2;
+let size = (sizeX+sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
 
 /*格線顯示==========*/
@@ -433,6 +433,7 @@ for(let i=0; i<20; i++) {
   agents[n.type].push(n);
 }
 
+/*
 for(let i=0; i<20; i++) {
   for(const p of agents[plant]) {
     for(let g=0; g<200; g++) if(Math.random()<0.5) {
@@ -451,7 +452,7 @@ for(let i=0; i<20; i++) {
     if(Math.random()<0.1) p.clone();
   }
 }
-
+*/
 
 
 
@@ -2298,7 +2299,7 @@ if(brainDian) {
       agents[d.type].push(d);
     }
 
-    while(agents[plant].length<500) {
+    while(agents[plant].length < w*h/2100) {
       for(const p of agents[plant]) {
         if(!p.dead) p.update();
       }
