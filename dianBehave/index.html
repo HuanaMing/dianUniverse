@@ -12,7 +12,7 @@
   #foodCanvas { position:absolute; background:transparent;}
   #normalCanvas { position:absolute; background:transparent;}
   .infoCanvas { 
-    background:hsla(240, 10%, 30%, 0.2);
+    background:transparent;
     margin:5px;
   }
   #infoDiv {
@@ -27,10 +27,10 @@
     top:50%;
     transform:translate(-50%,-50%);
   }
-  #textDiv {
-    position:absolute; 
+  #textInfo {
+    font-size: 12px;
     background:transparent;
-    width:360px;
+
   }
 
   #brainDiv {
@@ -120,9 +120,9 @@
 <canvas id="canvas"></canvas>
 <div id="infoDiv">
   <div id="textInfo"></div>
-  <canvas width="320" height="135" class="infoCanvas" id="plantInfoCanvas"></canvas>
-  <canvas width="320" height="135" class="infoCanvas" id="normalInfoCanvas"></canvas>
-  <canvas width="320" height="135" class="infoCanvas" id="hunterInfoCanvas"></canvas>
+  <canvas width="320" height="180" class="infoCanvas" id="plantInfoCanvas"></canvas>
+  <canvas width="320" height="180" class="infoCanvas" id="normalInfoCanvas"></canvas>
+  <canvas width="320" height="180" class="infoCanvas" id="hunterInfoCanvas"></canvas>
 </div>
 <div id="brainDiv">
   <div class="brainPanel">
@@ -202,6 +202,13 @@ const cloneBar = document.getElementById("cloneBar");
 const fightBar = document.getElementById("fightBar");
 const wanderBar = document.getElementById("wanderBar");
 
+const infoCanvas = [
+  null,
+  document.getElementById("plantInfoCanvas"),
+  null,
+  document.getElementById("normalInfoCanvas"),
+  document.getElementById("hunterInfoCanvas"),
+];
 const infoCtx = [
   null,
   document.getElementById("plantInfoCanvas").getContext("2d"),
@@ -223,6 +230,7 @@ let sizeX = window.innerWidth/maxGridX;
 let sizeY = window.innerHeight/maxGridY;
 let size = (sizeX+sizeY)/2;
 const dir = [[1,0],[-1,0],[0,1],[0,-1]];
+let infoPadding = 12.5;
 
 /*格線顯示==========*/
 let grid = false;
@@ -233,6 +241,7 @@ const rangeCache = [];
 const grids = [];  //grids[key] = agents
 const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
+const speciesMap = new Map();
 
 /*生命資料============================*/
 let agents = [[],[],[],[],[],[]];
@@ -241,6 +250,7 @@ const plant = 1;
 const food = 2;
 const normal = 3;
 const hunter = 4;
+const biasCon = 10**11;
 
 
 let evolutionPool = [[],[],[],[],[]];
@@ -614,18 +624,28 @@ class normalDian {
 
 
 /*基礎數值==========*/
-    this.type = 3;
+    this.type = normal;
     this.newGen = false;
     this.maxHp = 100;
     this.maxErg = 200;
     this.maxSpeed = 5;
     this.maxAge = 5000;
     this.atk = 5;
-    if(parent && parent.bias) {
-      this.bias = parent.bias+Math.random()*0.2-0.1;
+    if (parent && parent.bias !== undefined) {
+      const scale = 1e10;
+  // 轉成整數基因
+      const gene = Math.floor(parent.bias * scale);
+  // 前7位鎖住（10位 - 3位變異）
+      const head = Math.floor(gene / 1e3);
+  // 後3位突變
+      const tail = Math.floor(Math.random() * 1e3);
+      this.bias = (head * 1e3 + tail) / scale;
     } else {
-      this.bias = Math.random()*2-1;
+      this.bias = Math.floor(Math.random() * 1e10) / 1e10;
     }
+    this.species = Math.floor(this.bias*1e7);
+
+
     this.nextBuffer = new Float32Array(
       this.intentBrain.nodes.length+
       this.eatBrain.nodes.length+
@@ -763,8 +783,8 @@ class normalDian {
     }
     nodes[idx++].value = Math.pow(1-this.erg/this.maxErg, 2);   //之後加ergSensitivity和hpSensitivity
     nodes[idx++].value = Math.pow(1-this.hp/this.maxHp, 2);
-    nodes[idx++].value = Math.cos(this.face);
-    nodes[idx++].value = Math.sin(this.face);
+    nodes[idx++].value = Math.pow(this.age/this.maxAge, 2);
+    nodes[idx++].value = this.bias;
    
 //計算
 
@@ -825,8 +845,8 @@ class normalDian {
     }
     nodes[idx++].value = Math.pow(1-this.erg/this.maxErg, 2);   //之後加ergSensitivity和hpSensitivity
     nodes[idx++].value = Math.pow(1-this.hp/this.maxHp, 2);
-    nodes[idx++].value = Math.cos(this.face);
-    nodes[idx++].value = Math.sin(this.face);
+    nodes[idx++].value = Math.pow(this.age/this.maxAge, 2);
+    nodes[idx++].value = this.bias;
     nodes[idx++].value = intent[0]*2-1;
     nodes[idx++].value = intent[1]*2-1;
     nodes[idx++].value = intent[2]*2-1;
@@ -1078,6 +1098,14 @@ class normalDian {
     ctx.arc(this.x+eye2X, this.y+eye2Y, 1, 0, 2*Math.PI);
     ctx.fill();
 
+    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
+    ctx.beginPath();
+    ctx.fillStyle = speciesColor;
+    ctx.moveTo(this.x-2*(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed), this.y-2*(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed));
+    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/6), this.y-r*Math.sin(this.face+Math.PI/6));
+    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/6), this.y-r*Math.sin(this.face-Math.PI/6));
+    ctx.closePath();
+    ctx.fill();
   }
 
 /*時間==============*/
@@ -1144,6 +1172,7 @@ class normalDian {
     }
 
 //年齡
+    speciesMap.set(this.species,(speciesMap.get(this.species)||0) + 1);
     this.age ++;
     this.wanderCredit *= 1-0.002*this.wanderTime;
     this.draw();
@@ -1466,8 +1495,21 @@ function resize() {
     fertilizerMap.set(k, v);
   }
 
-
   rangeCache.length = 0;
+
+  const mh = h*0.9;
+  infoDiv.style.maxHeight = mh + "px";
+  infoDiv.style.width = mh/16*9 + "px";
+  infoDiv.style.borderRadius = mh/64 + "px";
+  textInfo.style.width = mh/16*9 + "px";
+  textInfo.style.fontSize = mh/640*12 + "px";
+  for(const c of document.getElementsByClassName("infoCanvas")) {
+    c.width = mh/16*8;
+    c.height = mh/16*8/16*9;
+    c.style.margin = mh/128+"px";
+  }
+  infoPadding = mh/16*8*0.05;
+
   if(grid) {
     bgCtx.clearRect(0,0,w,h);
     for(let y=0; y<=maxGridY; y+=1) {
@@ -1492,7 +1534,7 @@ function resize() {
 
 /*存檔============================*/
 window.addEventListener("beforeunload", () => {
-  localStorage.setItem("dian_world_save", JSON.stringify(evolutionPool));;
+  localStorage.setItem("dian_world_save", JSON.stringify(evolutionPool));
 });
 
 /*讀檔============================*/
@@ -1927,7 +1969,7 @@ let showFps = false;
 let infoShow = "min";
 const counts = [[],[],[],[],[]];
 const hourCounts = [[],[],[],[],[]];
-const infoPadding = 12.5;
+
 function loop() {
 
 //資訊卡
@@ -1947,27 +1989,27 @@ function loop() {
     textInfo.innerHTML = "";
     for(const c of infoCtx) {
       if(c===null) continue;
-      c.clearRect(0,0,320,135);
+      c.clearRect(0,0,infoCanvas[plant].width,infoCanvas[plant].height);
     }
 
     textInfo.innerHTML =
       `fps: ${Math.round(fps)}<br>`+
-      `plant: ${agents[plant].length}<br>`+
-      `normal: ${agents[normal].length}<br>`+
-      `hunter: ${agents[hunter].length}<br>`+
+      `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>`+
       `generation: ${generation}`;
 
     for(let t=1; t<=4; t++) {
       if(t===2) continue;
       const iCtx = infoCtx[t];
+      const cw = infoCanvas[t].width;
+      const ch = infoCanvas[t].height;
       iCtx.beginPath();
       iCtx.moveTo(infoPadding, infoPadding-2);
-      iCtx.lineTo(320-infoPadding, infoPadding-2);
-      iCtx.lineTo(320-infoPadding, 135-infoPadding);
-      iCtx.lineTo(infoPadding, 135-infoPadding);
+      iCtx.lineTo(cw-infoPadding, infoPadding-2);
+      iCtx.lineTo(cw-infoPadding, ch-infoPadding);
+      iCtx.lineTo(infoPadding, ch-infoPadding);
       iCtx.closePath();
       iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
-      iCtx.lineWidth = 1;
+      iCtx.lineWidth = cw/320;
       iCtx.stroke();
 
       const minL = counts[t].length;
@@ -2001,9 +2043,9 @@ function loop() {
         if(infoShow === "min") value = counts[t][Math.max(0,minL-60)+i];
         if(infoShow === "hour") value = hourCounts[t][i];
         if(!value) continue;
-        if(i===0) iCtx.moveTo(infoPadding, infoPadding+(135-2*infoPadding)*(max-value)/max);
-        else iCtx.lineTo(infoPadding+i*5, infoPadding+(135-2*infoPadding)*(max-value)/max);
-        lastX = infoPadding+i*5;
+        if(i===0) iCtx.moveTo(infoPadding, infoPadding+(ch-2*infoPadding)*(max-value)/max);
+        else iCtx.lineTo(infoPadding+i*(cw-2*infoPadding-cw/320)/59, infoPadding+(ch-2*infoPadding)*(max-value)/max);
+        lastX = infoPadding+i*(cw-2*infoPadding-cw/320)/59;
       }
 
       if(t===plant) {
@@ -2013,11 +2055,11 @@ function loop() {
         iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
         iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
       }
-      iCtx.lineWidth = 2;
+      iCtx.lineWidth = cw/160;
       iCtx.stroke();
 
-      iCtx.lineTo(lastX, 135-infoPadding);
-      iCtx.lineTo(infoPadding, 135-infoPadding);
+      iCtx.lineTo(lastX, ch-infoPadding);
+      iCtx.lineTo(infoPadding, ch-infoPadding);
       iCtx.closePath();
       iCtx.fill();
     }
@@ -2072,6 +2114,7 @@ function loop() {
     if(type) agents[deadClearFrame] = type.filter(a => !a.dead);
 
   }
+  speciesMap.clear();
 /*agents更新==========================*/
   for(let i=0; i<6; i++) {
     for(const a of agents[i]) {
