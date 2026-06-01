@@ -579,6 +579,7 @@ class normalDian {
     this.hp = 100;
     this.erg = 100;
     this.age = 0;
+    this.wave = 0;
 
     this.x = x?? Math.random()*canvas.width;
     this.y = y?? Math.random()*canvas.height;
@@ -1102,11 +1103,12 @@ class normalDian {
     ctx.fill();
 
     const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
+    const wave = Math.sin(this.wave)*Math.PI/12;
     ctx.beginPath();
     ctx.fillStyle = speciesColor;
-    ctx.moveTo(this.x-2*(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed), this.y-2*(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed));
-    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/6), this.y-r*Math.sin(this.face+Math.PI/6));
-    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/6), this.y-r*Math.sin(this.face-Math.PI/6));
+    ctx.moveTo(this.x-r*Math.cos(this.face) - (1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave), this.y-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave));
+    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/4), this.y-r*Math.sin(this.face+Math.PI/4));
+    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/4), this.y-r*Math.sin(this.face-Math.PI/4));
     ctx.closePath();
     ctx.fill();
   }
@@ -1177,6 +1179,7 @@ class normalDian {
 //年齡
     speciesMap.set(this.species,(speciesMap.get(this.species)||0) + 1);
     this.age ++;
+    this.wave += this.frontForce;
     this.wanderCredit *= 1-0.002*this.wanderTime;
     this.draw();
   }
