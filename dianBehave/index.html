@@ -318,8 +318,12 @@ class producer {
     const key = this.cell;
     for(const a of getCell(key)) {
       if(a.hp<=this.hp) continue;
-      const dx = a.x-this.x;
-      const dy = a.y-this.y;
+      let dx = a.x-this.x;
+      let dy = a.y-this.y;
+      if(dx > maxDistX) dx = -w+dx;
+      if(dx < -maxDistX) dx = w+dx;
+      if(dy > maxDistY) dy = -h+dy;
+      if(dy < -maxDistY) dy = h+dy;
       const dist2 = dx*dx + dy*dy;
       const minDist = this.radius+a.radius;
       if(a.type === 1 && dist2<minDist*minDist) {
@@ -347,6 +351,10 @@ class producer {
 /*繁殖================================*/
   clone() {
     const n = new producer(this);
+    if(n.x>w) n.x-=w;
+    if(n.x<0) n.x+=w;
+    if(n.y>h) n.y-=h;
+    if(n.y<0) n.y+=h;
     const nKey = toKey(n.x,n.y);
     let hasPlant = 0;
     for(const a of getCell(nKey)) {
@@ -356,10 +364,6 @@ class producer {
       }
     }
     if(hasPlant < 3) {
-      if(n.x>w) n.x-=w;
-      if(n.x<0) n.x+=w;
-      if(n.y>h) n.y-=h;
-      if(n.y<0) n.y+=h;
       addToCell(nKey, n);
       agents[n.type].push(n);
     }
@@ -522,8 +526,8 @@ class Food {
     const cy = keyToCellY(thisKey);
     for(let i=0; i<cache.length; i+=2) {
 
-      const dx = cache[i];
-      const dy = cache[i+1];
+      let dx = cache[i];
+      let dy = cache[i+1];
       const dist2 = Math.max( 0.25, dx*dx + dy*dy );
       const nx = (cx+dx+maxGridX) % maxGridX;
       const ny = (cy+dy+maxGridY) % maxGridY;
@@ -715,9 +719,9 @@ class normalDian {
         let dx = a.x-this.x;
         let dy = a.y-this.y;
         if(dx > maxDistX) dx = -w+dx;
-        if(dx < -maxDistX) dx = w-dx;
-        if(dy > maxDistY) dy = -h+dx;
-        if(dy < -maxDistY) dy = h-dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
         const dist2 = dx*dx+dy*dy;
         if(dist2 > this.maxVision*this.maxVision) continue;
         const invDist = 1/Math.sqrt(dist2);
@@ -993,13 +997,19 @@ class normalDian {
         return;
       }
       const bite = 20*(1-dist2/(size*size));
-      const dx = target.x-this.x;
-      const dy = target.y-this.y;
+      let dx = target.x-this.x;
+      let dy = target.y-this.y;
+      if(dx > maxDistX) dx = -w+dx;
+      if(dx < -maxDistX) dx = w+dx;
+      if(dy > maxDistY) dy = -h+dy;
+      if(dy < -maxDistY) dy = h+dy;
       if(target.hp > 10*bite) {
         target.hp -= 10*bite;
         this.erg += bite;
         target.x -= 0.01*dx;
         target.y -= 0.01*dy;
+        target.x = (target.x+w)%w;
+        target.y = (target.y+h)%h;
         const newCell = toKey(target.x, target.y);
         if(newCell !== target.cell) addToCell(newCell,target);
         this.score.eat += bite;
@@ -1035,8 +1045,13 @@ class normalDian {
       this.score.fight--;
       return false;
     }
-    const dx = closest.x-this.x;
-    const dy = closest.y-this.y;
+    let dx = closest.x-this.x;
+    let dy = closest.y-this.y;
+    if(dx > maxDistX) dx = -w+dx;
+    if(dx < -maxDistX) dx = w+dx;
+    if(dy > maxDistY) dy = -h+dy;
+    if(dy < -maxDistY) dy = h+dy;
+
     closest.hp -= this.atk;
     this.erg -= minDist2/this.maxSpeed;
     this.vx = dx*0.8;
@@ -1071,15 +1086,30 @@ class normalDian {
 
 /*渲染==============*/
   draw() {
-    //fillCell(this.cell, "hsla(80, 20%, 60%, 0.2)");
-
-    ctx.beginPath();
     const a = this.hp/this.maxHp*0.8+0.2;
     const r = this.erg/this.maxErg + 2.5;
+
+//尾巴
+    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
+    const wave = Math.sin(this.wave)*Math.PI/12;
+    ctx.beginPath();
+    ctx.fillStyle = speciesColor;
+    ctx.moveTo(
+      this.x-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
+      this.y-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+    );
+    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/4), this.y-r*Math.sin(this.face+Math.PI/4));
+    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/4), this.y-r*Math.sin(this.face-Math.PI/4));
+    ctx.closePath();
+    ctx.fill();
+
+//身體
+    ctx.beginPath();
     ctx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
     ctx.arc(this.x, this.y, r, 0, 2*Math.PI);
     ctx.fill();
 
+//眼睛
     const eye1X = r*Math.cos(this.face-Math.PI/6);
     const eye1Y = r*Math.sin(this.face-Math.PI/6);
     ctx.beginPath();
@@ -1102,15 +1132,7 @@ class normalDian {
     ctx.arc(this.x+eye2X, this.y+eye2Y, 1, 0, 2*Math.PI);
     ctx.fill();
 
-    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
-    const wave = Math.sin(this.wave)*Math.PI/12;
-    ctx.beginPath();
-    ctx.fillStyle = speciesColor;
-    ctx.moveTo(this.x-r*Math.cos(this.face) - (1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave), this.y-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave));
-    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/4), this.y-r*Math.sin(this.face+Math.PI/4));
-    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/4), this.y-r*Math.sin(this.face-Math.PI/4));
-    ctx.closePath();
-    ctx.fill();
+
   }
 
 /*時間==============*/
@@ -1888,8 +1910,8 @@ function pickFromPool(pool) {
 function createNearCache(range) {
   rangeCache[range] = [];
   const cache = rangeCache[range];
-  for(let x=Math.max(-maxGridX, -range); x<=Math.max(maxGridX, range); x++) {
-    for(let y=-range; y<=range; y++) {
+  for(let x=Math.max(-maxGridX/2, -range); x<=Math.min(maxGridX/2, range); x++) {
+    for(let y=Math.max(-maxGridY/2, -range); y<=Math.min(maxGridY/2, range); y++) {
       if(x*x+y*y<range*range) {
         cache.push(x);
         cache.push(y);
@@ -2439,14 +2461,14 @@ if(brainDian) {
 
   for(const [k,v] of fertilizerMap) {
     let next = v*0.998;
-    if(v>100 && Math.random() <= v/1000) {
+    if(v>50 && Math.random() <= v/1000) {
       const n = new producer();
       n.hp = 5;
       n.x = (keyToCellX(k) + Math.random())*sizeX;
       n.y = (keyToCellY(k) + Math.random())*sizeY;
       addToCell(toKey(n.x,n.y), n);
       agents[n.type].push(n);
-      next = 100;
+      next -= 50;
     }
     if(next<1) {fertilizerMap.delete(k); continue;}
     fertilizerMap.set(k, next);
