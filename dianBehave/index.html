@@ -350,23 +350,26 @@ class producer {
 
 /*繁殖================================*/
   clone() {
-    const n = new producer(this);
-    if(n.x>w) n.x-=w;
-    if(n.x<0) n.x+=w;
-    if(n.y>h) n.y-=h;
-    if(n.y<0) n.y+=h;
-    const nKey = toKey(n.x,n.y);
-    let hasPlant = 0;
-    for(const a of getCell(nKey)) {
-      if(a.type === plant) {
-        hasPlant++ ;
-        if(hasPlant >=3) break;
+    setTimeout(()=> {
+      const n = new producer(this);
+      if(n.x>w) n.x-=w;
+      if(n.x<0) n.x+=w;
+      if(n.y>h) n.y-=h;
+      if(n.y<0) n.y+=h;
+      const nKey = toKey(n.x,n.y);
+      let hasPlant = 0;
+
+      for(const a of getCell(nKey)) {
+        if(a.type === plant) {
+          hasPlant++ ;
+          if(hasPlant >=3) break;
+        }
       }
-    }
-    if(hasPlant < 3) {
-      addToCell(nKey, n);
-      agents[n.type].push(n);
-    }
+      if(hasPlant < 3) {
+        addToCell(nKey, n);
+        agents[n.type].push(n);
+      }
+    },600);
   }
 
 /*信號場===============================*/
@@ -434,11 +437,15 @@ class producer {
 
 /*渲染================================*/
   draw() {
-    //fillCell(this.cell, "hsla(200, 30%, 40%, 0.8)");
-    ctx.beginPath();
-    ctx.fillStyle = "hsla(200, 40%, 40%, 0.8)";
-    ctx.arc(this.x, this.y, (this.hp**0.3)*3/10, 0, 2*Math.PI);
-    ctx.fill();
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        ctx.beginPath();
+        ctx.fillStyle = "hsla(200, 40%, 40%, 0.8)";
+        ctx.arc(this.x+ox, this.y+oy, (this.hp**0.3)*3/10, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
+
   }
 }
 
@@ -550,11 +557,14 @@ class Food {
 
 /*渲染================================*/
   draw() {
-    //fillCell(this.cell, "hsla(200, 30%, 5%, 0.8)");
-    ctx.beginPath();
-    ctx.fillStyle = "hsla(40, 0%, 80%, 0.8)";
-    ctx.arc(this.x, this.y, (this.hp**0.3)/5, 0, 2*Math.PI);
-    ctx.fill();
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        ctx.beginPath();
+        ctx.fillStyle = "hsla(40, 0%, 80%, 0.8)";
+        ctx.arc(this.x+ox, this.y+oy, (this.hp**0.3)/5, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
   }
 }
 
@@ -991,12 +1001,12 @@ class normalDian {
         return;
       }
       const dist2 = this.vision[3][plant-1].minDist2;
-      if(dist2 > size*size) {
+      if(dist2 > 25) {
         this.score.eat --;
         this.sick();
         return;
       }
-      const bite = 20*(1-dist2/(size*size));
+      const bite = 20*(1-dist2/25);
       let dx = target.x-this.x;
       let dy = target.y-this.y;
       if(dx > maxDistX) dx = -w+dx;
@@ -1088,51 +1098,55 @@ class normalDian {
   draw() {
     const a = this.hp/this.maxHp*0.8+0.2;
     const r = this.erg/this.maxErg + 2.5;
-
-//尾巴
-    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
-    const wave = Math.sin(this.wave)*Math.PI/12;
-    ctx.beginPath();
-    ctx.fillStyle = speciesColor;
-    ctx.moveTo(
-      this.x-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
-      this.y-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
-    );
-    ctx.lineTo(this.x-r*Math.cos(this.face+Math.PI/4), this.y-r*Math.sin(this.face+Math.PI/4));
-    ctx.lineTo(this.x-r*Math.cos(this.face-Math.PI/4), this.y-r*Math.sin(this.face-Math.PI/4));
-    ctx.closePath();
-    ctx.fill();
-
-//身體
-    ctx.beginPath();
-    ctx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-    ctx.arc(this.x, this.y, r, 0, 2*Math.PI);
-    ctx.fill();
-
-//眼睛
     const eye1X = r*Math.cos(this.face-Math.PI/6);
     const eye1Y = r*Math.sin(this.face-Math.PI/6);
-    ctx.beginPath();
-    ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
-    ctx.arc(this.x+eye1X, this.y+eye1Y, 1.5, 0, 2*Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
-    ctx.arc(this.x+eye1X, this.y+eye1Y, 1, 0, 2*Math.PI);
-    ctx.fill();
-
     const eye2X = r*Math.cos(this.face+Math.PI/6);
     const eye2Y = r*Math.sin(this.face+Math.PI/6);
-    ctx.beginPath();
-    ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
-    ctx.arc(this.x+eye2X, this.y+eye2Y, 1.5, 0, 2*Math.PI);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
-    ctx.arc(this.x+eye2X, this.y+eye2Y, 1, 0, 2*Math.PI);
-    ctx.fill();
+    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
+    const wave = Math.sin(this.wave)*Math.PI/12;
+
+//尾巴
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        ctx.beginPath();
+        ctx.fillStyle = speciesColor;
+        ctx.moveTo(
+          this.x+ox-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
+          this.y+oy-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+        );
+        ctx.lineTo(this.x+ox-r*Math.cos(this.face+Math.PI/4), this.y+oy-r*Math.sin(this.face+Math.PI/4));
+        ctx.lineTo(this.x+ox-r*Math.cos(this.face-Math.PI/4), this.y+oy-r*Math.sin(this.face-Math.PI/4));
+        ctx.closePath();
+        ctx.fill();
+
+//身體
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+        ctx.arc(this.x+ox, this.y+oy, r, 0, 2*Math.PI);
+        ctx.fill();
+
+//眼睛
+
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+        ctx.arc(this.x+ox+eye1X, this.y+oy+eye1Y, 1.5, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+        ctx.arc(this.x+ox+eye1X, this.y+oy+eye1Y, 1, 0, 2*Math.PI);
+        ctx.fill();
 
 
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+        ctx.arc(this.x+ox+eye2X, this.y+oy+eye2Y, 1.5, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+        ctx.arc(this.x+ox+eye2X, this.y+oy+eye2Y, 1, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
   }
 
 /*時間==============*/
@@ -1539,25 +1553,27 @@ function resize() {
   infoPadding = mh/16*8*0.05;
 
   if(grid) {
-    bgCtx.clearRect(0,0,w,h);
-
-    for(let y=0; y<=maxGridY; y+=1) {
-      bgCtx.beginPath();
-      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-      bgCtx.lineWidth = 2;
-      bgCtx.moveTo(0, y*sizeY);
-      bgCtx.lineTo(w, y*sizeY);
-      bgCtx.stroke();
+    bgCtx.clearRect(-w,-h,3*w,3*h);
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        for(let y=0; y<=maxGridY; y+=1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          bgCtx.lineWidth = 2;
+          bgCtx.moveTo(0+ox, y*sizeY+oy);
+          bgCtx.lineTo(w+ox, y*sizeY+oy);
+          bgCtx.stroke();
+        }
+        for(let x=0; x<=maxGridX; x+=1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          bgCtx.lineWidth = 2;
+          bgCtx.moveTo(x*sizeX+ox, 0+oy);
+          bgCtx.lineTo(x*sizeX+ox, h+oy);
+          bgCtx.stroke();
+        }
+      }
     }
-    for(let x=0; x<=maxGridX; x+=1) {
-      bgCtx.beginPath();
-      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-      bgCtx.lineWidth = 2;
-      bgCtx.moveTo(x*sizeX, 0);
-      bgCtx.lineTo(x*sizeX, h);
-      bgCtx.stroke();
-    }
-
   }
 
 }
@@ -1661,24 +1677,28 @@ window.addEventListener("keydown", (e) => {
 /*格線============================*/
   if (e.code === "KeyG") {
     grid=!grid;
-    bgCtx.clearRect(0,0,10*w,10*h);
+    bgCtx.clearRect(-w,-h,3*w,3*h);
     if(grid) {
-      bgCtx.clearRect(0,0,10*w,10*h);
-      for(let y=0; y<=maxGridY; y+=1) {
-        bgCtx.beginPath();
-        bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-        bgCtx.lineWidth = 2;
-        bgCtx.moveTo(0, y*sizeY);
-        bgCtx.lineTo(w, y*sizeY);
-        bgCtx.stroke();
-      }
-      for(let x=0; x<=maxGridX; x+=1) {
-        bgCtx.beginPath();
-        bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-        bgCtx.lineWidth = 2;
-        bgCtx.moveTo(x*sizeX, 0);
-        bgCtx.lineTo(x*sizeX, h);
-        bgCtx.stroke();
+      bgCtx.clearRect(-w,-h,3*w,3*h);
+      for(let ox = -w; ox<=w; ox+=w) {
+        for(let oy = -h; oy<=h; oy+=h) {
+          for(let y=0; y<=maxGridY; y+=1) {
+            bgCtx.beginPath();
+            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+            bgCtx.lineWidth = 2;
+            bgCtx.moveTo(0+ox, y*sizeY+oy);
+            bgCtx.lineTo(w+ox, y*sizeY+oy);
+            bgCtx.stroke();
+          }
+          for(let x=0; x<=maxGridX; x+=1) {
+            bgCtx.beginPath();
+            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+            bgCtx.lineWidth = 2;
+            bgCtx.moveTo(x*sizeX+ox, 0+oy);
+            bgCtx.lineTo(x*sizeX+ox, h+oy);
+            bgCtx.stroke();
+          }
+        }
       }
     }
   }
@@ -1941,7 +1961,11 @@ function fillCell(key, color = "hsla(0, 0%, 100%, 1)", layer = bgCtx) {
   const y = keyToCellY(key)*sizeY;
   const x = keyToCellX(key)*sizeX;
   layer.fillStyle = color;
-  layer.fillRect(x, y, sizeX, sizeY);
+  for(let ox = -w; ox<=w; ox+=w) {
+    for(let oy = -h; oy<=h; oy+=h) {
+      layer.fillRect(x+ox, y+oy, sizeX, sizeY);
+    }
+  }
 }
 
 /*圖示神經網路========================*/
@@ -2132,7 +2156,7 @@ function loop() {
     
   }
 
-  ctx.clearRect(0,0,w,h);
+  ctx.clearRect(-w,-h,3*w,3*h);
   ctx.setTransform(
     zoom, 0,
     0, zoom,
@@ -2147,11 +2171,11 @@ function loop() {
       if(t===4) continue;
       signalFrame[t]++;
       if((t===plant || t===food) && signalFrame[t]%12 !== 0) continue;
-      let h ;
+      let hue ;
       const type = signalMap[t];
       if(t===plant) {
-        h= 200;
-        plantCtx.clearRect(0, 0, plantCanvas.width, plantCanvas.height);
+        hue= 200;
+        plantCtx.clearRect(-w, -h, 3*w, 3*h);
         plantCtx.setTransform(
           zoom, 0,
           0, zoom,
@@ -2159,14 +2183,14 @@ function loop() {
           -camera.y * zoom
         );
         for(const [k, v] of type) {
-          fillCell(k, `hsla(${h}, 10%, 15%, ${v})`, plantCtx);
+          fillCell(k, `hsla(${hue}, 10%, 15%, ${v})`, plantCtx);
         }
         signalMap[plant].clear();
 
       }
       if(t===food)  {
-        h= 300;
-        foodCtx.clearRect(0, 0, foodCanvas.width, foodCanvas.height);
+        hue= 300;
+        foodCtx.clearRect(-w, -h, 3*w, 3*h);
         foodCtx.setTransform(
           zoom, 0,
           0, zoom,
@@ -2174,13 +2198,13 @@ function loop() {
           -camera.y * zoom
         );
         for(const [k, v] of type) {
-          fillCell(k, `hsla(${h}, 10%, 20%, ${v})`, foodCtx);
+          fillCell(k, `hsla(${hue}, 10%, 20%, ${v})`, foodCtx);
         }
         signalMap[food].clear();
       }
       if(t===normal) {
-        h= 40;
-        normalCtx.clearRect(0, 0, normalCanvas.width, normalCanvas.height);
+        hue= 40;
+        normalCtx.clearRect(-w, -h, 3*w, 3*h);
         normalCtx.setTransform(
           zoom, 0,
           0, zoom,
@@ -2188,7 +2212,7 @@ function loop() {
           -camera.y * zoom
         );
         for(const [k, v] of type) {
-          fillCell(k, `hsla(${h}, 20%, 30%, ${v})`, normalCtx);
+          fillCell(k, `hsla(${hue}, 20%, 30%, ${v})`, normalCtx);
         }
         signalMap[t].clear();
       }
@@ -2275,11 +2299,6 @@ if(brainDian) {
       bCtx.stroke();
     }
   }
-
-  ctx.beginPath();
-  ctx.arc(brainDian.x, brainDian.y-7, 2, 0, 2*Math.PI);
-  ctx.fillStyle = `hsla(0, 70%, 60%, 1)`;
-  ctx.fill();
 
   bCtx.beginPath();
   bCtx.arc(73,73, r, 0, 2*Math.PI);
@@ -2462,12 +2481,29 @@ if(brainDian) {
   for(const [k,v] of fertilizerMap) {
     let next = v*0.998;
     if(v>50 && Math.random() <= v/1000) {
-      const n = new producer();
-      n.hp = 5;
-      n.x = (keyToCellX(k) + Math.random())*sizeX;
-      n.y = (keyToCellY(k) + Math.random())*sizeY;
-      addToCell(toKey(n.x,n.y), n);
-      agents[n.type].push(n);
+      setTimeout(()=> {
+        const n = new producer({
+          x: (keyToCellX(k)+Math.random())*sizeX,
+          y: (keyToCellY(k)+Math.random())*sizeY
+        });
+        if(n.x>w) n.x-=w;
+        if(n.x<0) n.x+=w;
+        if(n.y>h) n.y-=h;
+        if(n.y<0) n.y+=h;
+        const nKey = toKey(n.x,n.y);
+        let hasPlant = 0;
+
+        for(const a of getCell(nKey)) {
+          if(a.type === plant) {
+            hasPlant++ ;
+            if(hasPlant >=3) break;
+          }
+        }
+        if(hasPlant < 3) {
+          addToCell(nKey, n);
+          agents[n.type].push(n);
+        }
+      },600);
       next -= 50;
     }
     if(next<1) {fertilizerMap.delete(k); continue;}
