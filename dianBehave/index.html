@@ -394,7 +394,7 @@ class producer {
     },Math.floor(10000*Math.random()));
   }
 
-/*繁殖================================*/
+/*移動================================*/
   move() {
     this.offsetX = 0;
     this.offsetY = 0;
@@ -420,8 +420,8 @@ class producer {
         const dist = Math.hypot(dx,dy);
         const minDist = this.radius + 2.5;
         if(dist<minDist) {
-          this.offsetX -= dx/dist*(dist-minDist)*0.7;
-          this.offsetX -= dy/dist*(dist-minDist)*0.7;
+          this.offsetX -= dx/dist*(minDist-dist)*0.7;
+          this.offsetX -= dy/dist*(minDist-dist)*0.7;
         }
       }
     }
