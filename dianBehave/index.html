@@ -290,13 +290,23 @@ class producer {
   constructor(parent) {
     if(parent) {
       const angle = Math.random() * Math.PI * 2;
-      const dist = Math.sqrt(Math.random()) * size;
+      const r = Math.random();
+      let dist = 0;
+      if(r<0.001) {
+        dist = 5*Math.random()*size;
+      } else if(r<0.01) {
+        dist = 2*Math.random()*size;
+      } else {
+        dist = Math.random()*size;
+      }
       this.x = parent.x + Math.cos(angle) * dist;
       this.y = parent.y + Math.sin(angle) * dist;
     } else {
-      this.x = Math.random()*canvas.width;
-      this.y = Math.random()*canvas.height;
+      this.x = Math.random()*w;
+      this.y = Math.random()*h;
     }
+    this.offsetX = 0;
+    this.offsetY = 0;
     this.cell = null;
     this.cellIdx = null;
     this.age = 0;
@@ -304,10 +314,10 @@ class producer {
     this.vy = 0;
     this.dead = false;
 
-    this.type = 1;
+    this.type = plant;
     this.erg = 0;
     this.hp = parent ?5 :500;
-    this.radius = (this.hp**0.3)*3/10;
+    this.radius = (this.hp**0.3);
     this.maxHp = 10000;
     this.maxVision = 50;
   }
@@ -315,61 +325,106 @@ class producer {
 /*生長================================*/
   grow() {
     let biggerPlant = 0;
-    const key = this.cell;
-    for(const a of getCell(key)) {
-      if(a.hp<=this.hp) continue;
-      let dx = a.x-this.x;
-      let dy = a.y-this.y;
-      if(dx > maxDistX) dx = -w+dx;
-      if(dx < -maxDistX) dx = w+dx;
-      if(dy > maxDistY) dy = -h+dy;
-      if(dy < -maxDistY) dy = h+dy;
-      const dist2 = dx*dx + dy*dy;
-      const minDist = this.radius+a.radius;
-      if(a.type === 1 && dist2<minDist*minDist) {
-        biggerPlant++ ;
-        if(biggerPlant >=3) break;
+    const range = 2;
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const cache = rangeCache[range] || createNearCache(range);
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      for(const a of getCell(key)) {
+        if(a.type !== plant) continue;
+        if(a.hp<=this.hp) continue;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
+        const dist2 = dx*dx + dy*dy;
+        const minDist = this.radius + a.radius;
+        if(dist2<minDist*minDist) {
+          biggerPlant++ ;
+          if(biggerPlant >=3) break;
+        }
+        if(dist2<minDist*minDist/4) {
+          biggerPlant+=2 ;
+          if(biggerPlant >=3) break;
+        }
+        if(dist2<minDist*minDist/16) {
+          biggerPlant+=3 ;
+          if(biggerPlant >=3) break;
+        }
       }
     }
     if(this.hp<this.maxHp && biggerPlant<3) {
-      this.hp += Math.random()*5;
+      this.hp += Math.random()*2;
     } else if(biggerPlant>=3){
-      this.hp -= Math.random()*20;
+      this.hp = Math.max(0, this.hp-Math.random()*2);
+      return;
     }
-    const fertilizer = fertilizerMap.get(key);
+    const fertilizer = fertilizerMap.get(thisKey);
     if(fertilizer>0) {
-      const growth = fertilizer/20;
-      if(Math.random()<fertilizer/1000 && this.age > 1000 && this.hp > 1000) {
+      let growth = fertilizer/20;
+      if(fertilizer>100 && Math.random()<fertilizer/1000 && this.age > 1000 && this.hp > 1000) {
         this.clone();
+        growth = 50;
       } else if(this.hp<this.maxHp) {
         this.hp += growth/5;
       }
-      fertilizerMap.set(key, fertilizer-growth);
+      fertilizerMap.set(thisKey, fertilizer-growth);
     }
   }
 
 /*繁殖================================*/
   clone() {
     setTimeout(()=> {
-      const n = new producer(this);
+      const n = new producer({x:this.x, y:this.y});
       if(n.x>w) n.x-=w;
       if(n.x<0) n.x+=w;
       if(n.y>h) n.y-=h;
       if(n.y<0) n.y+=h;
       const nKey = toKey(n.x,n.y);
-      let hasPlant = 0;
+      addToCell(nKey, n);
+      agents[n.type].push(n);
+    },Math.floor(10000*Math.random()));
+  }
 
-      for(const a of getCell(nKey)) {
-        if(a.type === plant) {
-          hasPlant++ ;
-          if(hasPlant >=3) break;
+/*繁殖================================*/
+  move() {
+    this.offsetX = 0;
+    this.offsetY = 0;
+    const range = 2;
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const cache = rangeCache[range] || createNearCache(range);
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      for(const a of getCell(key)) {
+        if(a.type !== normal && a.type !== hunter) continue;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
+        const dist = Math.hypot(dx,dy);
+        const minDist = this.radius + 2.5;
+        if(dist<minDist) {
+          this.offsetX -= dx/dist*(dist-minDist)*0.7;
+          this.offsetX -= dy/dist*(dist-minDist)*0.7;
         }
       }
-      if(hasPlant < 3) {
-        addToCell(nKey, n);
-        agents[n.type].push(n);
-      }
-    },600);
+    }
   }
 
 /*信號場===============================*/
@@ -413,25 +468,28 @@ class producer {
         const nx = (cx+dx+maxGridX) % maxGridX;
         const ny = (cy+dy+maxGridY) % maxGridY;
         const key = cellToKey(nx, ny);
-        fertilizerMap.set(key, (fertilizerMap.get(key)||0) + value);
+        fertilizerMap.set(key, (fertilizerMap.get(key)||1) + value);
       }
       this.hp *= 0.98;
-      if(this.hp < 1) this.hp = 0;
     }
 
-    if(this.hp <= 1) {
+    if(Math.random()<0.47 && this.age<5000) this.grow();
+
+    if(this.hp <= 1 && !this.dead) {
       removeFromCell(this.cell, this); 
       this.dead = true;
       return;
     }
 
-    if(Math.random()<0.47 && this.age<5000) this.grow();
-    this.radius = (this.hp**0.3)*0.3;
-    if(this.age > 1000 && this.age%10 ===0 && this.hp>1000 && Math.random()<0.2) {
+    if(this.age > 1000 && this.age%600 ===0 && this.hp>1000) {
       this.clone();
     }
 
+
+
+    this.radius = (this.hp**0.3)*0.7;
     this.age ++;
+    this.move();
     this.draw();
   }
 
@@ -441,44 +499,13 @@ class producer {
       for(let oy = -h; oy<=h; oy+=h) {
         ctx.beginPath();
         ctx.fillStyle = "hsla(200, 40%, 40%, 0.8)";
-        ctx.arc(this.x+ox, this.y+oy, (this.hp**0.3)*3/10, 0, 2*Math.PI);
+        ctx.arc(this.x+this.offsetX+ox, this.y+this.offsetY+oy, this.radius, 0, 2*Math.PI);
         ctx.fill();
       }
     }
 
   }
 }
-
-//初始植物
-
-for(let i=0; i<20; i++) {
-  const n = new producer();
-  addToCell(toKey(n.x,n.y), n);
-  agents[n.type].push(n);
-}
-
-/*
-for(let i=0; i<20; i++) {
-  for(const p of agents[plant]) {
-    for(let g=0; g<200; g++) if(Math.random()<0.5) {
-      p.grow();
-      p.age += Math.round(4*Math.random());
-    }
-    if(Math.random()<0.1) p.clone();
-  }
-}
-for(let i=0; i<20; i++) {
-  for(const p of agents[plant]) {
-    for(let g=0; g<200; g++) if(Math.random()<0.5) {
-      p.grow();
-      p.age += Math.round(4*Math.random());
-    }
-    if(Math.random()<0.1) p.clone();
-  }
-}
-*/
-
-
 
 /*============================================================
 食物
@@ -591,7 +618,7 @@ class normalDian {
 
 /*狀態數值==========*/
     this.hp = 100;
-    this.erg = 100;
+    this.erg = 50;
     this.age = 0;
     this.wave = 0;
 
@@ -622,6 +649,8 @@ class normalDian {
     this.mode = "";
     this.keep = 0;
     this.currentIntent = [];
+
+    this.pregnent = -1;
 
     this.fightCooldown = 0;
     this.targetType = 0;
@@ -726,6 +755,7 @@ class normalDian {
 
       for(const a of agentInCell) {
         if(a === this) continue;
+        if((a.hp<=20 || a.dead) && a.type === plant) continue;
         let dx = a.x-this.x;
         let dy = a.y-this.y;
         if(dx > maxDistX) dx = -w+dx;
@@ -932,7 +962,7 @@ class normalDian {
     if(nx<0) this.x+=w;
     if(ny>h) this.y-=h;
     if(ny<0) this.y+=h;
-    this.erg -= 0.25*Math.hypot(this.vx, this.vy)/this.maxSpeed + 0.25;
+    this.erg -= 0.2*Math.abs(this.frontForce) + 0.2*Math.abs(this.turnForce) + 0.1;
     if(this.erg < 0) {
       this.hp += this.erg;
       this.erg =0;
@@ -961,52 +991,63 @@ class normalDian {
 
 /*繁殖==============*/
   clone() {
+    if(this.pregnent === 0) {
+      this.pregnent = -1;
+      const dir = [[0,-1], [0,1], [1,0], [-1,0]];
+      const randomDir = dir[Math.floor(Math.random()*4)];
+      let dx = randomDir[0]*size/10;
+      let dy = randomDir[1]*size/10;
+      let n;
+      if(Math.random()<0.05) {
+        n = new normalDian(null, this.x+dx, this.y+dy);
+      } else {
+        n = new normalDian(this, this.x+dx, this.y+dy);
+      }
+
+      addToCell(toKey(n.x,n.y), n);
+      agents[n.type].push(n);
+      this.x -= dx;
+      this.y -= dy;
+      this.score.wander += n.erg*this.wanderCredit;
+      this.score.born++;
+      this.score.clone += n.erg;
+    }
+    if(this.pregnent>0) {this.pregnent--; return;}
+
     if(this.mode !== "clone") return;
     if(this.erg*2 < this.maxErg) {
       this.score.clone -= 0.05;
       return;
     }
-    const dir = [[0,-1], [0,1], [1,0], [-1,0]];
-    const randomDir = dir[Math.floor(Math.random()*4)];
-    let dx = randomDir[0]*size/10;
-    let dy = randomDir[1]*size/10;
-    let n;
-    if(Math.random()<0.05) {
-      n = new normalDian(null, this.x+dx, this.y+dy);
-    } else {
-      n = new normalDian(this, this.x+dx, this.y+dy);
+
+    if(this.pregnent === -1) {
+      this.pregnent = 300;
+      this.erg -= 50;
+      this.keep = 0;
     }
 
-    addToCell(toKey(n.x,n.y), n);
-    agents[n.type].push(n);
-    this.x -= dx;
-    this.y -= dy;
-    this.erg -= 50;
-    this.keep = 0;
-    this.score.wander += n.erg*this.wanderCredit;
-    this.score.born++;
-    this.score.clone += n.erg;
 
   }
 
 /*進食==============*/
   food() {
-
     if(this.erg >= this.maxErg || this.mode !== "eat") return;
       this.erg -= 1/20;
-      const target = this.vision[3][plant-1].closest;
+      let target = this.vision[3][plant-1].closest;
+
       if(!target) {
         this.score.eat --;
         this.sick();
         return;
       }
+
       const dist2 = this.vision[3][plant-1].minDist2;
       if(dist2 > 25) {
         this.score.eat --;
         this.sick();
         return;
       }
-      const bite = 20*(1-dist2/25);
+      const bite = 10*(1-dist2/25);
       let dx = target.x-this.x;
       let dy = target.y-this.y;
       if(dx > maxDistX) dx = -w+dx;
@@ -1022,12 +1063,12 @@ class normalDian {
         target.y = (target.y+h)%h;
         const newCell = toKey(target.x, target.y);
         if(newCell !== target.cell) addToCell(newCell,target);
-        this.score.eat += bite;
+        this.score.erg += bite;
         this.score.wander += bite*this.wanderCredit;
       } else {
         this.erg += target.hp/10;
         this.score.eat += target.hp/10;
-        this.score.wander += target.hp/10*this.wanderCredit;
+        this.score.wander += target.hp/10*this.wanderCredit
         target.hp = 0;
       }
 
@@ -1038,7 +1079,6 @@ class normalDian {
 
 /*攻擊==============*/
   fight() {
-
 
     if(this.fightCooldown > 0) this.fightCooldown--;
     if(this.fightCooldown > 0 || this.mode !== "fight") return false;
@@ -1097,7 +1137,8 @@ class normalDian {
 /*渲染==============*/
   draw() {
     const a = this.hp/this.maxHp*0.8+0.2;
-    const r = this.erg/this.maxErg + 2.5;
+    let r = this.erg/this.maxErg + 2.5;
+    if(this.pregnent>0) r += 2.5*(1-this.pregnent/300);
     const eye1X = r*Math.cos(this.face-Math.PI/6);
     const eye1Y = r*Math.sin(this.face-Math.PI/6);
     const eye2X = r*Math.cos(this.face+Math.PI/6);
@@ -1151,7 +1192,7 @@ class normalDian {
 
 /*時間==============*/
   update() {
-    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg;
+    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/300);
 //觀察
     if(this.age%5 === 0) {
       this.input();
@@ -1181,13 +1222,13 @@ class normalDian {
       this.signal();
     }
 
+
+
 //恢復
     this.cure();
 
-
-
 //繁殖
-    if(this.erg >= this.maxErg) this.clone();
+    this.clone();
 
 //進食
     this.food();
@@ -1628,26 +1669,6 @@ window.addEventListener("keydown", (e) => {
     evolutionPool = [[],[],[],[],[]];
     generation = 0;
     localStorage.removeItem("dian_world_save");
-    for(let i=0; i<10; i++) {
-      const n = new producer();
-      addToCell(toKey(n.x,n.y), n);
-      agents[n.type].push(n);
-    }
-
-    for(let i=0; i<100; i++) {
-      for(const p of agents[plant]) {
-        for(let g=0; g<100; g++) if(Math.random()<0.5) {
-          p.grow();
-          p.age += Math.round(4*Math.random());
-        }
-        if(Math.random()<0.1) p.clone();
-      }
-    }
-    for(let i=0;i<100;i++){
-      const d = new normalDian();
-      addToCell(toKey(d.x,d.y), d);
-      agents[d.type].push(d);
-    }
   }
 /*幀率============================*/
   if (e.code === "KeyF") {
@@ -2231,7 +2252,7 @@ function loop() {
   }
   speciesMap.clear();
 /*agents更新==========================*/
-  for(let i=0; i<6; i++) {
+  for(let i=5; i>0; i--) {
     for(const a of agents[i]) {
       if(a.dead) continue;
       a.update();
@@ -2403,22 +2424,7 @@ if(brainDian) {
 // 沒進化資料 → fallback
 
 
-    if(agents[plant].length <= 10) {
-      for(let i=0; i<10; i++) {
-        const n = new producer();
-        addToCell(toKey(n.x,n.y), n);
-        agents[n.type].push(n);
-      }
-      for(let i=0; i<50; i++) {
-        for(const p of agents[plant]) {
-          for(let g=0; g<100; g++) if(Math.random()<0.5) {
-            p.grow();
-            p.age += Math.round(4*Math.random());
-          }
-          if(Math.random()<0.1) p.clone();
-        }
-      }
-    }
+
     const survive = [];
     for(const a of agents[normal]) survive.push(a);
     if(survive.length >0) {
@@ -2456,7 +2462,15 @@ if(brainDian) {
       agents[d.type].push(d);
     }
 
+    if(agents[plant].length < 1) {
+      for(let i=0; i<20; i++) {
+        const n = new producer();
+        addToCell(toKey(n.x,n.y), n);
+        agents[n.type].push(n);
+      }
+    }
     while(agents[plant].length < w*h/2100) {
+
       for(const p of agents[plant]) {
         if(!p.dead) p.update();
       }
@@ -2491,19 +2505,9 @@ if(brainDian) {
         if(n.y>h) n.y-=h;
         if(n.y<0) n.y+=h;
         const nKey = toKey(n.x,n.y);
-        let hasPlant = 0;
-
-        for(const a of getCell(nKey)) {
-          if(a.type === plant) {
-            hasPlant++ ;
-            if(hasPlant >=3) break;
-          }
-        }
-        if(hasPlant < 3) {
-          addToCell(nKey, n);
-          agents[n.type].push(n);
-        }
-      },600);
+        addToCell(nKey, n);
+        agents[n.type].push(n);
+      },10000);
       next -= 50;
     }
     if(next<1) {fertilizerMap.delete(k); continue;}
