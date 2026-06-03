@@ -354,7 +354,7 @@ class producer {
         }
       }
     }
-    this.hp += Math.random()*2*(1-2*shadowed/this.radius);
+    this.hp += Math.random()*5*(1-2*shadowed/this.radius);
 
     const fertilizer = fertilizerMap.get(thisKey);
     if(fertilizer>0) {
@@ -963,10 +963,12 @@ class normalDian {
 /*恢復==============*/
   cure() {
     if(this.erg>this.maxErg) {
+/*
       this.hp += (this.erg-this.maxErg)/10;
       this.erg = this.maxErg;
       return;
     }
+*/
   }
 
 /*生病==============*/
