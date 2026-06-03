@@ -2461,8 +2461,9 @@ if(brainDian) {
         agents[n.type].push(n);
       }
     }
-    while(agents[plant].length < w*h/2100) {
-
+    let times=0;
+    while(agents[plant].length < w*h/2100 || times>10000) {
+      times++;
       for(const p of agents[plant]) {
         if(!p.dead) p.update();
       }
