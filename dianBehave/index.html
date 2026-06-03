@@ -951,7 +951,7 @@ class normalDian {
     if(nx<0) this.x+=w;
     if(ny>h) this.y-=h;
     if(ny<0) this.y+=h;
-    this.erg -= 0.2*Math.abs(this.frontForce) + 0.2*Math.abs(this.turnForce) + 0.1;
+    this.erg -= 0.04*Math.abs(this.frontForce) + 0.04*Math.abs(this.turnForce) + 0.02;
     if(this.erg < 0) {
       this.hp += this.erg;
       this.erg =0;
