@@ -242,7 +242,6 @@ let grid = false;
 /*區塊資料============================*/
 const rangeCache = [];
 const grids = [];  //grids[key] = agents
-const signalMap = [ new Map(), new Map(), new Map(), new Map(), new Map() ];
 let fertilizerMap = new Map();
 const speciesMap = new Map();
 
@@ -416,32 +415,9 @@ class producer {
     }
   }
 
-/*信號場===============================*/
-  signal() {
-    const range = Math.ceil(this.maxVision/size);
-    const thisKey = this.cell;
-    const cx = keyToCellX(thisKey);
-    const cy = keyToCellY(thisKey);
-    const cache = rangeCache[range] || createNearCache(range);
-    for(let i=0; i<cache.length; i+=2) {
-      const dx = cache[i];
-      const dy = cache[i+1];
-      const dist2 = Math.max( 0.25, dx*dx + dy*dy );
-      const nx = (cx+dx+maxGridX) % maxGridX;
-      const ny = (cy+dy+maxGridY) % maxGridY;
-      const key = cellToKey(nx, ny);
-
-      signalMap[plant].set(
-        key,
-        (signalMap[plant].get(key)||0) + 10/dist2/size/size
-      );
-    }
-  }
-
 /*時間================================*/
   update() {
 
-    if(this.age % 60 === 0) this.signal();
     if(this.age >= 5000) {
       const range = Math.ceil((this.age-5000)/120);
       const cache = rangeCache[range] || createNearCache(range);
@@ -540,31 +516,8 @@ class Food {
     if(this.hp <= 1) this.hp=0;
   }
 
-/*信號場===============================*/
-  signal() {
-    const range = Math.ceil(this.maxVision/size);
-    const cache = rangeCache[range] || createNearCache(range);
-    const thisKey = this.cell;
-    const cx = keyToCellX(thisKey);
-    const cy = keyToCellY(thisKey);
-    for(let i=0; i<cache.length; i+=2) {
-
-      let dx = cache[i];
-      let dy = cache[i+1];
-      const dist2 = Math.max( 0.25, dx*dx + dy*dy );
-      const nx = (cx+dx+maxGridX) % maxGridX;
-      const ny = (cy+dy+maxGridY) % maxGridY;
-      const key = cellToKey(nx, ny);
-      signalMap[food].set(
-        key,
-        (signalMap[food].get(key)||0) + 20/dist2/size/size
-      );
-    }
-  }
-
 /*時間================================*/
   update() {
-    if(this.age % 60 === 0) this.signal();
     if(this.hp <= 0) {removeFromCell(this.cell, this); this.dead = true; return;}
     if(this.age > 100 && Math.random()<0.5) this.grow();
     this.age ++;
@@ -694,24 +647,7 @@ class normalDian {
     this.maxTurnSpeed = Math.PI/5;
 
   }
-/*信號場============*/
-  signal() {
-    const range = Math.ceil(this.maxVision/size);
-    const cache = rangeCache[range] || createNearCache(range);
-    const thisKey = this.cell;
-    const cx = keyToCellX(thisKey);
-    const cy = keyToCellY(thisKey);
 
-    for(let i=0; i<cache.length; i+=2) {
-      const dx = cache[i];
-      const dy = cache[i+1];
-      const dist2 = Math.max( 0.25, dx*dx + dy*dy );
-      const nx = (cx+dx+maxGridX) % maxGridX;
-      const ny = (cy+dy+maxGridY) % maxGridY;
-      const key = cellToKey(nx, ny);
-      signalMap[normal].set(key, (signalMap[normal].get(key) || 0) + 20/dist2/size/size);
-    }
-  }
 /*觀察==============*/
 
   input() {
@@ -1221,7 +1157,6 @@ class normalDian {
       else if(this.mode === "fight") this.steering(this.fightBrain,this.currentIntent);
       else if(this.mode === "wander") this.steering(this.wanderBrain,this.currentIntent);
       this.keep -= Math.random(); //計畫Math.random()*keepness基因化
-      this.signal();
     }
 
 
@@ -1666,7 +1601,6 @@ window.addEventListener("keydown", (e) => {
   if (e.ctrlKey && e.shiftKey && e.code === "KeyZ") {
     grids.length = 0;
     fertilizerMap.clear();
-    signalMap.forEach(m => m.clear());
     for(const t of agents) t.length = 0;
     evolutionPool = [[],[],[],[],[]];
     generation = 0;
@@ -2073,7 +2007,6 @@ let normalAgest;
 運行
 ============================================================*/
 let timeStamp = 0;
-const signalFrame = [0, 0, 0, 0, 0];
 let deadClearFrame = 0;
 let fps = 0;
 let lastTime = performance.now();
@@ -2186,62 +2119,6 @@ function loop() {
     -camera.x * zoom,
     -camera.y * zoom
   );
-
-//信息場
-  if(timeStamp%5 === 0) {
-    timeStamp = 0;
-    for(let t=1; t<5; t++) {
-      if(t===4) continue;
-      signalFrame[t]++;
-      if((t===plant || t===food) && signalFrame[t]%12 !== 0) continue;
-      let hue ;
-      const type = signalMap[t];
-      if(t===plant) {
-        hue= 200;
-        plantCtx.clearRect(-w, -h, 3*w, 3*h);
-        plantCtx.setTransform(
-          zoom, 0,
-          0, zoom,
-          -camera.x * zoom,
-          -camera.y * zoom
-        );
-        for(const [k, v] of type) {
-          fillCell(k, `hsla(${hue}, 10%, 15%, ${v})`, plantCtx);
-        }
-        signalMap[plant].clear();
-
-      }
-      if(t===food)  {
-        hue= 300;
-        foodCtx.clearRect(-w, -h, 3*w, 3*h);
-        foodCtx.setTransform(
-          zoom, 0,
-          0, zoom,
-          -camera.x * zoom,
-          -camera.y * zoom
-        );
-        for(const [k, v] of type) {
-          fillCell(k, `hsla(${hue}, 10%, 20%, ${v})`, foodCtx);
-        }
-        signalMap[food].clear();
-      }
-      if(t===normal) {
-        hue= 40;
-        normalCtx.clearRect(-w, -h, 3*w, 3*h);
-        normalCtx.setTransform(
-          zoom, 0,
-          0, zoom,
-          -camera.x * zoom,
-          -camera.y * zoom
-        );
-        for(const [k, v] of type) {
-          fillCell(k, `hsla(${hue}, 20%, 30%, ${v})`, normalCtx);
-        }
-        signalMap[t].clear();
-      }
-
-    }
-  }
 
 
 /*清理agents==========================*/
