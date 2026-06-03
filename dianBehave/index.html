@@ -1012,7 +1012,7 @@ class normalDian {
     }
 
     if(this.pregnent === -1) {
-      this.pregnent = 600;
+      this.pregnent = 2000;
       this.erg -= 50;
       this.keep = 0;
     }
@@ -1130,7 +1130,7 @@ class normalDian {
   draw() {
     const a = this.hp/this.maxHp*0.8+0.2;
     let r = this.erg/this.maxErg + 2.5;
-    if(this.pregnent>0) r += 2.5*(1-this.pregnent/600);
+    if(this.pregnent>0) r += 2.5*(1-this.pregnent/2000);
     const eye1X = r*Math.cos(this.face-Math.PI/6);
     const eye1Y = r*Math.sin(this.face-Math.PI/6);
     const eye2X = r*Math.cos(this.face+Math.PI/6);
@@ -1184,7 +1184,7 @@ class normalDian {
 
 /*時間==============*/
   update() {
-    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/600);
+    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/2000);
 //觀察
     if(this.age%5 === 0) {
       this.input();
