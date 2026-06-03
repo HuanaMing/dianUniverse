@@ -964,7 +964,7 @@ class normalDian {
   cure() {
     if(this.erg>this.maxErg) {
       this.hp += (this.erg-this.maxErg)/10;
-      this.erg = (this.maxErg+this.erg)/2;
+      this.erg = this.maxErg;
       return;
     }
   }
@@ -1010,7 +1010,7 @@ class normalDian {
     }
 
     if(this.pregnent === -1) {
-      this.pregnent = 300;
+      this.pregnent = 600;
       this.erg -= 50;
       this.keep = 0;
     }
@@ -1020,50 +1020,51 @@ class normalDian {
 
 /*進食==============*/
   food() {
-    if(this.erg >= this.maxErg || this.mode !== "eat") return;
-      this.erg -= 1/20;
-      let target = this.vision[3][plant-1].closest;
+    if(this.mode !== "eat") return;
+    if(this.erg >= this.maxErg) {
+      this.keep = 0;
+      return;
+    }
+    this.erg -= 1/20;
+    let target = this.vision[3][plant-1].closest;
 
-      if(!target) {
-        this.score.eat --;
-        this.sick();
-        return;
-      }
+    if(!target) {
+      this.score.eat --;
+      this.sick();
+      return;
+    }
 
-      const dist2 = this.vision[3][plant-1].minDist2;
-      if(dist2 > 25) {
-        this.score.eat --;
-        this.sick();
-        return;
-      }
-      const bite = 10*(1-dist2/25);
-      let dx = target.x-this.x;
-      let dy = target.y-this.y;
-      if(dx > maxDistX) dx = -w+dx;
-      if(dx < -maxDistX) dx = w+dx;
-      if(dy > maxDistY) dy = -h+dy;
-      if(dy < -maxDistY) dy = h+dy;
-      if(target.hp > 10*bite) {
-        target.hp -= 10*bite;
-        this.erg += bite;
-        target.x -= 0.01*dx;
-        target.y -= 0.01*dy;
-        target.x = (target.x+w)%w;
-        target.y = (target.y+h)%h;
-        const newCell = toKey(target.x, target.y);
-        if(newCell !== target.cell) addToCell(newCell,target);
-        this.score.erg += bite;
-        this.score.wander += bite*this.wanderCredit;
-      } else {
-        this.erg += target.hp/10;
-        this.score.eat += target.hp/10;
-        this.score.wander += target.hp/10*this.wanderCredit
-        target.hp = 0;
-      }
-
+    const dist2 = this.vision[3][plant-1].minDist2;
+    if(dist2 > 25) {
+      this.score.eat --;
+      this.sick();
+      return;
+    }
+    const bite = 10*(1-dist2/25);
+    let dx = target.x-this.x;
+    let dy = target.y-this.y;
+    if(dx > maxDistX) dx = -w+dx;
+    if(dx < -maxDistX) dx = w+dx;
+    if(dy > maxDistY) dy = -h+dy;
+    if(dy < -maxDistY) dy = h+dy;
+    if(target.hp > 10*bite) {
+      target.hp -= 10*bite;
+      this.erg += bite;
+      target.x -= 0.01*dx;
+      target.y -= 0.01*dy;
+      target.x = (target.x+w)%w;
+      target.y = (target.y+h)%h;
+      const newCell = toKey(target.x, target.y);
+      if(newCell !== target.cell) addToCell(newCell,target);
+      this.score.erg += bite;
+      this.score.wander += bite*this.wanderCredit;
+    } else {
+      this.erg += target.hp/10;
+      this.score.eat += target.hp/10;
+      this.score.wander += target.hp/10*this.wanderCredit
+      target.hp = 0;
+    }
     this.sick();
-
-
   }
 
 /*攻擊==============*/
@@ -1127,7 +1128,7 @@ class normalDian {
   draw() {
     const a = this.hp/this.maxHp*0.8+0.2;
     let r = this.erg/this.maxErg + 2.5;
-    if(this.pregnent>0) r += 2.5*(1-this.pregnent/300);
+    if(this.pregnent>0) r += 2.5*(1-this.pregnent/600);
     const eye1X = r*Math.cos(this.face-Math.PI/6);
     const eye1Y = r*Math.sin(this.face-Math.PI/6);
     const eye2X = r*Math.cos(this.face+Math.PI/6);
