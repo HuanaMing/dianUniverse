@@ -349,19 +349,11 @@ class producer {
         const minDist = this.radius + a.radius;
         if(dist2<minDist*minDist) {
           biggerPlant++ ;
-          if(biggerPlant >=3) break;
-        }
-        if(dist2<minDist*minDist/4) {
-          biggerPlant+=2 ;
-          if(biggerPlant >=3) break;
-        }
-        if(dist2<minDist*minDist/16) {
-          biggerPlant+=3 ;
-          if(biggerPlant >=3) break;
+          if(biggerPlant >=1) break;
         }
       }
     }
-    if(this.hp<this.maxHp && biggerPlant<3) {
+    if(this.hp<this.maxHp && biggerPlant<1) {
       this.hp += Math.random()*2;
     } else if(biggerPlant>=3){
       this.hp = Math.max(0, this.hp-Math.random()*2);
