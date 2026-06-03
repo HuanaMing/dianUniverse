@@ -254,6 +254,7 @@ const food = 2;
 const normal = 3;
 const hunter = 4;
 const biasCon = 10**11;
+let seedDelay = 0;
 
 
 let evolutionPool = [[],[],[],[],[]];
@@ -324,7 +325,7 @@ class producer {
 
 /*生長================================*/
   grow() {
-    let biggerPlant = 0;
+    let shadowed = 0;
     const range = 2;
     const thisKey = this.cell;
     const cx = keyToCellX(thisKey);
@@ -345,20 +346,16 @@ class producer {
         if(dx < -maxDistX) dx = w+dx;
         if(dy > maxDistY) dy = -h+dy;
         if(dy < -maxDistY) dy = h+dy;
-        const dist2 = dx*dx + dy*dy;
-        const minDist = this.radius + a.radius;
-        if(dist2<minDist*minDist) {
-          biggerPlant++ ;
-          if(biggerPlant >=1) break;
+        const dist = Math.hypot(dx,dy);
+        const minDist = a.radius+this.radius;
+        if(dist<minDist) {
+          shadowed += minDist-dist;
+          if(shadowed>this.radius) break;
         }
       }
     }
-    if(this.hp<this.maxHp && biggerPlant<1) {
-      this.hp += Math.random()*2;
-    } else if(biggerPlant>=1){
-      this.hp = Math.max(0, this.hp-Math.random()*2);
-      return;
-    }
+    this.hp += Math.random()*2*(1-2*shadowed/this.radius);
+
     const fertilizer = fertilizerMap.get(thisKey);
     if(fertilizer>0) {
       let growth = fertilizer/20;
@@ -383,7 +380,7 @@ class producer {
       const nKey = toKey(n.x,n.y);
       addToCell(nKey, n);
       agents[n.type].push(n);
-    },Math.floor(10000*Math.random()));
+    },seedDelay);
   }
 
 /*移動================================*/
@@ -2454,34 +2451,22 @@ if(brainDian) {
       agents[d.type].push(d);
     }
 
-    if(agents[plant].length < w*h/2100000) {
-      for(let i=0; i< w*h/2100000; i++) {
+    if(agents[plant].length < w*h/210000) {
+      for(let i=0; i< w*h/210000; i++) {
         const n = new producer();
         addToCell(toKey(n.x,n.y), n);
         agents[n.type].push(n);
       }
     }
     let times=0;
-    while(agents[plant].length < w*h/2100 || times>10000) {
+    seedDelay=0;
+    while(agents[plant].length < w*h/2100 && times<100000) {
       times++;
       for(const p of agents[plant]) {
         if(!p.dead) p.update();
       }
-      for(const [k,v] of fertilizerMap) {
-        let next = v*0.998;
-        if(v>100 && Math.random() <= v/1000) {
-          const n = new producer();
-          n.hp = 5;
-          n.x = (keyToCellX(k) + Math.random())*sizeX;
-          n.y = (keyToCellY(k) + Math.random())*sizeY;
-          addToCell(toKey(n.x,n.y), n);
-          agents[n.type].push(n);
-          next -= 100;
-        }
-        if(next<1) {fertilizerMap.delete(k); continue;}
-        fertilizerMap.set(k, next);
-      }
     }
+    seedDelay=10000;
   }
 
 
