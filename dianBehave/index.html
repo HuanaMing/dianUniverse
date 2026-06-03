@@ -1182,7 +1182,7 @@ class normalDian {
 
 /*時間==============*/
   update() {
-    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/300);
+    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/600);
 //觀察
     if(this.age%5 === 0) {
       this.input();
@@ -1230,7 +1230,7 @@ class normalDian {
     if(!this.fight())this.move();
 
 //死亡
-    if(this.age>this.maxAge) this.hp *= (1-(this.age-this.maxAge)/this.maxAge);
+    if(this.age>this.maxAge) this.hp = this.hp*(1-(this.age-this.maxAge)/this.maxAge)-0.01;
     if(this.hp <= 0) {
       removeFromCell(this.cell, this);
       this.dead = true;
