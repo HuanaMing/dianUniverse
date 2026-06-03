@@ -2454,8 +2454,8 @@ if(brainDian) {
       agents[d.type].push(d);
     }
 
-    if(agents[plant].length < 1) {
-      for(let i=0; i<20; i++) {
+    if(agents[plant].length < w*h/2100000) {
+      for(let i=0; i< w*h/2100000; i++) {
         const n = new producer();
         addToCell(toKey(n.x,n.y), n);
         agents[n.type].push(n);
