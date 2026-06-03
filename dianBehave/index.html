@@ -269,7 +269,7 @@ const color = [
   {},
   {h:200, s:40, l:40, a:0.8},
   {h:40, s:0, l:80, a:0.8},
-  {h:80, s:20, l:60, a:0.8},
+  {h:40, s:25, l:55, a:0.8},
   {h:350, s:40, l:50, a:0.8},
 ];
 let generation = 0;
@@ -1138,25 +1138,35 @@ class normalDian {
     const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
     const wave = Math.sin(this.wave)*Math.PI/12;
 
-//尾巴
+
     for(let ox = -w; ox<=w; ox+=w) {
       for(let oy = -h; oy<=h; oy+=h) {
+//漸層
+        let tailGrad = ctx.createLinearGradient(
+          this.x+ox-0.7*r*Math.cos(this.face),
+          this.y+oy-0.7*r*Math.sin(this.face),
+          this.x+ox-r*Math.cos(this.face)-0.8*(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
+          this.y+oy-r*Math.sin(this.face)-0.8*(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+        );
+        tailGrad.addColorStop(0, `hsla(${color[normal].h}, ${color[normal].s}%, ${color[normal].l}%, ${a})`);
+        tailGrad.addColorStop(1, speciesColor);
+
+//身體尾巴
         ctx.beginPath();
-        ctx.fillStyle = speciesColor;
+        ctx.fillStyle = tailGrad;
         ctx.moveTo(
           this.x+ox-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
-          this.y+oy-r*Math.sin(this.face)- (1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+          this.y+oy-r*Math.sin(this.face)-(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
         );
         ctx.lineTo(this.x+ox-r*Math.cos(this.face+Math.PI/4), this.y+oy-r*Math.sin(this.face+Math.PI/4));
+        ctx.arc(this.x+ox, this.y+oy, r, this.face-Math.PI*2.7/4, this.face+Math.PI*2.7/4);
         ctx.lineTo(this.x+ox-r*Math.cos(this.face-Math.PI/4), this.y+oy-r*Math.sin(this.face-Math.PI/4));
+
+
+
         ctx.closePath();
         ctx.fill();
 
-//身體
-        ctx.beginPath();
-        ctx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-        ctx.arc(this.x+ox, this.y+oy, r, 0, 2*Math.PI);
-        ctx.fill();
 
 //眼睛
 
