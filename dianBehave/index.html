@@ -247,6 +247,7 @@ const speciesMap = new Map();
 
 /*生命資料============================*/
 let agents = [[],[],[],[],[],[]];
+let brainDian = null;
 const none = 0;
 const plant = 1;
 const food = 2;
@@ -455,7 +456,7 @@ class producer {
     this.radius = (this.hp**0.3)*0.7;
     this.age ++;
     this.move();
-    this.draw();
+    if(this.hp>10) this.draw();
   }
 
 /*渲染================================*/
@@ -2141,12 +2142,15 @@ function loop() {
 
 
 /*最老草食點點========================*/
-let brainDian;
-for(const a of agents[normal]) {
-  if (!a.dead) {
-    brainDian = a;
+
+if(!brainDian || brainDian.dead) {
+  brainDian = null;
+  for(const a of agents[normal]) {
+    if (!a.dead && a.age<2000) {
+      brainDian = a;
+    }
+    if(brainDian) break;
   }
-  if(brainDian) break;
 }
 if(brainDian) {
   if(follow) {
@@ -2333,6 +2337,24 @@ if(brainDian) {
     if(evolutionPool[intent].length === 0) {
       for(let i=0;i<100;i++){
         const d = new normalDian();
+        addToCell(toKey(d.x,d.y), d);
+        agents[d.type].push(d);
+      }
+    } else {
+      for(let i=0; i<70; i++){
+  // 依機率取 DNA
+        const best = pickBestDNA();
+        if(!best) continue;
+        const parent = {
+          intentBrain: deserializeBrain(best.intentBrain, "intent"),
+          eatBrain: deserializeBrain(best.eatBrain, "eat"),
+          cloneBrain: deserializeBrain(best.cloneBrain, "clone"),
+          fightBrain: deserializeBrain(best.fightBrain, "fight"),
+          wanderBrain: deserializeBrain(best.wanderBrain, "wander"),
+        };
+
+        const d = new normalDian(parent);
+        d.newGen = true;
         addToCell(toKey(d.x,d.y), d);
         agents[d.type].push(d);
       }
