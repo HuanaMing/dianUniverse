@@ -2150,8 +2150,22 @@ for(const a of agents[normal]) {
 }
 if(brainDian) {
   if(follow) {
-    camera.x = brainDian.x-w/2/zoom;
-    camera.y = brainDian.y-h/2/zoom;
+    let dx = brainDian.x-w/2/zoom-camera.x;
+    let dy = brainDian.y-h/2/zoom-camera.y;
+    if(dx>w/2) dx-=w;
+    if(dx<-w/2) dx+=w;
+    if(dy>h/2) dy-=h;
+    if(dy<-h/2) dy+=h;
+    const dist = Math.hypot(dx,dy);
+    if(dist>10) {
+      const move = (dist-10)*0.05;
+      camera.x += dx/dist*move;
+      camera.y += dy/dist*move;
+      if(camera.x>w) camera.x-=w;
+      if(camera.x<0) camera.x+=w;
+      if(camera.y>h) camera.y-=h;
+      if(camera.y<0) camera.y+=h;
+    }
   }
   const vision = brainDian.vision;
   const maxVision = brainDian.maxVision;
