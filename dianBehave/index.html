@@ -1461,15 +1461,8 @@ class Connect {
 操作反應
 ============================================================*/
 
-/*視窗縮放============================*/
-window.addEventListener('resize', ()=>{
-  resize();
-});
-
 function resize() {
 
-  w = window.innerWidth;
-  h = window.innerHeight;
   const cellSize = Math.sqrt(w*h/2048);
   maxDistX = w/2;
   maxDistY = h/2;
@@ -1488,8 +1481,8 @@ function resize() {
   size = (sizeX+sizeY)/2;
 
   for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
-    c.width = w;
-    c.height = h;
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
     c.style.left = "0px";
     c.style.top = "0px";
   }
@@ -1555,6 +1548,37 @@ function resize() {
     }
   }
 
+}
+
+function drawGrid(fit=false) {
+  bgCtx.clearRect(-w,-h,3*w,3*h);
+  if(grid) {
+    bgCtx.clearRect(-w,-h,3*w,3*h);
+    bgCtx.setTransform(
+      zoom, 0,
+      0, zoom,
+      -camera.x * zoom,
+      -camera.y * zoom
+    );
+    for(let y=0; y<=maxGridY; y+=1) {
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      if(fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+      bgCtx.lineWidth = 1;
+      bgCtx.moveTo(0, y*sizeY);
+      bgCtx.lineTo(w, y*sizeY);
+      bgCtx.stroke();
+    }
+    for(let x=0; x<=maxGridX; x+=1) {
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      if(fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+      bgCtx.lineWidth = 1;
+      bgCtx.moveTo(x*sizeX, 0);
+      bgCtx.lineTo(x*sizeX, h);
+      bgCtx.stroke();
+    }
+  }
 }
 
 /*存檔============================*/
@@ -1635,64 +1659,84 @@ window.addEventListener("keydown", (e) => {
 /*格線============================*/
   if (e.code === "KeyG") {
     grid=!grid;
-    bgCtx.clearRect(-w,-h,3*w,3*h);
-    if(grid) {
-      bgCtx.clearRect(-w,-h,3*w,3*h);
-      for(let ox = -w; ox<=w; ox+=w) {
-        for(let oy = -h; oy<=h; oy+=h) {
-          for(let y=0; y<=maxGridY; y+=1) {
-            bgCtx.beginPath();
-            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-            bgCtx.lineWidth = 2;
-            bgCtx.moveTo(0+ox, y*sizeY+oy);
-            bgCtx.lineTo(w+ox, y*sizeY+oy);
-            bgCtx.stroke();
-          }
-          for(let x=0; x<=maxGridX; x+=1) {
-            bgCtx.beginPath();
-            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-            bgCtx.lineWidth = 2;
-            bgCtx.moveTo(x*sizeX+ox, 0+oy);
-            bgCtx.lineTo(x*sizeX+ox, h+oy);
-            bgCtx.stroke();
-          }
-        }
-      }
+    drawGrid();
+  }
+/*世界縮放=========================*/
+  if (e.shiftKey) {
+    if (e.code === "ArrowDown") {
+      h += 10.1/zoom;
+      if(Math.abs(h-window.innerHeight/zoom)<10/zoom) h=window.innerHeight/zoom;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowUp") {
+      h -= 10.1/zoom;
+      if(Math.abs(h-window.innerHeight/zoom)<10/zoom) h=window.innerHeight/zoom;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowLeft") {
+      w -= 10.1/zoom;
+      if(Math.abs(w-window.innerWidth/zoom)<10/zoom) w=window.innerWidth/zoom;
+      resize();
+      drawGrid(Math.abs(w-window.innerWidth/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowRight") {
+      w += 10.1/zoom;
+      if(Math.abs(w-window.innerWidth/zoom)<10/zoom) w=window.innerWidth/zoom;
+      resize();
+      drawGrid(Math.abs(w-window.innerWidth/zoom)<10/zoom);
+    }
+    if (e.code === "Space") {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+  }
+/*鏡頭縮放=========================*/
+  if(!e.shiftKey) {
+    if (e.code === "ArrowUp") {
+      zoom *= 1.1;
+      drawGrid();
+    }
+    if (e.code === "ArrowDown") {
+      zoom *= 0.9;
+      drawGrid();
+    }
+    if (e.code === "Space") {
+      follow = false;
+      camera.x=0;
+      camera.y=0;
+      zoom = 1;
+      drawGrid();
     }
   }
 
-/*鏡頭縮放=========================*/
-  if (e.code === "ArrowUp") {
-    zoom *= 1.1;
-  }
-  if (e.code === "ArrowDown") {
-    zoom *= 0.9;
-  }
-/*鏡頭縮放=========================*/
+/*鏡頭移動=========================*/
   if (e.code === "KeyW") {
     follow = false;
     camera.y-=10;
+    drawGrid();
   }
   if (e.code === "KeyS") {
     follow = false;
     camera.y+=10;
+    drawGrid();
   }
   if (e.code === "KeyA") {
     follow = false;
     camera.x-=10;
+    drawGrid();
   }
   if (e.code === "KeyD") {
     follow = false;
     camera.x+=10;
+    drawGrid();
   }
-  if (e.code === "Space") {
-    follow = false;
-    camera.x=0;
-    camera.y=0;
-    zoom = 1;
-  }
-/*鏡頭縮放=========================*/
-  if (e.code === "KeyA") {
+
+/*鏡頭跟隨=========================*/
+  if (e.code === "KeyQ") {
     follow = !follow;
   }
 });
