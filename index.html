@@ -1,213 +1,2473 @@
 <!DOCTYPE html>
 <html lang="zh-Hant">
+
 <head>
-<link rel="manifest" href="manifest.json">
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Dian Universe</title>
-
+<meta charset="UTF-8">
+<title>點點行為演化</title>
 <style>
-*{
-  margin:0;
-  padding:0;
-  box-sizing:border-box;
-}
+  body { background:#555; color:#ddd; text-align:center; font-family:sans-serif; overflow: hidden;}
+  #bgCanvas { position:absolute; background:#151515; }
+  #canvas { position:absolute; background:transparent;}
+  #plantCanvas { position:absolute; background:transparent;}
+  #foodCanvas { position:absolute; background:transparent;}
+  #normalCanvas { position:absolute; background:transparent;}
+  .infoCanvas { 
+    background:transparent;
+    margin:5px;
+  }
+  #infoDiv {
+    position:absolute; 
+    background:hsla(240, 10%, 10%, 0.08);
+    backdrop-filter:blur(3px);
+    border:1px solid rgba(120,220,255,0.3);
+    border-radius:10px;
+    width:360px;
+    max-height:640px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+  }
+  #textInfo {
+    font-size: 12px;
+    background:transparent;
 
-body{
-  font-family:sans-serif;
-  background:
-    radial-gradient(circle at top, #1f3b52 0%, #0d1520 40%, #05080d 100%);
-  color:white;
-  min-height:100vh;
-  overflow:hidden;
-}
-
-#bg{
-  position:fixed;
-  inset:0;
-  z-index:-1;
-}
-
-.container{
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center;
-  align-items:center;
-  padding:40px;
-}
-
-.title{
-  font-size:clamp(40px, 8vw, 90px);
-  font-weight:900;
-  letter-spacing:4px;
-  margin-bottom:12px;
-  text-shadow:
-    0 0 20px rgba(100,200,255,0.5),
-    0 0 60px rgba(100,200,255,0.2);
-}
-
-.subtitle{
-  opacity:0.7;
-  margin-bottom:50px;
-  text-align:center;
-}
-
-.grid{
-  width:min(1000px,100%);
-  display:grid;
-  grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-  gap:24px;
-}
-
-.card{
-  position:relative;
-  padding:28px;
-  border-radius:24px;
-  background:rgba(255,255,255,0.08);
-  border:1px solid rgba(255,255,255,0.12);
-  backdrop-filter:blur(3px);
-
-  text-decoration:none;
-  color:white;
-
-  transition:
-    transform .2s,
-    background .2s,
-    border .2s;
-}
-
-.card:hover{
-  transform:translateY(-8px) scale(1.02);
-  background:rgba(255,255,255,0.13);
-  border:1px solid rgba(120,220,255,0.5);
-}
-
-.card h2{
-  margin-bottom:10px;
-  font-size:28px;
-}
-
-.card p{
-  opacity:0.7;
-  line-height:1.5;
-}
-
-.badge{
-  position:absolute;
-  top:16px;
-  right:16px;
-  font-size:12px;
-  padding:4px 10px;
-  border-radius:999px;
-  background:#00bfff33;
-  border:1px solid #6ddcff66;
-}
-
-.footer{
-  margin-top:50px;
-  opacity:0.4;
-  font-size:14px;
-}
-</style>
-</head>
-
-<body>
-
-<canvas id="bg"></canvas>
-
-<div class="container">
-
-  <div class="title">
-    DIAN UNIVERSE
-  </div>
-
-  <div class="subtitle">
-    點點文明觀測中心
-  </div>
-
-  <div class="grid">
-
-    <a class="card" href="./dianEvolution/index.html">
-      <div class="badge">ONLINE</div>
-      <h2>🌱 Evolution</h2>
-      <p>
-        點點族群演化、生存、繁殖與滅絕。
-      </p>
-    </a>
-
-    <a class="card" href="./dianBehave/index.html">
-      <div class="badge">ONLINE</div>
-      <h2>🧠 Behave</h2>
-      <p>
-        行為模式、意圖系統與群體實驗。
-      </p>
-    </a>
-
-    <a class="card" href="./dianBeadReincarnate/index.html">
-      <div class="badge">WIP</div>
-      <h2>🚧</h2>
-      <p>
-        to be continue...
-      </p>
-    </a>
-
-  </div>
-
-  <div class="footer">
-    HuanaMing Dian Research Institute
-  </div>
-
-</div>
-
-<script>
-const canvas = document.getElementById("bg");
-const ctx = canvas.getContext("2d");
-
-let w,h;
-let particles=[];
-
-function resize(){
-  w=canvas.width=window.innerWidth;
-  h=canvas.height=window.innerHeight;
-}
-window.addEventListener("resize",resize);
-resize();
-
-for(let i=0;i<120;i++){
-  particles.push({
-    x:Math.random()*w,
-    y:Math.random()*h,
-    r:Math.random()*2+1,
-    vx:(Math.random()-0.5)*0.3,
-    vy:(Math.random()-0.5)*0.3
-  });
-}
-
-function loop(){
-  ctx.clearRect(0,0,w,h);
-
-  for(const p of particles){
-
-    p.x+=p.vx;
-    p.y+=p.vy;
-
-    if(p.x<0)p.x=w;
-    if(p.x>w)p.x=0;
-    if(p.y<0)p.y=h;
-    if(p.y>h)p.y=0;
-
-    ctx.beginPath();
-    ctx.arc(p.x,p.y,p.r,0,Math.PI*2);
-    ctx.fillStyle="rgba(120,220,255,0.7)";
-    ctx.fill();
   }
 
-  requestAnimationFrame(loop);
+  #brainDiv {
+    position:absolute; 
+    background:hsla(240, 10%, 10%, 0.08);
+    backdrop-filter:blur(3px);
+    border:1px solid rgba(120,220,255,0.3);
+    border-radius:10px;
+    width:800px;
+    min-height:30px;
+    max-height:640px;
+    left:50%;
+    top:50%;
+    transform:translate(-50%,-50%);
+    display:grid;
+    grid-template-columns: 200px 1fr 200px;
+  }
+  .brainPanel{
+    position:relative; 
+    padding:14px;
+    border-right:1px solid #1d2a36;
+    overflow:auto;
+  }
+  .bar{
+    flex:1;
+    height:8px;
+    background:#1c2a38;
+    border-radius:5px;
+    overflow:hidden;
+  }
+  .fill{
+    height:100%;
+    background:#3ddc97;
+  }
+  #neuroGraph{
+    position:absolute;
+    width:100%;
+    height:100%;
+    display:block;
+    inset:0;
+  }
+  #inputGraph{
+    position:absolute;
+    left:10px;
+    top:10px;
+    display:block;
+  }
+  #steeringGraph{
+    position:absolute;
+    left:10px;
+    top:10px;
+    display:block;
+  }
+  .brainCenter{
+    position:relative;
+    padding:14px;
+  }
+  .header{
+    font-size:13px;
+    margin-bottom:10px;
+    opacity:0.8;
+  }
+  .brainCard{
+    background:hsla(200, 30%, 10%, 0.4);
+    border:1px solid hsla(200, 30%, 40%, 0.4);
+    border-radius:12px;
+    padding:10px;
+    margin-bottom:10px;
+  }
+  .row{
+    display:flex;
+    align-items:center;
+    gap:10px;
+  }
+  .title{
+    font-size:12px;
+    opacity:0.7;
+    margin-bottom:6px;
+  }
+</style>
+</head>
+<body>
+<canvas id="bgCanvas"></canvas>
+<canvas id="plantCanvas"></canvas>
+<canvas id="foodCanvas"></canvas>
+<canvas id="normalCanvas"></canvas>
+<canvas id="canvas"></canvas>
+<div id="infoDiv">
+  <div id="textInfo"></div>
+  <canvas width="320" height="180" class="infoCanvas" id="plantInfoCanvas"></canvas>
+  <canvas width="320" height="180" class="infoCanvas" id="normalInfoCanvas"></canvas>
+  <canvas width="320" height="180" class="infoCanvas" id="hunterInfoCanvas"></canvas>
+</div>
+<div id="brainDiv">
+  <div class="brainPanel">
+    <div class="header">⚖️ 決策</div>
+    <div class="brainCard" style="position:relative; width:145px; height:145px; background:transparent; border:0px">
+      <canvas id="inputGraph">雷達圖</canvas>
+    </div>
+    <div class="brainCard">
+      <div class="row">
+        <div class="title">🍔</div>
+        <div class="bar"><div class="fill" id="eatBar" style="background:hsla(200,40%,40%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">🧬</div>
+        <div class="bar"><div class="fill" id="cloneBar" style="background:hsla(50,20%,60%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">🥊</div>
+        <div class="bar"><div class="fill" id="fightBar" style="background:hsla(350,40%,50%,0.8);"></div></div>
+      </div>
+      <div class="row">
+        <div class="title">☁️</div>
+        <div class="bar"><div class="fill" id="wanderBar" style="background:hsla(50,5%,60%,0.8);"></div></div>
+      </div>
+    </div>
+  </div>
+  <div class="brainCenter">
+    <div class="header">💭 思考</div>
+    <div class="brainCard" style="position:relative">
+      <canvas id="neuroGraph" style="background:red">神經網路圖</canvas>
+    </div>
+  </div>
+  <div class="brainPanel">
+    <div class="header">⚙️ 行動</div>
+    <div class="brainCard" style="position:relative; width:145px; height:145px; background:transparent; border:0px">
+      <canvas id="steeringGraph">方向盤</canvas>
+    </div>
+  </div>
+</div>
+<script>
+/*============================================================
+初始化
+============================================================*/
+/*物件定義============================*/
+const infoDiv = document.getElementById("infoDiv");
+infoDiv.style.display = "none";
+const brainDiv = document.getElementById("brainDiv");
+brainDiv.style.display = "none";
+const textInfo = document.getElementById("textInfo");
+const canvas = document.getElementById("canvas");
+const ctx = canvas.getContext("2d");
+const plantCanvas = document.getElementById("plantCanvas");
+const plantCtx = plantCanvas.getContext("2d");
+const foodCanvas = document.getElementById("foodCanvas");
+const foodCtx = foodCanvas.getContext("2d");
+const normalCanvas = document.getElementById("normalCanvas");
+const normalCtx = normalCanvas.getContext("2d");
+const bgCanvas = document.getElementById("bgCanvas");
+const bgCtx = bgCanvas.getContext("2d");
+const brainCanvas = [
+  document.getElementById("inputGraph"),
+  document.getElementById("neuroGraph"),
+  document.getElementById("steeringGraph"),
+];
+
+brainCanvas[0].width = 145;
+brainCanvas[0].height = 145;
+brainCanvas[2].width = 145;
+brainCanvas[2].height = 145;
+const brainCtx = [
+  document.getElementById("inputGraph").getContext("2d"),
+  document.getElementById("neuroGraph").getContext("2d"),
+  document.getElementById("steeringGraph").getContext("2d"),
+];
+const eatBar = document.getElementById("eatBar");
+const cloneBar = document.getElementById("cloneBar");
+const fightBar = document.getElementById("fightBar");
+const wanderBar = document.getElementById("wanderBar");
+
+const infoCanvas = [
+  null,
+  document.getElementById("plantInfoCanvas"),
+  null,
+  document.getElementById("normalInfoCanvas"),
+  document.getElementById("hunterInfoCanvas"),
+];
+const infoCtx = [
+  null,
+  document.getElementById("plantInfoCanvas").getContext("2d"),
+  null,
+  document.getElementById("normalInfoCanvas").getContext("2d"),
+  document.getElementById("hunterInfoCanvas").getContext("2d"),
+];
+
+
+
+/*區塊常數============================*/
+let w = window.innerWidth;
+let h = window.innerHeight;
+let maxDistX = w/2;
+let maxDistY = h/2;
+let maxGridX = 64;
+let maxGridY = 32;
+let sizeX = window.innerWidth/maxGridX;
+let sizeY = window.innerHeight/maxGridY;
+let size = (sizeX+sizeY)/2;
+let zoom = 1;
+let camera = {x:0, y:0};
+let follow = false;
+const dir = [[1,0],[-1,0],[0,1],[0,-1]];
+let infoPadding = 12.5;
+
+/*格線顯示==========*/
+let grid = false;
+
+
+/*區塊資料============================*/
+const rangeCache = [];
+const grids = [];  //grids[key] = agents
+let fertilizerMap = new Map();
+const speciesMap = new Map();
+
+/*生命資料============================*/
+let agents = [[],[],[],[],[],[]];
+let brainDian = null;
+const none = 0;
+const plant = 1;
+const food = 2;
+const normal = 3;
+const hunter = 4;
+const biasCon = 10**11;
+let seedDelay = 0;
+
+
+let evolutionPool = [[],[],[],[],[]];
+const intent = 0;
+const eat = 1;
+const clone = 2;
+const fight = 3;
+const wander = 4;
+const MAX_POOL = 20;
+
+const color = [
+  {},
+  {h:200, s:40, l:40, a:0.8},
+  {h:40, s:0, l:80, a:0.8},
+  {h:35, s:60, l:60, a:0.8},
+  {h:350, s:40, l:50, a:0.8},
+];
+let generation = 0;
+
+/*視窗大小============================*/
+for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+  c.style.left = "0px";
+  c.style.top = "0px";
+  c.width = w;
+  c.height = h;
+}
+resize();
+
+/*============================================================
+生產者
+============================================================*/
+
+class producer {
+  constructor(parent) {
+    if(parent) {
+      const angle = Math.random() * Math.PI * 2;
+      const r = Math.random();
+      let dist = 0;
+      if(r<0.001) {
+        dist = 5*Math.random()*size;
+      } else if(r<0.01) {
+        dist = 2*Math.random()*size;
+      } else {
+        dist = Math.random()*size;
+      }
+      this.x = parent.x + Math.cos(angle) * dist;
+      this.y = parent.y + Math.sin(angle) * dist;
+    } else {
+      this.x = Math.random()*w;
+      this.y = Math.random()*h;
+    }
+    this.offsetX = 0;
+    this.offsetY = 0;
+    this.cell = null;
+    this.cellIdx = null;
+    this.age = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.dead = false;
+
+    this.type = plant;
+    this.erg = 0;
+    this.hp = parent ?5 :500;
+    this.radius = (this.hp**0.3);
+    this.maxHp = 10000;
+    this.maxVision = 50;
+  }
+
+/*生長================================*/
+  grow() {
+    let shadowed = 0;
+    const range = 2;
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const cache = rangeCache[range] || createNearCache(range);
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      for(const a of getCell(key)) {
+        if(a.type !== plant) continue;
+        if(a.hp<=this.hp) continue;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
+        const dist = Math.hypot(dx,dy);
+        const minDist = a.radius+this.radius;
+        if(dist<minDist) {
+          shadowed += minDist-dist;
+          if(shadowed>this.radius) break;
+        }
+      }
+    }
+    this.hp += Math.random()*3*(1-2*shadowed/this.radius);
+
+    const fertilizer = fertilizerMap.get(thisKey);
+    if(fertilizer>0) {
+      let growth = fertilizer/20;
+      if(fertilizer>100 && Math.random()<fertilizer/1000 && this.age > 1000 && this.hp > 1000) {
+        this.clone();
+        growth = 50;
+      } else if(this.hp<this.maxHp) {
+        this.hp += growth/5;
+      }
+      fertilizerMap.set(thisKey, fertilizer-growth);
+    }
+  }
+
+/*繁殖================================*/
+  clone() {
+    setTimeout(()=> {
+      const n = new producer({x:this.x, y:this.y});
+      if(n.x>w) n.x-=w;
+      if(n.x<0) n.x+=w;
+      if(n.y>h) n.y-=h;
+      if(n.y<0) n.y+=h;
+      const nKey = toKey(n.x,n.y);
+      addToCell(nKey, n);
+      agents[n.type].push(n);
+    },seedDelay);
+  }
+
+/*移動================================*/
+  move() {
+    this.offsetX = 0;
+    this.offsetY = 0;
+    const range = 2;
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const cache = rangeCache[range] || createNearCache(range);
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      for(const a of getCell(key)) {
+        if(a.type !== normal && a.type !== hunter) continue;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
+        const dist = Math.hypot(dx,dy);
+        const minDist = this.radius + 2.5;
+        if(dist<minDist) {
+          this.offsetX -= dx/dist*(minDist-dist)*0.7;
+          this.offsetX -= dy/dist*(minDist-dist)*0.7;
+        }
+      }
+    }
+  }
+
+/*時間================================*/
+  update() {
+
+    if(this.age >= 5000) {
+      const range = Math.ceil((this.age-5000)/120);
+      const cache = rangeCache[range] || createNearCache(range);
+      const thisKey = this.cell;
+      const cx = keyToCellX(thisKey);
+      const cy = keyToCellY(thisKey);
+      let count = cache.length/2;
+      const value = this.hp*0.002/count;
+      for(let i=0; i<cache.length; i+=2) {
+        const dx = cache[i];
+        const dy = cache[i+1];
+        const dist2 = Math.max( 0.25, dx*dx + dy*dy );
+        const nx = (cx+dx+maxGridX) % maxGridX;
+        const ny = (cy+dy+maxGridY) % maxGridY;
+        const key = cellToKey(nx, ny);
+        fertilizerMap.set(key, (fertilizerMap.get(key)||1) + value);
+      }
+      this.hp *= 0.98;
+    }
+
+    if(Math.random()<0.47 && this.age<5000) this.grow();
+
+    if(this.hp <= 1 && !this.dead) {
+      removeFromCell(this.cell, this); 
+      this.dead = true;
+      return;
+    }
+
+    if(this.age > 1000 && this.age%600 ===0 && this.hp>1000) {
+      this.clone();
+    }
+
+
+
+    this.radius = (this.hp**0.3)*0.8;
+    this.age ++;
+    this.move();
+    if(this.hp>10) this.draw();
+  }
+
+/*渲染================================*/
+  draw() {
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(200, ${20+30*this.age/5000}%, ${60-30*this.age/5000}%, 0.8)`;
+        ctx.arc(this.x+this.offsetX+ox, this.y+this.offsetY+oy, this.radius, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
+
+  }
 }
 
+/*============================================================
+食物
+============================================================*/
+
+class Food {
+  constructor(parent) {
+
+    this.x = parent.x;
+    this.y = parent.y;
+    this.cell = toKey(this.x, this.y);
+    this.cellIdx = null;
+
+    this.age = 0;
+    this.vx = 0;
+    this.vy = 0;
+    this.dead = false;
+
+    this.type = 2;
+    this.hp = (parent.erg||0) + parent.hp + 50;
+    this.maxHp = this.hp;
+    this.maxVision = 50;
+  }
+
+/*生長================================*/
+  grow() {
+    const range = Math.ceil(this.age/500);
+    const cache = rangeCache[range] || createNearCache(range);
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const value = this.hp * 0.04 / cache.length;
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const dist2 = dx*dx + dy*dy ;
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      fertilizerMap.set(key, (fertilizerMap.get(key)||0) + value);
+    }
+    this.hp*= 0.98;
+    if(this.hp <= 1) this.hp=0;
+  }
+
+/*時間================================*/
+  update() {
+    if(this.hp <= 0) {removeFromCell(this.cell, this); this.dead = true; return;}
+    if(this.age > 100 && Math.random()<0.5) this.grow();
+    this.age ++;
+    this.draw();
+  }
+
+/*渲染================================*/
+  draw() {
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        ctx.beginPath();
+        ctx.fillStyle = "hsla(40, 0%, 80%, 0.8)";
+        ctx.arc(this.x+ox, this.y+oy, (this.hp**0.3)/5, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
+  }
+}
+
+/*============================================================
+點點
+============================================================*/
+
+/*草食點點============================*/
+class normalDian {
+  constructor(parent,x,y) {
+    if(parent) {
+      this.intentBrain =  new IntentBrain(parent.intentBrain);
+      this.eatBrain =  new SteeringBrain(parent.eatBrain);
+      this.cloneBrain =  new SteeringBrain(parent.cloneBrain);
+      this.fightBrain =  new SteeringBrain(parent.fightBrain);
+      this.wanderBrain =  new SteeringBrain(parent.wanderBrain);
+    } else {
+      this.intentBrain =  new IntentBrain();
+      this.eatBrain =  new SteeringBrain();
+      this.cloneBrain =  new SteeringBrain();
+      this.fightBrain =  new SteeringBrain();
+      this.wanderBrain =  new SteeringBrain();
+    }
+
+/*狀態數值==========*/
+    this.hp = 100;
+    this.erg = 50;
+    this.age = 0;
+    this.wave = 0;
+
+    this.x = x?? Math.random()*canvas.width;
+    this.y = y?? Math.random()*canvas.height;
+    this.cell = toKey(this.x, this.y);
+    this.cellIdx = null;
+
+    this.face = Math.PI*2*Math.random();
+    this.turnForce = 0;
+    this.frontForce = 0;
+
+    this.vision = [];
+    for(let d=0; d<4; d++) {
+      const arr = [];
+      for(let t=0; t<4; t++) {
+        arr.push({
+          signal:0,
+          closest:null,
+          minDist2:Infinity,
+          closestDot:0,
+          closestCross:0
+        });
+      }
+      this.vision.push(arr);
+    }
+
+    this.mode = "";
+    this.keep = 0;
+    this.currentIntent = [];
+
+    this.pregnent = -1;
+
+    this.fightCooldown = 0;
+    this.targetType = 0;
+
+    this.wandering = false;
+    this.wanderTime = 0;
+    this.wanderCredit = 0;
+    this.wanderStart = {x:0, y:0};
+    this.wanderMove = 0;
+
+    this.score = {
+      eat:0,
+      clone:0,
+      fight:0,
+      wander:0,
+      born:0,
+    }
+
+
+/*基礎數值==========*/
+    this.type = normal;
+    this.newGen = false;
+    this.maxHp = 100;
+    this.maxErg = 200;
+    this.maxSpeed = 5;
+    this.maxAge = 5000;
+    this.atk = 5;
+    if (parent && parent.bias !== undefined) {
+      const scale = 1e10;
+  // 轉成整數基因
+      const gene = Math.floor(parent.bias * scale);
+  // 前7位鎖住（10位 - 3位變異）
+      const head = Math.floor(gene / 1e3);
+  // 後3位突變
+      const tail = Math.floor(Math.random() * 1e3);
+      this.bias = (head * 1e3 + tail) / scale;
+    } else {
+      this.bias = Math.floor(Math.random() * 1e10) / 1e10;
+    }
+    this.species = Math.floor(this.bias*1e7);
+
+
+    this.nextBuffer = new Float32Array(
+      this.intentBrain.nodes.length+
+      this.eatBrain.nodes.length+
+      this.cloneBrain.nodes.length+
+      this.fightBrain.nodes.length+
+      this.wanderBrain.nodes.length
+    );
+     
+    this.maxVision = 300;
+    this.maxTurnSpeed = Math.PI/5;
+
+  }
+
+/*觀察==============*/
+
+  input() {
+//初始化，左後右前
+    for(let d=0; d<4; d++) {
+      for(let t=0; t<4; t++) {
+        const v = this.vision[d][t];
+        v.signal = 0;
+        v.closest = null;
+        v.minDist2 = Infinity;
+        v.closestDot = 0;
+        v.closestCross = 0;
+      }
+    }
+    const range = Math.ceil(this.maxVision/size);
+    const fx = Math.cos(this.face);
+    const fy = Math.sin(this.face);
+    const thisKey = this.cell;
+    const cx = keyToCellX(thisKey);
+    const cy = keyToCellY(thisKey);
+    const cache = rangeCache[range] || createNearCache(range);
+    for(let i=0; i<cache.length; i+=2) {
+      const dx = cache[i];
+      const dy = cache[i+1];
+      const nx = (cx+dx+maxGridX) % maxGridX;
+      const ny = (cy+dy+maxGridY) % maxGridY;
+      const key = cellToKey(nx, ny);
+      const agentInCell = getCell(key);
+      if(agentInCell.length === 0 || !agentInCell) continue;
+
+      for(const a of agentInCell) {
+        if(a === this) continue;
+        if((a.hp<=20 || a.dead) && a.type === plant) continue;
+        let dx = a.x-this.x;
+        let dy = a.y-this.y;
+        if(dx > maxDistX) dx = -w+dx;
+        if(dx < -maxDistX) dx = w+dx;
+        if(dy > maxDistY) dy = -h+dy;
+        if(dy < -maxDistY) dy = h+dy;
+        const dist2 = dx*dx+dy*dy;
+        if(dist2 > this.maxVision*this.maxVision) continue;
+        const invDist = 1/Math.sqrt(dist2);
+
+        let cross = (fx*dy-fy*dx)*invDist;  //正右負左
+        let dot = (fx*dx+fy*dy)*invDist;    //正前負後
+
+        if(cross>0 && Math.abs(dot) <= 0.7071 ) { //0.7071 = 0.5^0.5
+          this.vision[0][a.type-1].signal += a.hp/a.maxHp/(dist2+1);
+          if(dist2 < this.vision[0][a.type-1].minDist2) {
+            this.vision[0][a.type-1].closest = a;
+            this.vision[0][a.type-1].closestDot = dot;
+            this.vision[0][a.type-1].closestCross = cross;          
+            this.vision[0][a.type-1].minDist2 = dist2;
+          }
+        } else if(dot < 0 && Math.abs(cross) < 0.7071 ) {
+          this.vision[1][a.type-1].signal += a.hp/a.maxHp/(dist2+1);
+          if(dist2 < this.vision[1][a.type-1].minDist2) {
+            this.vision[1][a.type-1].closest = a;
+            this.vision[1][a.type-1].closestDot = dot;
+            this.vision[1][a.type-1].closestCross = cross;    
+            this.vision[1][a.type-1].minDist2 = dist2;
+          }
+        } else if(cross<0 && Math.abs(dot) <= 0.7071 ) {
+          this.vision[2][a.type-1].signal += a.hp/a.maxHp/(dist2+1);
+          if(dist2 < this.vision[2][a.type-1].minDist2) {
+            this.vision[2][a.type-1].closest = a;
+            this.vision[2][a.type-1].closestDot = dot;
+            this.vision[2][a.type-1].closestCross = cross;    
+            this.vision[2][a.type-1].minDist2 = dist2;
+          }
+        } else if(dot > 0 && Math.abs(cross) < 0.7071 ) {
+          this.vision[3][a.type-1].signal += a.hp/a.maxHp/(dist2+1);
+          if(dist2 < this.vision[3][a.type-1].minDist2) {
+            this.vision[3][a.type-1].closest = a;
+            this.vision[3][a.type-1].closestDot = dot;
+            this.vision[3][a.type-1].closestCross = cross;    
+            this.vision[3][a.type-1].minDist2 = dist2;
+          }
+        } 
+      }
+    }
+  }
+
+
+/*做甚麼==============*/
+  intent() {
+    const brain = this.intentBrain;
+    const nodes = this.intentBrain.nodes;
+    const connects = this.intentBrain.connects;
+//初始化
+    let idx = 0;
+    for(let dir=0; dir<4; dir++) {
+      for(let type=0; type<4; type++) {
+        if(this.vision[dir][type].minDist2 !== Infinity) {
+          nodes[idx++].value = 1/(this.vision[dir][type].minDist2+1);
+          nodes[idx++].value = this.vision[dir][type].signal;
+          nodes[idx++].value = this.vision[dir][type].closestDot;
+          nodes[idx++].value = this.vision[dir][type].closestCross;
+        } else {
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+        }
+      }
+    }
+    nodes[idx++].value = Math.pow(1-this.erg/this.maxErg, 2);   //之後加ergSensitivity和hpSensitivity
+    nodes[idx++].value = Math.pow(1-this.hp/this.maxHp, 2);
+    nodes[idx++].value = Math.pow(this.age/this.maxAge, 2);
+    nodes[idx++].value = this.bias;
+   
+//計算
+
+//上一幀資訊用來回流
+    const next = this.nextBuffer.fill(0);
+    for(const c of connects) {
+      if(!c.enable || c.forward) continue;
+      next[c.outId] += accumulate(c.weight, nodes[c.inId].value);
+    }
+
+//propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
+    const outByIn = brain.outByIn;
+    for(const id of brain.order) {
+      const n = nodes[id];
+      const edges = outByIn[id];
+      if(!edges || edges.length === 0) continue;
+      for(const c of edges) {
+        if(!c.enable) continue;
+        next[c.outId] += accumulate(c.weight, n.value);
+      }
+    }
+
+
+// activate
+    for(let i=0;i<nodes.length;i++){
+      nodes[i].value = Math.tanh(next[i]);
+    }
+    
+    const l = INTENT_OUT_NODE+SELF_NODE+OTHER_NODE;
+//輸出結果
+    const eat = nodes[l-4].value;  //吃
+    const clone = nodes[l-3].value;  //生
+    const fight = nodes[l-2].value;  //打
+    const wander = nodes[l-1].value;  //晃
+    return softMax([eat, clone, fight, wander]);
+  }
+
+/*行動==============*/
+  steering(brain, intent=[0,0,0,0]) {
+    const nodes = brain.nodes;
+    const connects = brain.connects;
+//初始化
+    let idx = 0;
+    for(let dir=0; dir<4; dir++) {
+      for(let type=0; type<4; type++) {
+        if(this.vision[dir][type].minDist2 !== Infinity) {
+          nodes[idx++].value = 1/(this.vision[dir][type].minDist2+1);
+          nodes[idx++].value = this.vision[dir][type].signal;
+          nodes[idx++].value = this.vision[dir][type].closestDot;
+          nodes[idx++].value = this.vision[dir][type].closestCross;
+        } else {
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+          nodes[idx++].value = 0;
+        }
+      }
+    }
+    nodes[idx++].value = Math.pow(1-this.erg/this.maxErg, 2);   //之後加ergSensitivity和hpSensitivity
+    nodes[idx++].value = Math.pow(1-this.hp/this.maxHp, 2);
+    nodes[idx++].value = Math.pow(this.age/this.maxAge, 2);
+    nodes[idx++].value = this.bias;
+    nodes[idx++].value = intent[0]*2-1;
+    nodes[idx++].value = intent[1]*2-1;
+    nodes[idx++].value = intent[2]*2-1;
+    nodes[idx++].value = intent[3]*2-1;
+   
+//計算
+    const next = this.nextBuffer.fill(0);
+//上一幀資訊用來回流
+    for(const c of connects) {
+      if(!c.enable || c.forward) continue;
+      next[c.outId] += accumulate(c.weight, nodes[c.inId].value);
+    }
+// propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
+    const outByIn = brain.outByIn;
+    for(const id of brain.order) {
+      const n = nodes[id];
+      const edges = outByIn[id];
+      if(!edges || edges.length === 0) continue;
+      for(const c of edges) {
+        if(!c.enable) continue;
+        next[c.outId] += accumulate(c.weight, n.value);
+      }
+    }
+
+// activate
+    for(let i=0;i<nodes.length;i++){
+      nodes[i].value = Math.tanh(next[i]);
+    }
+
+    const l = MOTOR_OTHER_NODE + SELF_NODE + INTENT_COUNT + MOTOR_OUT_NODE;
+//輸出結果
+    const turn = nodes[l-2].value;  //轉向
+    const move = nodes[l-1].value;  //動力
+    this.turnForce = turn;
+    this.frontForce = move;
+    const faceFactor = move<0 ?0.3 :1;
+    if(this.mode === "fight") {
+      let maxIdx = null;
+      let maxValue = -Infinity;
+      for(let i=3; i<=6; i++) {
+        if(nodes[l-i].value > maxValue) {
+          maxIdx = i;
+          maxValue = nodes[l-i].value;
+        }
+      }
+      this.targetType = 0;
+      if(maxIdx) this.targetType = maxIdx-2;
+    }
+
+    this.face += turn*this.maxTurnSpeed;
+    this.face %= Math.PI*2;
+    this.vx = Math.cos(this.face)*this.maxSpeed*move*faceFactor;
+    this.vy = Math.sin(this.face)*this.maxSpeed*move*faceFactor;
+  }
+
+
+
+/*移動==============*/
+  move() {
+    const nx = this.x+this.vx;
+    const ny = this.y+this.vy;
+    this.x = nx;
+    this.y = ny;
+    if(nx>w) this.x-=w;
+    if(nx<0) this.x+=w;
+    if(ny>h) this.y-=h;
+    if(ny<0) this.y+=h;
+    this.erg -= 0.04*Math.abs(this.frontForce) + 0.04*Math.abs(this.turnForce) + 0.02;
+    if(this.erg < 0) {
+      this.hp += this.erg;
+      this.erg =0;
+    }
+    const newCell = toKey(this.x, this.y);
+    if(newCell !== this.cell) addToCell(newCell,this);
+  }
+
+/*恢復==============*/
+  cure() {
+/*
+    if(this.erg>this.maxErg) {
+      this.hp += (this.erg-this.maxErg)/10;
+      this.erg = this.maxErg;
+      return;
+    }
+*/
+  }
+
+/*生病==============*/
+  sick() {
+    let foodSignal = 0;
+    for(const d of this.vision) {
+      foodSignal += d[food-1].signal;
+    }
+    if(foodSignal > 0.01) this.hp -= foodSignal;
+  }
+
+/*繁殖==============*/
+  clone() {
+    if(this.pregnent === 0) {
+      this.pregnent = -1;
+      const dir = [[0,-1], [0,1], [1,0], [-1,0]];
+      const randomDir = dir[Math.floor(Math.random()*4)];
+      let dx = randomDir[0]*size/10;
+      let dy = randomDir[1]*size/10;
+      let n;
+      if(Math.random()<0.05) {
+        n = new normalDian(null, this.x+dx, this.y+dy);
+      } else {
+        n = new normalDian(this, this.x+dx, this.y+dy);
+      }
+
+      addToCell(toKey(n.x,n.y), n);
+      agents[n.type].push(n);
+      this.x -= dx;
+      this.y -= dy;
+      this.score.wander += n.erg*this.wanderCredit;
+      this.score.born++;
+      this.score.clone += n.erg;
+    }
+    if(this.pregnent>0) {this.pregnent--; return;}
+
+    if(this.mode !== "clone") return;
+    if(this.erg*2 < this.maxErg) {
+      this.score.clone -= 0.05;
+      return;
+    }
+
+    if(this.pregnent === -1) {
+      this.pregnent = 2000;
+      this.erg -= 50;
+      this.keep = 0;
+    }
+
+
+  }
+
+/*進食==============*/
+  food() {
+    if(this.mode !== "eat") return;
+    if(this.erg >= this.maxErg) {
+      this.keep = 0;
+      return;
+    }
+    this.erg -= 0.01;
+    let target = this.vision[3][plant-1].closest;
+
+    if(!target) {
+      this.score.eat --;
+      this.sick();
+      return;
+    }
+
+    const dist2 = this.vision[3][plant-1].minDist2;
+    if(dist2 > 25) {
+      this.score.eat --;
+      this.sick();
+      return;
+    }
+    const bite = 10*(1-dist2/25);
+    let dx = target.x-this.x;
+    let dy = target.y-this.y;
+    if(dx > maxDistX) dx = -w+dx;
+    if(dx < -maxDistX) dx = w+dx;
+    if(dy > maxDistY) dy = -h+dy;
+    if(dy < -maxDistY) dy = h+dy;
+    if(target.hp > 10*bite) {
+      target.hp -= 10*bite;
+      this.erg += bite;
+      target.x -= 0.01*dx;
+      target.y -= 0.01*dy;
+      target.x = (target.x+w)%w;
+      target.y = (target.y+h)%h;
+      const newCell = toKey(target.x, target.y);
+      if(newCell !== target.cell) addToCell(newCell,target);
+      this.score.erg += bite;
+      this.score.wander += bite*this.wanderCredit;
+    } else {
+      this.erg += target.hp/10;
+      this.score.eat += target.hp/10;
+      this.score.wander += target.hp/10*this.wanderCredit
+      target.hp = 0;
+    }
+    this.sick();
+  }
+
+/*攻擊==============*/
+  fight() {
+
+    if(this.fightCooldown > 0) this.fightCooldown--;
+    if(this.fightCooldown > 0 || this.mode !== "fight") return false;
+
+    this.erg -= this.atk/20;
+    let closest = null;
+    let minDist2 = this.maxSpeed*this.maxSpeed;
+    const dist2 = this.vision[3][this.targetType-1].minDist2;
+    if(dist2 <minDist2) {
+      closest = this.vision[3][this.targetType-1].closest;
+      minDist2 = dist2;
+    }
+    if(!closest) {
+      this.score.fight--;
+      return false;
+    }
+    let dx = closest.x-this.x;
+    let dy = closest.y-this.y;
+    if(dx > maxDistX) dx = -w+dx;
+    if(dx < -maxDistX) dx = w+dx;
+    if(dy > maxDistY) dy = -h+dy;
+    if(dy < -maxDistY) dy = h+dy;
+
+    closest.hp -= this.atk;
+    this.erg -= minDist2/this.maxSpeed;
+    this.vx = dx*0.8;
+    this.vy = dy*0.8;
+    this.move();
+    this.score.fight += this.atk;
+    this.score.wander += this.atk*this.wanderCredit;
+    this.fightCooldown = 20;
+    this.keep = 0;
+  }
+
+/*探索==============*/
+  wander() {
+
+    if(this.mode === "wander" && this.wandering === false) {
+      this.wandering = true;
+      this.wanderTime = 0;
+      this.wanderStart = {x:this.x, y:this.y};
+      this.wanderMove=1;
+    }
+
+    if(this.mode === "wander") {
+      this.wanderTime ++;
+      this.wanderMove += this.vx*this.vx + this.vy*this.vy;
+    }
+
+    if(this.mode !== "wander" && this.wandering === true) {
+      this.wanderCredit = Math.hypot(this.x-this.wanderStart.x, this.y-this.wanderStart.y)/this.wanderMove;
+      this.wandering = false;
+    }
+  }
+
+/*渲染==============*/
+  draw() {
+    const a = this.hp/this.maxHp*0.8+0.2;
+    let r = this.erg/this.maxErg + 2.5;
+    if(this.pregnent>0) r += 2.5*(1-this.pregnent/2000);
+    const eye1X = r*Math.cos(this.face-Math.PI/6);
+    const eye1Y = r*Math.sin(this.face-Math.PI/6);
+    const eye2X = r*Math.cos(this.face+Math.PI/6);
+    const eye2Y = r*Math.sin(this.face+Math.PI/6);
+    const speciesColor = `hsla(${360*this.species/1e7}, ${10+speciesMap.get(this.species)/agents[3].length*90}%, ${40 + (this.bias*1e10 % 1000) / 1000 * 20}%, ${a})`;
+    const wave = Math.sin(this.wave)*Math.PI/12;
+
+
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+//漸層
+        let tailGrad = ctx.createLinearGradient(
+          this.x+ox-0.7*r*Math.cos(this.face),
+          this.y+oy-0.7*r*Math.sin(this.face),
+          this.x+ox-r*Math.cos(this.face)-0.8*(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
+          this.y+oy-r*Math.sin(this.face)-0.8*(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+        );
+        tailGrad.addColorStop(0, `hsla(${color[normal].h}, ${color[normal].s}%, ${color[normal].l}%, ${a})`);
+        tailGrad.addColorStop(1, speciesColor);
+
+//身體尾巴
+        ctx.beginPath();
+        ctx.fillStyle = tailGrad;
+        ctx.moveTo(
+          this.x+ox-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
+          this.y+oy-r*Math.sin(this.face)-(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
+        );
+        ctx.lineTo(this.x+ox-r*Math.cos(this.face+Math.PI/4), this.y+oy-r*Math.sin(this.face+Math.PI/4));
+        ctx.arc(this.x+ox, this.y+oy, r, this.face-Math.PI*2.7/4, this.face+Math.PI*2.7/4);
+        ctx.lineTo(this.x+ox-r*Math.cos(this.face-Math.PI/4), this.y+oy-r*Math.sin(this.face-Math.PI/4));
+
+
+
+        ctx.closePath();
+        ctx.fill();
+
+
+//眼睛
+
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+        ctx.arc(this.x+ox+eye1X, this.y+oy+eye1Y, 1.5, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+        ctx.arc(this.x+ox+eye1X, this.y+oy+eye1Y, 1, 0, 2*Math.PI);
+        ctx.fill();
+
+
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+        ctx.arc(this.x+ox+eye2X, this.y+oy+eye2Y, 1.5, 0, 2*Math.PI);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+        ctx.arc(this.x+ox+eye2X, this.y+oy+eye2Y, 1, 0, 2*Math.PI);
+        ctx.fill();
+      }
+    }
+  }
+
+/*時間==============*/
+  update() {
+    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/2000);
+//觀察
+    if(this.age%5 === 0) {
+      this.input();
+//做甚麼
+      let r;
+      this.currentIntent = this.intent();
+      if(this.keep <=0) {
+        let max = -Infinity;
+        let idx = null;
+        const ints = this.currentIntent;
+        const modes = ["eat", "clone", "fight", "wander"];
+        for(let i=0; i<ints.length; i++) {
+          if(ints[i]>max) {
+            max = ints[i];
+            idx = i;
+          }
+        }
+        this.mode = modes[idx];
+        this.keep = 2;
+      }
+
+      if(this.mode === "eat") this.steering(this.eatBrain,this.currentIntent);
+      else if(this.mode === "clone") this.steering(this.cloneBrain,this.currentIntent);
+      else if(this.mode === "fight") this.steering(this.fightBrain,this.currentIntent);
+      else if(this.mode === "wander") this.steering(this.wanderBrain,this.currentIntent);
+      this.keep -= Math.random(); //計畫Math.random()*keepness基因化
+    }
+
+
+
+//恢復
+    this.cure();
+
+//繁殖
+    this.clone();
+
+//進食
+    this.food();
+
+//晃
+    this.wander();
+
+//打架&移動
+    if(!this.fight())this.move();
+
+//死亡
+    if(this.age>this.maxAge) this.hp = this.hp*(1-(this.age-this.maxAge)/this.maxAge)-0.01;
+    if(this.hp <= 0) {
+      removeFromCell(this.cell, this);
+      this.dead = true;
+      recordDeath(this);
+      if(!this.newGen) {
+        const n = new Food(this);
+        addToCell(toKey(n.x,n.y), n);
+        agents[n.type].push(n);
+      }
+      return;
+    }
+
+//年齡
+    speciesMap.set(this.species,(speciesMap.get(this.species)||0) + 1);
+    this.age ++;
+    this.wave += this.frontForce;
+    this.wanderCredit *= 1-0.002*this.wanderTime;
+    this.draw();
+  }
+}
+/*點點腦==============================*/
+
+/*決策腦==============*/
+const OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
+const SELF_NODE = 4; //hp, erg, faceSin, faceCos
+const INTENT_OUT_NODE = 4; //吃，生，打，晃
+
+class IntentBrain {
+  constructor(brain, data) {
+
+//讀紀錄
+    if(data) {
+      this.nodes = data.nodes.map(n => new Node(n.id, n.depth));
+      this.connects = data.connects.map(c =>
+        new Connect(c.inId, c.outId, c.weight, c.enable, c.forward)
+      );
+
+//全新
+    } else if(!brain) {
+      this.nodes = [];
+      for(let i=0; i<OTHER_NODE + SELF_NODE; i++) this.nodes.push(new Node(this.nodes.length, 0));
+
+      for(let i=0; i<INTENT_OUT_NODE; i++) this.nodes.push(new Node(this.nodes.length, 1));
+
+      this.connects = [];
+      let l = this.nodes.length;
+      for(let i=0; i<l-INTENT_OUT_NODE; i++) {
+        if(Math.random()<0.5) {
+          for(let j=0; j<INTENT_OUT_NODE; j++) {
+            if(Math.random()<0.5) this.connects.push(new Connect(this.nodes[i].id, this.nodes[l-j-1].id, Math.random()*2-1));
+          }
+        }
+      }
+
+//遺傳
+    } else {
+      this.nodes = [];
+      for(const n of brain.nodes) {
+        this.nodes.push(n.clone());
+      }
+      this.connects = [];
+      for(const c of brain.connects) {
+        this.connects.push(c.clone());
+      }
+      if(Math.random()<0.1) {
+        const inId = Math.floor(Math.random()*this.nodes.length);
+        const outId = Math.floor(Math.random()*this.nodes.length);
+        const inDepth = this.nodes[inId].depth;
+        const outDepth = this.nodes[outId].depth;
+        let forward = true;
+        if(inDepth > outDepth) forward = false;
+        if(inDepth !== outDepth) this.connects.push(new Connect(inId, outId, Math.random()*2-1, true, forward));
+      }
+      if (Math.random() < 0.05 && this.connects.length > 0) {
+        const c = this.connects[Math.floor(Math.random() * this.connects.length)];
+        if (c.enable) {
+          const inDepth = this.nodes[c.inId].depth;
+          const outDepth = this.nodes[c.outId].depth;
+
+          const newId = this.nodes.length;
+          const newDepth = (inDepth + outDepth) / 2;
+          if(inDepth !== outDepth) {
+//關閉舊連線
+            c.enable = false;
+            const newNode = new Node(newId, newDepth);
+            this.nodes.push(newNode);
+//拆成兩段
+            this.connects.push(new Connect(c.inId, newId, c.weight, true, c.forward));
+            this.connects.push(new Connect(newId, c.outId, Math.random()*2-1, true, c.forward));
+          }
+
+        }
+      }
+    }
+
+//排序計算順序
+    this.order = [];
+    let l = this.nodes.length;
+    const inNodesCount = Array(l).fill(0);
+    const outNodesId = Array(l).fill().map(() => []);
+    this.outByIn = Array(l).fill().map(() => []);
+    for(const c of this.connects) {
+//每個node輸出的其他nodeId
+       if(c.forward) outNodesId[c.inId].push(c.outId);
+      this.outByIn[c.inId].push(c);
+//每個node有幾個輸入node
+       if(c.forward) inNodesCount[c.outId]++;
+    }
+//沒輸入的當起點
+    const queue = [];
+    for(let i=0; i<l; i++) {
+      if(inNodesCount[i] === 0) queue.push(i);
+    }
+//排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
+    const order = [];
+    let time=0;
+    while(queue.length > 0 && time<=1000) {
+//取queue的第一個id放進order
+      time++;
+      const n = queue.shift();
+      this.order.push(n);
+//以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
+      for(const next of outNodesId[n]) {
+        inNodesCount[next]--;
+        if(inNodesCount[next] === 0) {
+          queue.push(next);
+        }
+      }
+    }
+  }
+}
+
+/*行動腦==============*/ //吃，逃，打，晃
+const MOTOR_OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
+const INTENT_COUNT = 4;
+const MOTOR_OUT_NODE = 6; //轉向，前進，type*4
+
+class SteeringBrain {
+  constructor(brain, data) {
+    this.score = 0;
+//讀紀錄
+    if(data) {
+      this.nodes = data.nodes.map(n => new Node(n.id, n.depth));
+      this.connects = data.connects.map(c =>
+        new Connect(c.inId, c.outId, c.weight, c.enable, c.forward)
+      );
+
+//全新
+    } else if(!brain) {
+      this.nodes = [];
+      for(let i=0; i< MOTOR_OTHER_NODE + INTENT_COUNT + SELF_NODE; i++) this.nodes.push(new Node(this.nodes.length, 0));
+      for(let i=0; i< MOTOR_OUT_NODE; i++) this.nodes.push(new Node(this.nodes.length, 1));
+
+      this.connects = [];
+      let l = this.nodes.length;
+      for(let i=0; i<l- MOTOR_OUT_NODE; i++) {
+        if(Math.random()<0.5) {
+          for(let j=0; j<MOTOR_OUT_NODE; j++) {
+            if(Math.random()<0.5) this.connects.push(new Connect(this.nodes[i].id, this.nodes[l-j-1].id, Math.random()*2-1));
+          }
+        }
+      }
+
+//遺傳
+    } else {
+      this.nodes = [];
+      for(const n of brain.nodes) {
+        this.nodes.push(n.clone());
+      }
+      this.connects = [];
+      for(const c of brain.connects) {
+        this.connects.push(c.clone());
+      }
+      if(Math.random()<0.1) {
+        const inId = Math.floor(Math.random()*this.nodes.length);
+        const outId = Math.floor(Math.random()*this.nodes.length);
+        const inDepth = this.nodes[inId].depth;
+        const outDepth = this.nodes[outId].depth;
+        let forward = true;
+        if(inDepth > outDepth) forward = false;
+        if(inDepth !== outDepth) this.connects.push(new Connect(inId, outId, Math.random()*2-1, true, forward));
+      }
+      if (Math.random() < 0.05 && this.connects.length > 0) {
+        const c = this.connects[Math.floor(Math.random() * this.connects.length)];
+        if (c.enable) {
+          const inDepth = this.nodes[c.inId].depth;
+          const outDepth = this.nodes[c.outId].depth;
+
+          const newId = this.nodes.length;
+          const newDepth = (inDepth + outDepth) / 2;
+          if(inDepth !== outDepth) {
+//關閉舊連線
+            c.enable = false;
+            const newNode = new Node(newId, newDepth);
+            this.nodes.push(newNode);
+//拆成兩段
+            this.connects.push(new Connect(c.inId, newId, c.weight, true, c.forward));
+            this.connects.push(new Connect(newId, c.outId, Math.random()*2-1, true, c.forward));
+          }
+        }
+      }
+    }
+//排序計算順序
+    this.order = [];
+    let l = this.nodes.length;
+    const inNodesCount = Array(l).fill(0);
+    const outNodesId = Array(l).fill().map(() => []);
+    this.outByIn = Array(l).fill().map(() => []);
+    for(const c of this.connects) {
+//每個node輸出的其他nodeId
+      if(c.forward) outNodesId[c.inId].push(c.outId);
+      this.outByIn[c.inId].push(c);
+//每個node有幾個輸入node
+      if(c.forward) inNodesCount[c.outId]++;
+    }
+//沒輸入的當起點
+    const queue = [];
+    for(let i=0; i<l; i++) {
+      if(inNodesCount[i] === 0) queue.push(i);
+    }
+//排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
+    const order = [];
+    let time=0;
+    while(queue.length > 0 && time<=1000) {
+//取queue的第一個id放進order
+      time++;
+      const n = queue.shift();
+      this.order.push(n);
+//以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
+      for(const next of outNodesId[n]) {
+        inNodesCount[next]--;
+        if(inNodesCount[next] === 0) {
+          queue.push(next);
+        }
+      }
+    }
+  }
+}
+
+
+
+/*神經元============*/
+class Node {
+  constructor(id, depth, value = 0) {
+    this.id = id;
+    this.value = 0;
+    this.depth = depth;
+  }
+  clone() {
+    return new Node(this.id, this.depth);
+  }
+}
+
+/*神經==============*/
+class Connect {
+  constructor(inId, outId, weight, enable = true, forward = true,) {
+    this.forward = forward;
+    this.enable = enable;
+    this.inId = inId;
+    this.outId = outId;
+    this.weight = weight;
+  }
+  clone() {
+    let w = this.weight;
+    if(Math.random() < 0.1) {
+      w += (Math.random()*2-1) * 0.5; // 小幅變動
+    }
+    if(Math.random() < 0.1) {
+      w = Math.random()*2-1; // 重置
+    }
+    let enable = this.enable;
+    if(Math.random() < 0.1) {
+     enable = !this.enable; //關閉or開啟
+    }
+    return new Connect(this.inId, this.outId, w, enable, this.forward);
+  }
+}
+
+/*============================================================
+操作反應
+============================================================*/
+
+function resize() {
+
+  const cellSize = Math.sqrt(w*h/2048);
+  maxDistX = w/2;
+  maxDistY = h/2;
+
+  maxGridX = 1;
+  while (cellSize*maxGridX*2 <= w) {
+    maxGridX *= 2;
+  }
+  maxGridY = 1;
+  while (cellSize*maxGridY*2 <= h) {
+    maxGridY *= 2;
+  }
+
+  sizeX = w/maxGridX;
+  sizeY = h/maxGridY;
+  size = (sizeX+sizeY)/2;
+
+  for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
+    c.width = window.innerWidth;
+    c.height = window.innerHeight;
+    c.style.left = "0px";
+    c.style.top = "0px";
+  }
+
+  for(let t=plant; t<=hunter; t++) {
+    for(const a of agents[t]) {
+      if(!a.dead) {
+        a.x = (a.x + w) % w;
+        a.y = (a.y + h) % h;
+        addToCell(toKey(a.x, a.y), a);
+      }
+    }
+  }
+  const nfer = new Map();
+  for(const [k,v] of fertilizerMap) {
+    const cx = keyToCellX(k);
+    const cy = keyToCellY(k);
+    if(cx>=maxGridX || cx<0 || cy>=maxGridY || cy<0) continue;
+    const key = toKey(cx,cy);
+    nfer.set(key, v);
+  }
+  fertilizerMap.clear();
+  for(const [k,v] of nfer) {
+    fertilizerMap.set(k, v);
+  }
+
+  rangeCache.length = 0;
+
+  const mh = h*0.9;
+  infoDiv.style.maxHeight = mh + "px";
+  infoDiv.style.width = mh/16*9 + "px";
+  infoDiv.style.borderRadius = mh/64 + "px";
+  textInfo.style.width = mh/16*9 + "px";
+  textInfo.style.fontSize = mh/640*12 + "px";
+  for(const c of document.getElementsByClassName("infoCanvas")) {
+    c.width = mh/16*8;
+    c.height = mh/16*8/16*9;
+    c.style.margin = mh/128+"px";
+  }
+  infoPadding = mh/16*8*0.05;
+
+  if(grid) {
+    bgCtx.clearRect(-w,-h,3*w,3*h);
+    for(let ox = -w; ox<=w; ox+=w) {
+      for(let oy = -h; oy<=h; oy+=h) {
+        for(let y=0; y<=maxGridY; y+=1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          bgCtx.lineWidth = 2;
+          bgCtx.moveTo(0+ox, y*sizeY+oy);
+          bgCtx.lineTo(w+ox, y*sizeY+oy);
+          bgCtx.stroke();
+        }
+        for(let x=0; x<=maxGridX; x+=1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          bgCtx.lineWidth = 2;
+          bgCtx.moveTo(x*sizeX+ox, 0+oy);
+          bgCtx.lineTo(x*sizeX+ox, h+oy);
+          bgCtx.stroke();
+        }
+      }
+    }
+  }
+
+}
+
+function drawGrid(fit=false) {
+  bgCtx.clearRect(-w,-h,3*w,3*h);
+  if(grid) {
+    bgCtx.clearRect(-w,-h,3*w,3*h);
+    bgCtx.setTransform(
+      zoom, 0,
+      0, zoom,
+      -camera.x * zoom,
+      -camera.y * zoom
+    );
+    for(let y=0; y<=maxGridY; y+=1) {
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      if(fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+      bgCtx.lineWidth = 1;
+      bgCtx.moveTo(0, y*sizeY);
+      bgCtx.lineTo(w, y*sizeY);
+      bgCtx.stroke();
+    }
+    for(let x=0; x<=maxGridX; x+=1) {
+      bgCtx.beginPath();
+      bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+      if(fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+      bgCtx.lineWidth = 1;
+      bgCtx.moveTo(x*sizeX, 0);
+      bgCtx.lineTo(x*sizeX, h);
+      bgCtx.stroke();
+    }
+  }
+}
+
+/*存檔============================*/
+window.addEventListener("beforeunload", () => {
+  localStorage.setItem("dian_world_save", JSON.stringify(evolutionPool));
+});
+
+/*讀檔============================*/
+function loadWorld() {
+  const raw = localStorage.getItem("dian_world_save");
+  if(!raw) return false;
+
+  const data = JSON.parse(raw);
+  
+  evolutionPool = data || [[],[],[],[],[]];
+  const t = performance.now();
+  for(let i=0; i<5; i++) {
+    for(const b of evolutionPool[i]) {
+      if(b.time) b.time = t;
+    }
+  }
+
+  return true;
+}
+
+function deserializeBrain(data, region) {
+
+  if (!data?.nodes || !data?.connects) {
+    return region === "intent"
+      ? new IntentBrain(null)
+      : new SteeringBrain(null);
+  }
+
+  const brain = region === "intent"
+    ? new IntentBrain(null, data)
+    : new SteeringBrain(null, data);
+
+  return brain;
+}
+loadWorld();
+
+
+window.addEventListener("keydown", (e) => {
+/*刪檔============================*/
+  if (e.ctrlKey && e.shiftKey && e.code === "KeyZ") {
+    grids.length = 0;
+    fertilizerMap.clear();
+    for(const t of agents) t.length = 0;
+    evolutionPool = [[],[],[],[],[]];
+    generation = 0;
+    localStorage.removeItem("dian_world_save");
+  }
+/*幀率============================*/
+  if (e.code === "KeyF") {
+    const display = infoDiv.style.display;
+    if(display === "none") {
+
+      infoDiv.style.display = "block";
+    } else if(display === "block" && infoShow === "min"){
+      infoShow = "hour";
+    } else if(display === "block" && infoShow === "hour"){
+      infoDiv.style.display = "none";
+      infoShow = "min";
+    }
+    showFps = !showFps;
+  }
+
+/*可視化神經======================*/
+  if (e.code === "KeyB") {
+    const display = brainDiv.style.display;
+    if(display === "none") {
+      brainDiv.style.display = "grid";
+    } else if(display === "grid"){
+      brainDiv.style.display = "none";
+    }
+  }
+
+/*格線============================*/
+  if (e.code === "KeyG") {
+    grid=!grid;
+    drawGrid();
+  }
+/*世界縮放=========================*/
+  if (e.shiftKey) {
+    if (e.code === "ArrowDown") {
+      h += 10.1/zoom;
+      if(Math.abs(h-window.innerHeight/zoom)<10/zoom) h=window.innerHeight/zoom;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowUp") {
+      h -= 10.1/zoom;
+      if(Math.abs(h-window.innerHeight/zoom)<10/zoom) h=window.innerHeight/zoom;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowLeft") {
+      w -= 10.1/zoom;
+      if(Math.abs(w-window.innerWidth/zoom)<10/zoom) w=window.innerWidth/zoom;
+      resize();
+      drawGrid(Math.abs(w-window.innerWidth/zoom)<10/zoom);
+    }
+    if (e.code === "ArrowRight") {
+      w += 10.1/zoom;
+      if(Math.abs(w-window.innerWidth/zoom)<10/zoom) w=window.innerWidth/zoom;
+      resize();
+      drawGrid(Math.abs(w-window.innerWidth/zoom)<10/zoom);
+    }
+    if (e.code === "Space") {
+      w = window.innerWidth;
+      h = window.innerHeight;
+      resize();
+      drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
+    }
+  }
+/*鏡頭縮放=========================*/
+  if(!e.shiftKey) {
+    if (e.code === "ArrowUp") {
+      zoom *= 1.1;
+      drawGrid();
+    }
+    if (e.code === "ArrowDown") {
+      zoom *= 0.9;
+      drawGrid();
+    }
+    if (e.code === "Space") {
+      follow = false;
+      camera.x=0;
+      camera.y=0;
+      zoom = 1;
+      drawGrid();
+    }
+  }
+
+/*鏡頭移動=========================*/
+  if (e.code === "KeyW") {
+    follow = false;
+    camera.y-=10;
+    drawGrid();
+  }
+  if (e.code === "KeyS") {
+    follow = false;
+    camera.y+=10;
+    drawGrid();
+  }
+  if (e.code === "KeyA") {
+    follow = false;
+    camera.x-=10;
+    drawGrid();
+  }
+  if (e.code === "KeyD") {
+    follow = false;
+    camera.x+=10;
+    drawGrid();
+  }
+
+/*鏡頭跟隨=========================*/
+  if (e.code === "KeyQ") {
+    follow = !follow;
+  }
+});
+
+/*============================================================
+工具函數
+============================================================*/
+/*區塊資料============================*/
+/*查詢==============*/
+function getCell(key) {
+  if(grids[key]===undefined) {
+    grids[key] = [];
+  }
+  return grids[key];
+}
+/*新增==============*/
+function addToCell(key, agent) {
+  if(agent.cell!==null && agent.cellIdx!==null) removeFromCell(agent.cell, agent);
+  agent.cell = key;
+  const newCell = getCell(key);
+  agent.cellIdx = newCell.length;
+  newCell.push(agent);
+}
+/*移除==============*/
+function removeFromCell(key, agent) {
+  const idx = agent.cellIdx;
+  const cell = getCell(key);
+  cell[idx] = cell[cell.length-1];
+  cell[idx].cellIdx = idx;
+  cell.pop();
+}
+/*所在區塊==========*/
+function toKey(x,y) {
+  const cellX = (x / sizeX) | 0;
+  const cellY = (y / sizeY) | 0;
+
+  return cellX | (cellY << 10);
+}
+/*所在區塊==========*/
+function cellToKey(cellX,cellY) {
+  return cellX | (cellY << 10);
+}
+/*區塊解碼==========*/
+function keyToCellX(key) {
+  return key & (maxGridX-1);
+}
+function keyToCellY(key) {
+  return key >> 10;
+}
+
+/*神經運算============================*/
+function accumulate(w, v) {
+  return Math.tanh(w*v);
+}
+
+/*死亡結算============================*/
+
+/*更新進化池========*/
+function recordDeath(dian) {
+  if(dian.age*1.5 < dian.maxAge) return;
+  const time = performance.now();
+  evolutionPool[intent].push({
+    score: 0,
+    rank:0,
+    time,
+    brain: serializeBrain(dian.intentBrain),
+    intent: Math.max(0, dian.score.born*120/(dian.maxAge-600)),
+  });
+
+  const intBrain = evolutionPool[intent][evolutionPool[intent].length-1];
+  evolutionPool[eat].push({
+    score: dian.score.eat,
+    rank:0,
+    time,
+    brain: serializeBrain(dian.eatBrain),
+    intent: intBrain,
+  });
+
+  evolutionPool[clone].push({
+    score: dian.score.clone,
+    rank:0,
+    time,
+    brain: serializeBrain(dian.cloneBrain),
+    intent: intBrain,
+  });
+
+  evolutionPool[fight].push({
+    score: dian.score.fight,
+    rank:0,
+    time,
+    brain: serializeBrain(dian.fightBrain),
+    intent: intBrain,
+  });
+
+  evolutionPool[wander].push({
+    score: dian.score.wander,
+    rank:0,
+    time,
+    brain: serializeBrain(dian.wanderBrain),
+    intent: intBrain,
+  });
+
+
+  for(const b of evolutionPool) {
+    if(b === evolutionPool[intent]) {
+      for(const e of b) {
+        e.score = e.intent;
+      } 
+      continue;
+    }
+    let min = Infinity;
+    for(const e of b) if(e.score<min) min = e.score;
+    let total = 0;
+    for(const e of b) {
+      total += e.score-min;
+    }
+    for(const e of b) {
+      if(total === 0) {
+        e.rank = 1/MAX_POOL;
+      } else {
+        e.rank = (e.score-min)/total;
+      }
+      e.intent.score *= e.rank;
+    }
+  }
+
+  let intentTotal = 1;
+  for(const e of evolutionPool[intent]) {
+    intentTotal += e.score;
+  }
+  for(const e of evolutionPool[intent]) {
+    if(intentTotal === 0) {
+      e.rank = 1/MAX_POOL;
+      continue;
+    }
+    e.rank = e.score/intentTotal;
+  }
+
+  for(const b of evolutionPool) {
+    if(b.length > MAX_POOL) {
+      b.shift();
+    }
+  }
+}
+
+/*壓縮DNA訊息=======*/
+function serializeBrain(brain) {
+  return {
+    nodes: brain.nodes.map(n => ({
+      id: n.id,
+      depth: n.depth
+    })),
+    connects: brain.connects.map(c => ({
+      inId: c.inId,
+      outId: c.outId,
+      weight: c.weight,
+      enable: c.enable,
+      forward:c.forward,
+    }))
+  };
+}
+
+/*選擇下一代DNA======*/
+function pickBestDNA() {
+  return {
+    intentBrain: pickFromPool(evolutionPool[intent]),
+    eatBrain: pickFromPool(evolutionPool[eat]),
+    cloneBrain: pickFromPool(evolutionPool[clone]),
+    fightBrain: pickFromPool(evolutionPool[fight]),
+    wanderBrain: pickFromPool(evolutionPool[wander]),
+  };
+}
+
+function pickFromPool(pool) {
+  let total = 0;
+  for(const e of pool) {
+    if(e.score<0) continue;
+    total += e.rank*e.rank;
+  }
+  let r = Math.random() * total;
+  for(const e of pool) {
+    if(e.score<0) continue;
+    r -= e.rank*e.rank;
+    if(r <= 0) {
+      return e.brain;
+    }
+  }
+  return null;
+}
+
+/*範圍資料庫=========*/
+
+function createNearCache(range) {
+  rangeCache[range] = [];
+  const cache = rangeCache[range];
+  for(let x=Math.max(-maxGridX/2, -range); x<=Math.min(maxGridX/2, range); x++) {
+    for(let y=Math.max(-maxGridY/2, -range); y<=Math.min(maxGridY/2, range); y++) {
+      if(x*x+y*y<range*range) {
+        cache.push(x);
+        cache.push(y);
+      }
+    }
+  }
+  return cache;
+}
+
+function softMax(arr=[]) {
+  const max = Math.max(...arr);
+
+  const exps = arr.map(v => Math.exp(v - max));
+
+  let sum = 0;
+  for(const e of exps) sum += e;
+
+  return exps.map(e => e / sum);
+}
+
+/*============================================================
+渲染
+============================================================*/
+
+/*區塊著色============================*/
+function fillCell(key, color = "hsla(0, 0%, 100%, 1)", layer = bgCtx) {
+  const y = keyToCellY(key)*sizeY;
+  const x = keyToCellX(key)*sizeX;
+  layer.fillStyle = color;
+  for(let ox = -w; ox<=w; ox+=w) {
+    for(let oy = -h; oy<=h; oy+=h) {
+      layer.fillRect(x+ox, y+oy, sizeX, sizeY);
+    }
+  }
+}
+
+/*圖示神經網路========================*/
+function drawBrain(brain) {
+  if (!brain) return;
+
+  const nodes = brain.nodes;
+  const connects = brain.connects;
+
+  const startX = 25;
+  const startY = 50;
+  const layerGap = 80;
+  const nodeGap = 15;
+
+  const nodePos = new Map();
+
+  // 找 depth 範圍
+  let minD = Infinity;
+  let maxD = -Infinity;
+  for (const n of nodes) {
+    if (n.depth < minD) minD = n.depth;
+    if (n.depth > maxD) maxD = n.depth;
+  }
+
+// 避免除以0（全部同層）
+  const range = maxD - minD || 1;
+
+// 用來避免重疊
+  const depthGroups = new Map();
+
+// 分組（依 depth）
+  for (const n of nodes) {
+    const key = n.depth.toFixed(2); // 調精度
+    if (!depthGroups.has(key)) depthGroups.set(key, []);
+    depthGroups.get(key).push(n);
+  }
+
+// 排位置
+  for (const [key, group] of depthGroups) {
+    const d = parseFloat(key);
+    const norm = (d - minD) / range;
+
+    const x = startX + norm * 200; // 控制整體寬度
+
+    group.forEach((n, i) => {
+      const y = startY + i * nodeGap;
+
+      nodePos.set(n.id, { x, y });
+
+      infoCtx.beginPath();
+      const v = Math.tanh(n.value);
+
+      const light = (v + 1) * 25 + 25;
+      const a = v ===0? 0.1:1
+      infoCtx.fillStyle = `hsla(200, 80%, ${light}%, ${a})`;
+      infoCtx.arc(x, y, 5, 0, Math.PI * 2);
+      infoCtx.fill();
+    });
+  }
+  // 畫連線
+  for (const c of connects) {
+    if (!c.enable) continue;
+
+    const from = nodePos.get(c.inId);
+    const to = nodePos.get(c.outId);
+    if (!from || !to) continue;
+
+    infoCtx.beginPath();
+    const strength = Math.abs(c.weight);
+    infoCtx.strokeStyle = c.weight > 0
+      ? `rgba(200,200,200,${strength})`
+      : `rgba(50,50,50,${strength})`;
+
+    infoCtx.moveTo(from.x, from.y);
+    infoCtx.lineTo(to.x, to.y);
+    infoCtx.stroke();
+  }
+}
+let normalAgest;
+
+/*============================================================
+運行
+============================================================*/
+let timeStamp = 0;
+let deadClearFrame = 0;
+let fps = 0;
+let lastTime = performance.now();
+let frames = 0;
+let showFps = false;
+let infoShow = "min";
+const counts = [[],[],[],[],[]];
+const hourCounts = [[],[],[],[],[]];
+
+function loop() {
+
+//資訊卡
+  frames++;
+  const now = performance.now();
+  const delta = now - lastTime;
+  if (delta >= 1000) {
+    fps = (frames * 1000) / delta;
+
+    counts[plant].push(agents[plant].length),
+    counts[normal].push(agents[normal].length),
+    counts[hunter].push(agents[hunter].length),
+
+    frames = 0;
+    lastTime = now;
+
+    textInfo.innerHTML = "";
+    for(const c of infoCtx) {
+      if(c===null) continue;
+      c.clearRect(0,0,infoCanvas[plant].width,infoCanvas[plant].height);
+    }
+
+    textInfo.innerHTML =
+      `fps: ${Math.round(fps)}<br>`+
+      `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>`+
+      `generation: ${generation}`;
+
+    for(let t=1; t<=4; t++) {
+      if(t===2) continue;
+      const iCtx = infoCtx[t];
+      const cw = infoCanvas[t].width;
+      const ch = infoCanvas[t].height;
+      iCtx.beginPath();
+      iCtx.moveTo(infoPadding, infoPadding-2);
+      iCtx.lineTo(cw-infoPadding, infoPadding-2);
+      iCtx.lineTo(cw-infoPadding, ch-infoPadding);
+      iCtx.lineTo(infoPadding, ch-infoPadding);
+      iCtx.closePath();
+      iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
+      iCtx.lineWidth = cw/320;
+      iCtx.stroke();
+
+      const minL = counts[t].length;
+      if(counts[t].length>120) {
+        let avg = 0;
+        for(let i=0; i<60; i++) {
+          avg += counts[t][i];
+        }
+        avg /= 60;
+        hourCounts[t].push(avg);
+        if(hourCounts[t].length>60) hourCounts[t].shift();
+        counts[t].splice(0,60);
+      }
+      let max = 0;
+      for(let i=0; i<60; i++) {
+        let value;
+        if(infoShow === "min") {
+          value = counts[t][Math.max(0,minL-60)+i];
+          if(value>max) max = value;
+        } else if(infoShow === "hour") {
+          value = hourCounts[t][i];
+          if(value>max) max = value;
+        }
+      }
+
+      iCtx.beginPath();
+      let lastX;
+
+      for(let i=0; i<60; i++) {
+        let value;
+        if(infoShow === "min") value = counts[t][Math.max(0,minL-60)+i];
+        if(infoShow === "hour") value = hourCounts[t][i];
+        if(!value) continue;
+        if(i===0) iCtx.moveTo(infoPadding, infoPadding+(ch-2*infoPadding)*(max-value)/max);
+        else iCtx.lineTo(infoPadding+i*(cw-2*infoPadding-cw/320)/59, infoPadding+(ch-2*infoPadding)*(max-value)/max);
+        lastX = infoPadding+i*(cw-2*infoPadding-cw/320)/59;
+      }
+
+      if(t===plant) {
+        iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
+        iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
+      } else if(t===normal) {
+        iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
+        iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
+      }
+      iCtx.lineWidth = cw/160;
+      iCtx.stroke();
+
+      iCtx.lineTo(lastX, ch-infoPadding);
+      iCtx.lineTo(infoPadding, ch-infoPadding);
+      iCtx.closePath();
+      iCtx.fill();
+    }
+    
+  }
+
+  ctx.clearRect(-w,-h,3*w,3*h);
+  ctx.setTransform(
+    zoom, 0,
+    0, zoom,
+    -camera.x * zoom,
+    -camera.y * zoom
+  );
+
+
+/*清理agents==========================*/
+  if(timeStamp%5 === 0) {
+    deadClearFrame++;
+    deadClearFrame%=6;
+    const type = agents[deadClearFrame];
+    if(type) agents[deadClearFrame] = type.filter(a => !a.dead);
+
+  }
+  speciesMap.clear();
+/*agents更新==========================*/
+  for(let i=5; i>0; i--) {
+    for(const a of agents[i]) {
+      if(a.dead) continue;
+      a.update();
+    }
+  }
+
+
+
+/*最老草食點點========================*/
+
+if(!brainDian || brainDian.dead) {
+  brainDian = null;
+  for(const a of agents[normal]) {
+    if (!a.dead && a.age<2000) {
+      brainDian = a;
+    }
+    if(brainDian) break;
+  }
+}
+if(brainDian) {
+  if(follow) {
+    let dx = brainDian.x-w/2/zoom-camera.x;
+    let dy = brainDian.y-h/2/zoom-camera.y;
+    if(dx>w/2) dx-=w;
+    if(dx<-w/2) dx+=w;
+    if(dy>h/2) dy-=h;
+    if(dy<-h/2) dy+=h;
+    const dist = Math.hypot(dx,dy);
+    if(dist>10) {
+      const move = (dist-10)*0.05;
+      camera.x += dx/dist*move;
+      camera.y += dy/dist*move;
+      if(camera.x>w) camera.x-=w;
+      if(camera.x<0) camera.x+=w;
+      if(camera.y>h) camera.y-=h;
+      if(camera.y<0) camera.y+=h;
+    }
+  }
+  const vision = brainDian.vision;
+  const maxVision = brainDian.maxVision;
+  const face = brainDian.face;
+  const intent = brainDian.currentIntent;
+  const quarH = Math.PI/4;
+  const rightStart = quarH;
+  const backStart = quarH+0.5*Math.PI;
+  const leftStart = quarH+Math.PI;
+  const frontStart = quarH+1.5*Math.PI;
+  const a = brainDian.hp/brainDian.maxHp*0.8+0.2;
+  const r = brainDian.erg/brainDian.maxErg + 2.5;
+  const turn = brainDian.turnForce;
+  const front = brainDian.frontForce;
+
+//決策層
+  let bCtx = brainCtx[0];
+
+  bCtx.clearRect(0,0,180,180);
+  bCtx.beginPath();
+  bCtx.arc(73,73,72, 0, 2*Math.PI);
+  bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+  bCtx.lineWidth = 0.5;
+  bCtx.stroke();
+  for(let d=0; d<4; d++) {
+    const dir = vision[d];  //右後左前
+
+    for(let t=0; t<4; t++) {
+      const type = dir[t];
+      if(type.minDist2 === Infinity) continue;
+      const distance = Math.sqrt(type.minDist2)/maxVision;
+      const angle = Math.atan2(type.closestCross, type.closestDot);
+
+      bCtx.beginPath();
+      bCtx.arc(73, 73, 72*distance, quarH+(d-1)*Math.PI/2, quarH+(d)*Math.PI/2);
+      bCtx.lineTo(73,73);
+      bCtx.closePath();
+      const c = color[t+1];
+      bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1,1600*type.signal)})`;
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(73+72*distance*Math.cos(-Math.PI/2+angle), 73+72*distance*Math.sin(-Math.PI/2+angle), 2, 0, 2*Math.PI);
+      bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l+10}%,1)`;
+      bCtx.stroke();
+    }
+  }
+
+  bCtx.beginPath();
+  bCtx.arc(73,73, r, 0, 2*Math.PI);
+  bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(quarH-Math.PI/2),73+r*Math.sin(quarH-Math.PI/2), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(quarH-Math.PI/2),73+r*Math.sin(quarH-Math.PI/2), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(Math.PI*1.5-quarH),73+r*Math.sin(Math.PI*1.5-quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(Math.PI*1.5-quarH),73+r*Math.sin(Math.PI*1.5-quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  eatBar.style.width = `${intent[0]*100}%`;
+  cloneBar.style.width = `${intent[1]*100}%`;
+  fightBar.style.width = `${intent[2]*100}%`;
+  wanderBar.style.width = `${intent[3]*100}%`;
+
+//行動層
+  bCtx = brainCtx[2];
+  bCtx.clearRect(0,0,180,180);
+  bCtx.beginPath();
+  bCtx.arc(73,73,72, 0, 2*Math.PI);
+  bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+  bCtx.lineWidth = 0.5;
+  bCtx.stroke();
+ 
+  bCtx.beginPath();
+  bCtx.arc(73,73, r, 0, 2*Math.PI);
+  bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face+quarH),73+r*Math.sin(face+quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face+quarH),73+r*Math.sin(face+quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face-quarH),73+r*Math.sin(face-quarH), 2, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+  bCtx.fill();
+
+  bCtx.beginPath();
+  bCtx.arc(73+r*Math.cos(face-quarH),73+r*Math.sin(face-quarH), 1, 0, 2*Math.PI);
+  bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+  bCtx.fill();
+
+  let px = 73;
+  let py = 73;
+  let ang = face;
+
+  bCtx.beginPath();
+  bCtx.moveTo(px, py);
+
+  for(let i=0; i<36; i++) {
+    const nx = px + Math.cos(ang) * front * 2;
+    const ny = py + Math.sin(ang) * front * 2;
+
+    bCtx.beginPath();
+    bCtx.moveTo(px, py);
+    bCtx.lineTo(nx, ny);
+
+    bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1-i/36})`;
+    bCtx.lineWidth = 1 + i;
+    bCtx.stroke();
+
+    bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1-i/36})`;
+    bCtx.lineWidth = 1 + i/18;
+    bCtx.stroke();
+
+    ang += turn/36;
+    px = nx;
+    py = ny;
+  }	
+
+}
+
+
+
+//滅絕
+  if(agents[normal].length <= 3) {
+    generation ++;
+
+// 沒進化資料 → fallback
+
+
+
+    const survive = [];
+    for(const a of agents[normal]) survive.push(a);
+    if(survive.length >0) {
+      for(let i=0; i<70; i++){
+  // 取倖存者DNA
+        const parent = survive[Math.floor(Math.random()*survive.length)];
+        const d = new normalDian(parent);
+        d.newGen = true;
+        addToCell(toKey(d.x,d.y), d);
+        agents[d.type].push(d);
+      }
+    }
+    if(evolutionPool[intent].length === 0) {
+      for(let i=0;i<100;i++){
+        const d = new normalDian();
+        addToCell(toKey(d.x,d.y), d);
+        agents[d.type].push(d);
+      }
+    } else {
+      for(let i=0; i<70; i++){
+  // 依機率取 DNA
+        const best = pickBestDNA();
+        if(!best) continue;
+        const parent = {
+          intentBrain: deserializeBrain(best.intentBrain, "intent"),
+          eatBrain: deserializeBrain(best.eatBrain, "eat"),
+          cloneBrain: deserializeBrain(best.cloneBrain, "clone"),
+          fightBrain: deserializeBrain(best.fightBrain, "fight"),
+          wanderBrain: deserializeBrain(best.wanderBrain, "wander"),
+        };
+
+        const d = new normalDian(parent);
+        d.newGen = true;
+        addToCell(toKey(d.x,d.y), d);
+        agents[d.type].push(d);
+      }
+    }
+    for(let i=0; i<30; i++){
+  // 依機率取 DNA
+      const best = pickBestDNA();
+      if(!best) continue;
+      const parent = {
+        intentBrain: deserializeBrain(best.intentBrain, "intent"),
+        eatBrain: deserializeBrain(best.eatBrain, "eat"),
+        cloneBrain: deserializeBrain(best.cloneBrain, "clone"),
+        fightBrain: deserializeBrain(best.fightBrain, "fight"),
+        wanderBrain: deserializeBrain(best.wanderBrain, "wander"),
+      };
+
+      const d = new normalDian(parent);
+      d.newGen = true;
+      addToCell(toKey(d.x,d.y), d);
+      agents[d.type].push(d);
+    }
+
+//植物復甦
+    if(agents[plant].length < maxGridX*maxGridY/2) {
+      for(let i=0; i< maxGridX*maxGridY/2; i++) {
+        const n = new producer();
+        n.hp = 10000*Math.random();
+        n.age = Math.floor(5000*Math.random());
+        addToCell(toKey(n.x,n.y), n);
+        agents[n.type].push(n);
+      }
+    }
+    let times=0;
+    seedDelay=0;
+    while(agents[plant].length < w*h/2100 && times<1000000) {
+      times++;
+      for(const p of agents[plant]) {
+        if(!p.dead) p.update();
+      }
+    }
+    seedDelay=10000;
+  }
+
+
+  for(const [k,v] of fertilizerMap) {
+    let next = v*0.998;
+    if(v>50 && Math.random() <= v/1000) {
+      setTimeout(()=> {
+        const n = new producer({
+          x: (keyToCellX(k)+Math.random())*sizeX,
+          y: (keyToCellY(k)+Math.random())*sizeY
+        });
+        if(n.x>w) n.x-=w;
+        if(n.x<0) n.x+=w;
+        if(n.y>h) n.y-=h;
+        if(n.y<0) n.y+=h;
+        const nKey = toKey(n.x,n.y);
+        addToCell(nKey, n);
+        agents[n.type].push(n);
+      },10000);
+      next -= 50;
+    }
+    if(next<1) {fertilizerMap.delete(k); continue;}
+    fertilizerMap.set(k, next);
+  }
+  timeStamp++;
+  requestAnimationFrame(loop);
+}
 loop();
 </script>
-
 </body>
 </html>
