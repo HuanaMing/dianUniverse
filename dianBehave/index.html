@@ -1092,6 +1092,7 @@ class normalDian {
 //身體尾巴
         ctx.beginPath();
         ctx.fillStyle = tailGrad;
+
         ctx.moveTo(
           this.x+ox-r*Math.cos(this.face)-(1+this.frontForce/2)*r*Math.cos(this.face-this.turnForce*this.maxTurnSpeed+wave),
           this.y+oy-r*Math.sin(this.face)-(1+this.frontForce/2)*r*Math.sin(this.face-this.turnForce*this.maxTurnSpeed+wave)
@@ -1099,11 +1100,15 @@ class normalDian {
         ctx.lineTo(this.x+ox-r*Math.cos(this.face+Math.PI/4), this.y+oy-r*Math.sin(this.face+Math.PI/4));
         ctx.arc(this.x+ox, this.y+oy, r, this.face-Math.PI*2.7/4, this.face+Math.PI*2.7/4);
         ctx.lineTo(this.x+ox-r*Math.cos(this.face-Math.PI/4), this.y+oy-r*Math.sin(this.face-Math.PI/4));
-
-
-
         ctx.closePath();
         ctx.fill();
+
+        if(this===brainDian) {
+          ctx.lineWidth = 0.2;
+          ctx.strokeStyle = "white";
+          ctx.stroke();
+        }
+
 
 
 //眼睛
@@ -2203,9 +2208,10 @@ if(!brainDian || brainDian.dead) {
   }
 }
 if(brainDian) {
+
   if(follow) {
-    let dx = brainDian.x-w/2/zoom-camera.x;
-    let dy = brainDian.y-h/2/zoom-camera.y;
+    let dx = brainDian.x-canvas.width/2/zoom-camera.x;
+    let dy = brainDian.y-canvas.height/2/zoom-camera.y;
     if(dx>w/2) dx-=w;
     if(dx<-w/2) dx+=w;
     if(dy>h/2) dy-=h;
