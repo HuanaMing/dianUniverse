@@ -1487,8 +1487,8 @@ function resize() {
   size = (sizeX+sizeY)/2;
 
   for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
-    c.width = window.innerWidth;
-    c.height = window.innerHeight;
+    c.width = w;
+    c.height = h;
     c.style.left = "0px";
     c.style.top = "0px";
   }
