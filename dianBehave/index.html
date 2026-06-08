@@ -355,7 +355,7 @@ class producer {
         }
       }
     }
-    this.hp += Math.random()*3*(1-2*shadowed/this.radius);
+    this.hp += Math.random()*2*(1-2*shadowed/this.radius);
 
     const fertilizer = fertilizerMap.get(thisKey);
     if(fertilizer>0) {
@@ -1202,6 +1202,7 @@ class normalDian {
     this.age ++;
     this.wave += this.frontForce;
     this.wanderCredit *= 1-0.002*this.wanderTime;
+    if(this.wanderCredit<0.000006) this.wanderCredit = 0;
     this.draw();
   }
 }
