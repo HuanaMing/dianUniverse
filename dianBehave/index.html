@@ -1487,8 +1487,8 @@ function resize() {
   size = (sizeX+sizeY)/2;
 
   for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
-    c.width = w;
-    c.height = h;
+    c.width = window.innerWidth;
+    c.height = window.innerWidth;
     c.style.left = "0px";
     c.style.top = "0px";
   }
@@ -2208,23 +2208,18 @@ if(!brainDian || brainDian.dead) {
   }
 }
 if(brainDian) {
-
   if(follow) {
-    let dx = brainDian.x-canvas.width/2/zoom-camera.x;
-    let dy = brainDian.y-canvas.height/2/zoom-camera.y;
-    if(dx>w/2) dx-=w;
-    if(dx<-w/2) dx+=w;
-    if(dy>h/2) dy-=h;
-    if(dy<-h/2) dy+=h;
+    let dx = brainDian.x-window.innerWidth/2/zoom-camera.x;
+    let dy = brainDian.y-window.innerHeight/2/zoom-camera.y;
+    if(dx>w/2) camera.x +=w;
+    if(dx<-w/2) camera.x -=w;
+    if(dy>h/2) camera.y +=h;
+    if(dy<-h/2) camera.y -=h;
     const dist = Math.hypot(dx,dy);
-    if(dist>10) {
-      const move = (dist-10)*0.05;
+    if(dist>5) {
+      const move = (dist-5)*0.05;
       camera.x += dx/dist*move;
       camera.y += dy/dist*move;
-      if(camera.x>w) camera.x-=w;
-      if(camera.x<0) camera.x+=w;
-      if(camera.y>h) camera.y-=h;
-      if(camera.y<0) camera.y+=h;
     }
   }
   const vision = brainDian.vision;
