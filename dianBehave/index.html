@@ -1584,6 +1584,7 @@ request.onupgradeneeded = function (e) {
 
 request.onsuccess = function (e) {
   db = e.target.result;
+  console.log("DB ready");
   loadWorld();
 };
 
@@ -1605,6 +1606,7 @@ function saveWorld() {
   store.put(data, "mainSave"); // key = "mainSave"
 
   tx.oncomplete = () => {
+    console.log("save ready");
     saveAnim = 60;
   };
 }
@@ -1644,6 +1646,7 @@ function loadWorld() {
     }
 
     fertilizerMap = new Map(data.fertilizer);
+    console.log("load ready");
     loop();
   };
 
