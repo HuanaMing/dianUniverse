@@ -1625,7 +1625,11 @@ function loadWorld() {
 
   req.onsuccess = () => {
     const data = req.result;
-    if (!data) return false;
+    if (!data) {
+      loop();
+      console.log("歡迎加入點點宇宙!");
+      return;
+    }
 
     for (const d of data.plant || []) {
       let p = new producer(null, d);
