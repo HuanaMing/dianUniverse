@@ -289,8 +289,8 @@ resize();
 ============================================================*/
 
 class producer {
-  constructor(parent) {
-    if(parent) {
+  constructor(parent, data) {
+    if(parent && !data) {
       const angle = Math.random() * Math.PI * 2;
       const r = Math.random();
       let dist = 0;
@@ -303,6 +303,9 @@ class producer {
       }
       this.x = parent.x + Math.cos(angle) * dist;
       this.y = parent.y + Math.sin(angle) * dist;
+    } else if(!parent && data) {
+      this.x = data.x;
+      this.y = data.y;
     } else {
       this.x = Math.random()*w;
       this.y = Math.random()*h;
@@ -311,14 +314,14 @@ class producer {
     this.offsetY = 0;
     this.cell = null;
     this.cellIdx = null;
-    this.age = 0;
+    this.age = data?.age ?? 0;
     this.vx = 0;
     this.vy = 0;
-    this.dead = false;
+    this.dead = data?.dead ?? false;
 
     this.type = plant;
-    this.erg = 0;
-    this.hp = parent ?5 :500;
+    this.erg = data?.erg ?? 0;
+    this.hp = data?.hp ?? 5;
     this.radius = (this.hp**0.3);
     this.maxHp = 10000;
     this.maxVision = 50;
@@ -419,7 +422,6 @@ class producer {
 
 /*時間================================*/
   update() {
-
     if(this.age >= 5000) {
       const range = Math.ceil((this.age-5000)/120);
       const cache = rangeCache[range] || createNearCache(range);
@@ -479,21 +481,20 @@ class producer {
 ============================================================*/
 
 class Food {
-  constructor(parent) {
-
-    this.x = parent.x;
-    this.y = parent.y;
+  constructor(parent, data) {
+    this.x = data?.x ?? parent.x;
+    this.y = data?.y ?? parent.y;
     this.cell = toKey(this.x, this.y);
     this.cellIdx = null;
 
-    this.age = 0;
+    this.age = data?.age ?? 0;
     this.vx = 0;
     this.vy = 0;
-    this.dead = false;
+    this.dead = data?.dead ?? false;
 
     this.type = 2;
-    this.hp = (parent.erg||0) + parent.hp + 50;
-    this.maxHp = this.hp;
+    this.hp = data?.erg ?? ((parent?.erg||0) + (parent?.hp||0) + 50);
+    this.maxHp = data?.maxHp ?? this.hp;
     this.maxVision = 50;
   }
 
@@ -545,13 +546,19 @@ class Food {
 
 /*草食點點============================*/
 class normalDian {
-  constructor(parent,x,y) {
-    if(parent) {
+  constructor(parent,x,y, data) {
+    if(parent && !data) {
       this.intentBrain =  new IntentBrain(parent.intentBrain);
       this.eatBrain =  new SteeringBrain(parent.eatBrain);
       this.cloneBrain =  new SteeringBrain(parent.cloneBrain);
       this.fightBrain =  new SteeringBrain(parent.fightBrain);
       this.wanderBrain =  new SteeringBrain(parent.wanderBrain);
+    } else if(!parent && data) {
+      this.intentBrain =  deserializeBrain(data.intentBrain, "intent");
+      this.eatBrain =  deserializeBrain(data.eatBrain, "steering");
+      this.cloneBrain =  deserializeBrain(data.cloneBrain, "steering");
+      this.fightBrain =  deserializeBrain(data.fightBrain, "steering");
+      this.wanderBrain =  deserializeBrain(data.wanderBrain, "steering");
     } else {
       this.intentBrain =  new IntentBrain();
       this.eatBrain =  new SteeringBrain();
@@ -561,19 +568,21 @@ class normalDian {
     }
 
 /*狀態數值==========*/
-    this.hp = 100;
-    this.erg = 50;
-    this.age = 0;
-    this.wave = 0;
+    this.hp = data?.hp ?? 100;
+    this.erg = data?.erg ?? 50;
+    this.age = data?.age ?? 0;
+    this.wave = data?.wave ?? 0;
 
-    this.x = x?? Math.random()*canvas.width;
-    this.y = y?? Math.random()*canvas.height;
+    this.x = data?.x ?? x ?? Math.random()*canvas.width;
+    this.y = data?.y ?? y ?? Math.random()*canvas.height;
+    this.vx = data?.vx ?? 0;
+    this.vy = data?.vy ?? 0;
     this.cell = toKey(this.x, this.y);
     this.cellIdx = null;
 
-    this.face = Math.PI*2*Math.random();
-    this.turnForce = 0;
-    this.frontForce = 0;
+    this.face = data?.face ?? Math.PI*2*Math.random();
+    this.turnForce = data?.turnforce ?? 0;
+    this.frontForce = data?.frontForce ?? 0;
 
     this.vision = [];
     for(let d=0; d<4; d++) {
@@ -590,29 +599,14 @@ class normalDian {
       this.vision.push(arr);
     }
 
-    this.mode = "";
-    this.keep = 0;
-    this.currentIntent = [];
+    this.mode = data?.mode ?? "";
+    this.keep = data?.keep ?? 0;
+    this.currentIntent = data?.currentIntent ?? [];
 
-    this.pregnent = -1;
+    this.pregnent = data?.pregnent ?? -1;
 
-    this.fightCooldown = 0;
-    this.targetType = 0;
-
-    this.wandering = false;
-    this.wanderTime = 0;
-    this.wanderCredit = 0;
-    this.wanderStart = {x:0, y:0};
-    this.wanderMove = 0;
-
-    this.score = {
-      eat:0,
-      clone:0,
-      fight:0,
-      wander:0,
-      born:0,
-    }
-
+    this.fightCooldown = data?.fightCooldown ?? 0;
+    this.targetType = data?.targetType ?? 0;
 
 /*基礎數值==========*/
     this.type = normal;
@@ -622,6 +616,7 @@ class normalDian {
     this.maxSpeed = 5;
     this.maxAge = 5000;
     this.atk = 5;
+
     if (parent && parent.bias !== undefined) {
       const scale = 1e10;
   // 轉成整數基因
@@ -631,7 +626,10 @@ class normalDian {
   // 後3位突變
       const tail = Math.floor(Math.random() * 1e3);
       this.bias = (head * 1e3 + tail) / scale;
-    } else {
+    } else if(!parent && data) {
+      this.bias = data.bias;
+    }
+    else {
       this.bias = Math.floor(Math.random() * 1e10) / 1e10;
     }
     this.species = Math.floor(this.bias*1e7);
@@ -937,15 +935,11 @@ class normalDian {
       agents[n.type].push(n);
       this.x -= dx;
       this.y -= dy;
-      this.score.wander += n.erg*this.wanderCredit;
-      this.score.born++;
-      this.score.clone += n.erg;
     }
     if(this.pregnent>0) {this.pregnent--; return;}
 
     if(this.mode !== "clone") return;
     if(this.erg*2 < this.maxErg) {
-      this.score.clone -= 0.05;
       return;
     }
 
@@ -969,14 +963,12 @@ class normalDian {
     let target = this.vision[3][plant-1].closest;
 
     if(!target) {
-      this.score.eat --;
       this.sick();
       return;
     }
 
     const dist2 = this.vision[3][plant-1].minDist2;
     if(dist2 > 25) {
-      this.score.eat --;
       this.sick();
       return;
     }
@@ -996,12 +988,8 @@ class normalDian {
       target.y = (target.y+h)%h;
       const newCell = toKey(target.x, target.y);
       if(newCell !== target.cell) addToCell(newCell,target);
-      this.score.erg += bite;
-      this.score.wander += bite*this.wanderCredit;
     } else {
       this.erg += target.hp/10;
-      this.score.eat += target.hp/10;
-      this.score.wander += target.hp/10*this.wanderCredit
       target.hp = 0;
     }
     this.sick();
@@ -1022,7 +1010,6 @@ class normalDian {
       minDist2 = dist2;
     }
     if(!closest) {
-      this.score.fight--;
       return false;
     }
     let dx = closest.x-this.x;
@@ -1037,8 +1024,6 @@ class normalDian {
     this.vx = dx*0.8;
     this.vy = dy*0.8;
     this.move();
-    this.score.fight += this.atk;
-    this.score.wander += this.atk*this.wanderCredit;
     this.fightCooldown = 20;
     this.keep = 0;
   }
@@ -1201,8 +1186,6 @@ class normalDian {
     speciesMap.set(this.species,(speciesMap.get(this.species)||0) + 1);
     this.age ++;
     this.wave += this.frontForce;
-    this.wanderCredit *= 1-0.002*this.wanderTime;
-    if(this.wanderCredit<0.000006) this.wanderCredit = 0;
     this.draw();
   }
 }
@@ -1325,7 +1308,6 @@ const MOTOR_OUT_NODE = 6; //轉向，前進，type*4
 
 class SteeringBrain {
   constructor(brain, data) {
-    this.score = 0;
 //讀紀錄
     if(data) {
       this.nodes = data.nodes.map(n => new Node(n.id, n.depth));
@@ -1589,24 +1571,81 @@ function drawGrid(fit=false) {
 }
 
 /*存檔============================*/
-window.addEventListener("beforeunload", () => {
-  localStorage.setItem("dian_world_save", JSON.stringify(evolutionPool));
-});
+let db;
+let saveAnim = 0;
+const request = indexedDB.open("dianBehaveDB", 1);
+
+request.onupgradeneeded = function (e) {
+  db = e.target.result;
+
+  // 一個 store = 一種存檔
+  db.createObjectStore("world");
+};
+
+request.onsuccess = function (e) {
+  db = e.target.result;
+  loadWorld();
+};
+
+request.onerror = function (e) {	
+  console.error("DB error", e);
+};
+
+function saveWorld() {
+  const data = {
+    fertilizer: Array.from(fertilizerMap),
+    plant: serializePlant(),
+    food: serializeFood(),
+    normal: serializeNormal(),
+  }
+
+  const tx = db.transaction("world", "readwrite");
+  const store = tx.objectStore("world");
+
+  store.put(data, "mainSave"); // key = "mainSave"
+
+  tx.oncomplete = () => {
+    saveAnim = 60;
+  };
+}
+
+setInterval(() => {
+  saveWorld();
+}, 60000); // 每 60 秒存一次
 
 /*讀檔============================*/
 function loadWorld() {
-  const raw = localStorage.getItem("dian_world_save");
-  if(!raw) return false;
 
-  const data = JSON.parse(raw);
-  
-  evolutionPool = data || [[],[],[],[],[]];
-  const t = performance.now();
-  for(let i=0; i<5; i++) {
-    for(const b of evolutionPool[i]) {
-      if(b.time) b.time = t;
+  const tx = db.transaction("world", "readonly");
+  const store = tx.objectStore("world");
+
+  const req = store.get("mainSave");
+
+  req.onsuccess = () => {
+    const data = req.result;
+    if (!data) return false;
+
+    for (const d of data.plant || []) {
+      let p = new producer(null, d);
+      addToCell(toKey(p.x, p.y), p);
+      agents[plant].push(p);
     }
-  }
+
+    for (const d of data.food || []) {
+      let f = new Food(null, d);
+      addToCell(toKey(f.x, f.y), f);
+      agents[food].push(f);
+    }
+
+    for (const d of data.normal || []) {
+      let n = new normalDian(null, null, null, d);
+      addToCell(toKey(n.x, n.y), n);
+      agents[normal].push(n);
+    }
+
+    fertilizerMap = new Map(data.fertilizer);
+    loop();
+  };
 
   return true;
 }
@@ -1625,51 +1664,34 @@ function deserializeBrain(data, region) {
 
   return brain;
 }
-loadWorld();
+
 
 
 window.addEventListener("keydown", (e) => {
+
+  if(e.ctrlKey && e.shiftKey) {
 /*刪檔============================*/
-  if (e.ctrlKey && e.shiftKey && e.code === "KeyZ") {
-    grids.length = 0;
-    fertilizerMap.clear();
-    for(const t of agents) t.length = 0;
-    evolutionPool = [[],[],[],[],[]];
-    generation = 0;
-    localStorage.removeItem("dian_world_save");
-  }
-/*幀率============================*/
-  if (e.code === "KeyF") {
-    const display = infoDiv.style.display;
-    if(display === "none") {
-
-      infoDiv.style.display = "block";
-    } else if(display === "block" && infoShow === "min"){
-      infoShow = "hour";
-    } else if(display === "block" && infoShow === "hour"){
-      infoDiv.style.display = "none";
-      infoShow = "min";
-    }
-    showFps = !showFps;
-  }
-
-/*可視化神經======================*/
-  if (e.code === "KeyB") {
-    const display = brainDiv.style.display;
-    if(display === "none") {
-      brainDiv.style.display = "grid";
-    } else if(display === "grid"){
-      brainDiv.style.display = "none";
+    if(e.code === "KeyZ") {
+      grids.length = 0;
+      fertilizerMap.clear();
+      for(const t of agents) t.length = 0;
+      evolutionPool = [[],[],[],[],[]];
+      generation = 0;
     }
   }
 
-/*格線============================*/
-  if (e.code === "KeyG") {
-    grid=!grid;
-    drawGrid();
+
+  if (!e.shiftKey && e.ctrlKey) {
+    if(e.code === "KeyS") {
+      e.preventDefault();
+      saveWorld();
+    }
   }
+
+
+
+  if(e.shiftKey && !e.ctrlKey) {
 /*世界縮放=========================*/
-  if (e.shiftKey) {
     if (e.code === "ArrowDown") {
       h += 10.1/zoom;
       newZoom = zoom;
@@ -1706,8 +1728,37 @@ window.addEventListener("keydown", (e) => {
       drawGrid(Math.abs(h-window.innerHeight/zoom)<10/zoom);
     }
   }
+
+  if(!e.shiftKey && !e.ctrlKey) {
+/*格線============================*/
+    if (e.code === "KeyG") {
+      grid=!grid;
+      drawGrid();
+    }
+/*幀率============================*/
+    if (e.code === "KeyF") {
+      const display = infoDiv.style.display;
+      if(display === "none") {
+  
+        infoDiv.style.display = "block";
+      } else if(display === "block" && infoShow === "min"){
+        infoShow = "hour";
+      } else if(display === "block" && infoShow === "hour"){
+        infoDiv.style.display = "none";
+        infoShow = "min";
+      }
+      showFps = !showFps;
+    }
+/*可視化神經======================*/
+    if (e.code === "KeyB") {
+      const display = brainDiv.style.display;
+      if(display === "none") {
+        brainDiv.style.display = "grid";
+      } else if(display === "grid"){
+        brainDiv.style.display = "none";
+      }
+    }
 /*鏡頭縮放=========================*/
-  if(!e.shiftKey) {
     if (e.code === "ArrowUp") {
       zoom += 0.1;
       drawGrid();
@@ -1723,34 +1774,34 @@ window.addEventListener("keydown", (e) => {
       zoom = newZoom;
       drawGrid();
     }
-  }
-
 /*鏡頭移動=========================*/
-  if (e.code === "KeyW") {
-    follow = false;
-    camera.y-=10;
-    drawGrid();
-  }
-  if (e.code === "KeyS") {
-    follow = false;
-    camera.y+=10;
-    drawGrid();
-  }
-  if (e.code === "KeyA") {
-    follow = false;
-    camera.x-=10;
-    drawGrid();
-  }
-  if (e.code === "KeyD") {
-    follow = false;
-    camera.x+=10;
-    drawGrid();
-  }
+    if (e.code === "KeyW") {
+      follow = false;
+      camera.y-=10;
+      drawGrid();
+    }
+    if (e.code === "KeyS") {
+      follow = false;
+      camera.y+=10;
+      drawGrid();
+    }
+    if (e.code === "KeyA") {
+      follow = false;
+      camera.x-=10;
+      drawGrid();
+    }
+    if (e.code === "KeyD") {
+      follow = false;
+      camera.x+=10;
+      drawGrid();
+    }
 
 /*鏡頭跟隨=========================*/
-  if (e.code === "KeyQ") {
-    follow = !follow;
+    if (e.code === "KeyQ") {
+      follow = !follow;
+    }
   }
+
 });
 
 /*============================================================
@@ -1809,83 +1860,8 @@ function accumulate(w, v) {
 /*更新進化池========*/
 function recordDeath(dian) {
   if(dian.age*1.5 < dian.maxAge) return;
-  const time = performance.now();
-  evolutionPool[intent].push({
-    score: 0,
-    rank:0,
-    time,
-    brain: serializeBrain(dian.intentBrain),
-    intent: Math.max(0, dian.score.born*120/(dian.maxAge-600)),
-  });
 
-  const intBrain = evolutionPool[intent][evolutionPool[intent].length-1];
-  evolutionPool[eat].push({
-    score: dian.score.eat,
-    rank:0,
-    time,
-    brain: serializeBrain(dian.eatBrain),
-    intent: intBrain,
-  });
-
-  evolutionPool[clone].push({
-    score: dian.score.clone,
-    rank:0,
-    time,
-    brain: serializeBrain(dian.cloneBrain),
-    intent: intBrain,
-  });
-
-  evolutionPool[fight].push({
-    score: dian.score.fight,
-    rank:0,
-    time,
-    brain: serializeBrain(dian.fightBrain),
-    intent: intBrain,
-  });
-
-  evolutionPool[wander].push({
-    score: dian.score.wander,
-    rank:0,
-    time,
-    brain: serializeBrain(dian.wanderBrain),
-    intent: intBrain,
-  });
-
-
-  for(const b of evolutionPool) {
-    if(b === evolutionPool[intent]) {
-      for(const e of b) {
-        e.score = e.intent;
-      } 
-      continue;
-    }
-    let min = Infinity;
-    for(const e of b) if(e.score<min) min = e.score;
-    let total = 0;
-    for(const e of b) {
-      total += e.score-min;
-    }
-    for(const e of b) {
-      if(total === 0) {
-        e.rank = 1/MAX_POOL;
-      } else {
-        e.rank = (e.score-min)/total;
-      }
-      e.intent.score *= e.rank;
-    }
-  }
-
-  let intentTotal = 1;
-  for(const e of evolutionPool[intent]) {
-    intentTotal += e.score;
-  }
-  for(const e of evolutionPool[intent]) {
-    if(intentTotal === 0) {
-      e.rank = 1/MAX_POOL;
-      continue;
-    }
-    e.rank = e.score/intentTotal;
-  }
+  evolutionPool[dian.type].push(dian);
 
   for(const b of evolutionPool) {
     if(b.length > MAX_POOL) {
@@ -1911,32 +1887,85 @@ function serializeBrain(brain) {
   };
 }
 
-/*選擇下一代DNA======*/
-function pickBestDNA() {
-  return {
-    intentBrain: pickFromPool(evolutionPool[intent]),
-    eatBrain: pickFromPool(evolutionPool[eat]),
-    cloneBrain: pickFromPool(evolutionPool[clone]),
-    fightBrain: pickFromPool(evolutionPool[fight]),
-    wanderBrain: pickFromPool(evolutionPool[wander]),
-  };
+//生產者
+function serializePlant() {
+  const plantData = [];
+  for(const a of agents[plant]) {
+    const result = {
+      x: a.x,
+      y: a.y,
+      age: a.age,
+      dead: a.dead,
+      erg: a.erg,
+      hp: a.hp,
+    }
+    plantData.push(result);
+  }
+  return plantData;
 }
 
-function pickFromPool(pool) {
-  let total = 0;
-  for(const e of pool) {
-    if(e.score<0) continue;
-    total += e.rank*e.rank;
-  }
-  let r = Math.random() * total;
-  for(const e of pool) {
-    if(e.score<0) continue;
-    r -= e.rank*e.rank;
-    if(r <= 0) {
-      return e.brain;
+//食物
+function serializeFood() {
+  const foodData = [];
+  for(const a of agents[food]) {
+    const result = {
+      x: a.x,
+      y: a.y,
+      age: a.age,
+      dead: a.dead,
+      erg: a.erg,
+      hp: a.hp,
+      maxHp: a.maxHp,
     }
+    foodData.push(result);
   }
-  return null;
+  return foodData;
+}
+
+//草食點點
+function serializeNormal() {
+  const normalData = [];
+  for(const a of agents[normal]) {
+    const result = {
+      x: a.x,
+      y: a.y,
+      vx:a.vx,
+      vy:a.vy,
+      age: a.age,
+      dead: a.dead,
+      erg: a.erg,
+      hp: a.hp,
+      intentBrain: serializeBrain(a.intentBrain),
+      eatBrain: serializeBrain(a.eatBrain),
+      cloneBrain: serializeBrain(a.cloneBrain),
+      fightBrain: serializeBrain(a.fightBrain),
+      wanderBrain: serializeBrain(a.wanderBrain),
+      wave: a.wave,
+
+      face: a.face,
+      turnForce: a.turnForce,
+      frontForce: a.frontForce,
+
+      mode: a.mode,
+      keep: a.keep,
+      currentIntent: a.currentIntent,
+
+      pregnent: a.pregnent,
+
+      fightCooldown: a.fightCooldown,
+      targetType: a.targetType,
+
+      bias: a.bias,
+    }
+    normalData.push(result);
+  }
+  return normalData;
+}
+
+/*選擇下一代DNA======*/
+function pickFromPool(pool) {
+  let r = Math.floor(Math.random() * pool.length);
+  return pool[r];
 }
 
 /*範圍資料庫=========*/
@@ -2177,7 +2206,21 @@ function loop() {
     -camera.y * zoom
   );
 
+  if(saveAnim > 0) {
+    saveAnim--;
 
+    ctx.save();
+
+    ctx.translate(canvas.width-30, 30);
+    ctx.rotate(saveAnim*0.1);
+
+    ctx.font = "10px Arial";
+    ctx.textAlign = "center";
+  
+    ctx.fillText("🦈", 0, 0);
+
+    ctx.restore();
+  }
 /*清理agents==========================*/
   if(timeStamp%5 === 0) {
     deadClearFrame++;
@@ -2386,7 +2429,7 @@ if(brainDian) {
         agents[d.type].push(d);
       }
     }
-    if(evolutionPool[intent].length === 0) {
+    if(evolutionPool[normal].length === 0) {
       for(let i=0;i<100;i++){
         const d = new normalDian();
         addToCell(toKey(d.x,d.y), d);
@@ -2395,38 +2438,13 @@ if(brainDian) {
     } else {
       for(let i=0; i<70; i++){
   // 依機率取 DNA
-        const best = pickBestDNA();
-        if(!best) continue;
-        const parent = {
-          intentBrain: deserializeBrain(best.intentBrain, "intent"),
-          eatBrain: deserializeBrain(best.eatBrain, "eat"),
-          cloneBrain: deserializeBrain(best.cloneBrain, "clone"),
-          fightBrain: deserializeBrain(best.fightBrain, "fight"),
-          wanderBrain: deserializeBrain(best.wanderBrain, "wander"),
-        };
+        const parent = pickFromPool(evolutionPool[normal]);
 
         const d = new normalDian(parent);
         d.newGen = true;
         addToCell(toKey(d.x,d.y), d);
         agents[d.type].push(d);
       }
-    }
-    for(let i=0; i<30; i++){
-  // 依機率取 DNA
-      const best = pickBestDNA();
-      if(!best) continue;
-      const parent = {
-        intentBrain: deserializeBrain(best.intentBrain, "intent"),
-        eatBrain: deserializeBrain(best.eatBrain, "eat"),
-        cloneBrain: deserializeBrain(best.cloneBrain, "clone"),
-        fightBrain: deserializeBrain(best.fightBrain, "fight"),
-        wanderBrain: deserializeBrain(best.wanderBrain, "wander"),
-      };
-
-      const d = new normalDian(parent);
-      d.newGen = true;
-      addToCell(toKey(d.x,d.y), d);
-      agents[d.type].push(d);
     }
 
 //植物復甦
@@ -2475,7 +2493,7 @@ if(brainDian) {
   timeStamp++;
   requestAnimationFrame(loop);
 }
-loop();
+
 </script>
 </body>
 </html>
