@@ -2280,13 +2280,13 @@ if(brainDian) {
   if(follow) {
     let dx = brainDian.x-window.innerWidth/2/zoom-camera.x;
     let dy = brainDian.y-window.innerHeight/2/zoom-camera.y;
-    if(dx>w/2) camera.x +=w;
-    if(dx<-w/2) camera.x -=w;
-    if(dy>h/2) camera.y +=h;
-    if(dy<-h/2) camera.y -=h;
+    if(dx>w/2) {camera.x +=w; dx-=w;}
+    if(dx<-w/2) {camera.x -=w; dx+=w;}
+    if(dy>h/2) {camera.y +=h; dy-=h;}
+    if(dy<-h/2) {camera.y -=h; dy+=h;}
     const dist = Math.hypot(dx,dy);
-    if(dist>5) {
-      const move = (dist-5)*0.05;
+    if(dist>0) {
+      const move = (dist-0)*0.05;
       camera.x += dx/dist*move;
       camera.y += dy/dist*move;
     }
