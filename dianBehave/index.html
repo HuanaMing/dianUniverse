@@ -1640,11 +1640,11 @@ function loadWorld() {
       return;
     }
     
-    camera = data.camera.pos;
-    zoom = data.camera.zoom;
-    newZoom = data.camera.newZoom;
-    w = data.world.w;
-    h = data.world.h;
+    if(data.camera) camera =data.camera.pos;
+    if(data.camera) zoom = data.camera.zoom;
+    if(data.camera) newZoom = data.camera.newZoom;
+    if(data.camera) w = data.world.w;
+    if(data.camera) h = data.world.h;
     resize();
 
     for (const d of data.plant || []) {
