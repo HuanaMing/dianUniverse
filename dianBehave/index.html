@@ -282,7 +282,6 @@ for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
   c.width = w;
   c.height = h;
 }
-resize();
 
 /*============================================================
 生產者
@@ -1598,6 +1597,15 @@ function saveWorld() {
     plant: serializePlant(),
     food: serializeFood(),
     normal: serializeNormal(),
+    camera: {
+      pos: camera,
+      zoom: zoom,
+      newZoom: newZoom,
+    },
+    world: {
+      w: w,
+      h: h,
+    }
   }
 
   const tx = db.transaction("world", "readwrite");
@@ -1626,10 +1634,18 @@ function loadWorld() {
   req.onsuccess = () => {
     const data = req.result;
     if (!data) {
+      resize();
       loop();
       console.log("歡迎加入點點宇宙!");
       return;
     }
+    
+    camera = data.camera.pos;
+    zoom = data.camera.zoom;
+    newZoom = data.camera.newZoom;
+    w = data.world.w;
+    h = data.world.h;
+    resize();
 
     for (const d of data.plant || []) {
       let p = new producer(null, d);
@@ -1651,6 +1667,7 @@ function loadWorld() {
 
     fertilizerMap = new Map(data.fertilizer);
     console.log("load ready");
+
     loop();
   };
 
