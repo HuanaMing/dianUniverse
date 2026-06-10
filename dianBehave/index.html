@@ -413,8 +413,8 @@ class producer {
         const dist = Math.hypot(dx,dy);
         const minDist = this.radius + 2.5;
         if(dist<minDist) {
-          this.offsetX -= dx/dist*(minDist-dist)*0.7;
-          this.offsetX -= dy/dist*(minDist-dist)*0.7;
+          this.offsetX -= dx/dist*(minDist-dist)*0.2;
+          this.offsetY -= dy/dist*(minDist-dist)*0.2;
         }
       }
     }
@@ -581,7 +581,7 @@ class normalDian {
     this.cellIdx = null;
 
     this.face = data?.face ?? Math.PI*2*Math.random();
-    this.turnForce = data?.turnforce ?? 0;
+    this.turnForce = data?.turnForce ?? 0;
     this.frontForce = data?.frontForce ?? 0;
 
     this.vision = [];
@@ -1122,7 +1122,7 @@ class normalDian {
 
 /*時間==============*/
   update() {
-    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - (1-this.pregnent/2000);
+    this.maxSpeed = 1.5 + 2.5*this.erg/this.maxErg - Math.max(0, this.pregnent)/2000;
 //觀察
     if(this.age%5 === 0) {
       this.input();
@@ -1471,7 +1471,7 @@ function resize() {
 
   for(const c of [canvas, plantCanvas, foodCanvas, normalCanvas, bgCanvas]) {
     c.width = window.innerWidth;
-    c.height = window.innerWidth;
+    c.height = window.innerHeight;
     c.style.left = "0px";
     c.style.top = "0px";
   }
