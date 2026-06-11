@@ -697,7 +697,6 @@
         //#region ============ 行為 ============
         //#region ============ 老化 ============
         aging() {
-          this.age++;
           const range = Math.ceil(this.age / 500);
           const cache = rangeCache[range] || createNearCache(range);
           const thisKey = this.cell;
@@ -730,6 +729,7 @@
         //#region ============ 運行 ============
         update() {
           if (this.deadCheck()) return;
+          this.age++;
           if (this.age > 100 && Math.random() < 0.5) this.aging();
           this.draw();
         }
@@ -1266,7 +1266,7 @@
         }
         //#endregion
         //#region ============ 死亡 ============
-        dead() {
+        die() {
           removeFromCell(this.cell, this);
           this.dead = true;
           if (this.age * 1.5 > this.maxAge) {
@@ -1469,7 +1469,7 @@
           //死亡
           this.aging();
           if (this.hp <= 0) {
-            this.dead();
+            this.die();
             return;
           }
           //時間
@@ -1853,7 +1853,7 @@
           }
           //鏡頭縮放
           if (key === "ArrowUp" || key === "ArrowDown" || key === "Space")
-            editZoomSzie(key);
+            editZoomSize(key);
 
           //鏡頭移動
           if (
