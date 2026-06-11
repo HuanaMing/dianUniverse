@@ -1269,11 +1269,10 @@
         dead() {
           removeFromCell(this.cell, this);
           this.dead = true;
-          if (this.age * 1.5 < this.maxAge) {
-            evolutionPool[normal].push(this);
-            if (b.length > MAX_POOL) {
-              b.shift();
-            }
+          if (this.age * 1.5 > this.maxAge) {
+            const b = evolutionPool[this.type];
+            b.push(this);
+            if (b.length > MAX_POOL) b.shift();
           }
           if (!this.newGen) {
             const n = new Food(this);
@@ -1824,7 +1823,6 @@
           )
             editWorldSzie(key);
         }
-
         if (!e.shiftKey && !e.ctrlKey) {
           //繪製格線
           if (key === "KeyG") {
@@ -2134,7 +2132,7 @@
       //#endregion
       //#region ============ 編輯世界邊界 ============
       function editWorldSzie(key) {
-        if (key === "space") {
+        if (key === "Space") {
           newZoom = 1;
           w = window.innerWidth;
           h = window.innerHeight;
@@ -2170,10 +2168,10 @@
         drawGrid();
       }
       function moveCamera(key) {
-        if (key === "keyW") camera.y -= 10;
-        if (key === "keyS") camera.y += 10;
-        if (key === "keyA") camera.x -= 10;
-        if (key === "keyD") camera.x += 10;
+        if (key === "KeyW") camera.y -= 10;
+        if (key === "KeyS") camera.y += 10;
+        if (key === "KeyA") camera.x -= 10;
+        if (key === "KeyD") camera.x += 10;
         follow = false;
         drawGrid();
       }
