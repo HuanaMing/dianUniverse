@@ -513,7 +513,7 @@
         //#region ============ 行為 ============
         //#region ============ 老化 ============
         aging() {
-          if (this.seedAge < seedDelay) {
+          if (this.seedAge < seedDelay && this.hp<20) {
             this.seedAge++;
             return false;
           }
