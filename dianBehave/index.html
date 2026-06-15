@@ -2181,6 +2181,84 @@
         drawGrid();
       }
       //#endregion
+      //#region ============ 計算fps ============
+      function fpsCount() {
+        frames++;
+        const now = performance.now();
+        const delta = now - lastTime;
+        if (delta >= 1000) {
+          fps = (frames * 1000) / delta;
+
+          (counts[plant].push(agents[plant].length),
+            counts[normal].push(agents[normal].length),
+            counts[hunter].push(agents[hunter].length),
+            (frames = 0));
+          lastTime = now;
+
+          textInfo.innerHTML = "";
+          for (const c of infoCtx) {
+            if (c === null) continue;
+            c.clearRect(
+              0,
+              0,
+              infoCanvas[plant].width,
+              infoCanvas[plant].height,
+            );
+          }
+          drawInfo();
+
+        }
+      }
+      //#endregion
+      //#region ============ 清除死亡點點 ============
+      function clearDead() {
+        if (timeStamp % 5 === 0) {
+          deadClearFrame++;
+          deadClearFrame %= 6;
+          const type = agents[deadClearFrame];
+          if (type) agents[deadClearFrame] = type.filter((a) => !a.dead);
+        }
+      }
+      //#endregion
+      //#region ============ 找新目標點點 ============
+      function newBrainDian() {
+        brainDian = null;
+        for (const a of agents[normal]) {
+          if (!a.dead && a.age < 2000) {
+            brainDian = a;
+          }
+          if (brainDian) break;
+        }
+      }
+      //#endregion
+      //#region ============ 鏡頭跟隨 ============
+      function followBrainDian() {
+        let dx = brainDian.x - window.innerWidth / 2 / zoom - camera.x;
+        let dy = brainDian.y - window.innerHeight / 2 / zoom - camera.y;
+        if (dx > w / 2) {
+          camera.x += w;
+          dx -= w;
+        }
+        if (dx < -w / 2) {
+          camera.x -= w;
+          dx += w;
+        }
+        if (dy > h / 2) {
+          camera.y += h;
+          dy -= h;
+        }
+        if (dy < -h / 2) {
+          camera.y -= h;
+          dy += h;
+        }
+        const dist = Math.hypot(dx, dy);
+        if (dist > 0) {
+          const move = (dist - 0) * 0.05;
+          camera.x += (dx / dist) * move;
+          camera.y += (dy / dist) * move;
+        }
+      }
+      //#endregion
       //#region ============ 數學函數 ============
       function softMax(arr = []) {
         const max = Math.max(...arr);
@@ -2195,7 +2273,7 @@
       //#endregion
       //#endregion
       //#region ============ 渲染 ============
-      //繪製格線
+      //#region ============ 劃格線 ============
       function drawGrid(fit = false) {
         bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
         if (grid) {
@@ -2229,128 +2307,296 @@
         }
       }
       //#endregion
-      //#region ============ 運行 ============
-      let timeStamp = 0;
-      let deadClearFrame = 0;
-      let fps = 0;
-      let lastTime = performance.now();
-      let frames = 0;
-      let showFps = false;
-      let infoShow = "min";
-      const counts = [[], [], [], [], []];
-      const hourCounts = [[], [], [], [], []];
+      //#region ============ 畫世界資訊頁 ============
+      function drawInfo() {
+        textInfo.innerHTML =
+          `fps: ${Math.round(fps)}<br>` +
+          `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>` +
+          `generation: ${generation}`;
 
-      function loop() {
-        //資訊卡
-        frames++;
-        const now = performance.now();
-        const delta = now - lastTime;
-        if (delta >= 1000) {
-          fps = (frames * 1000) / delta;
+        for (let t = 1; t <= 4; t++) {
+          if (t === 2) continue;
+          const iCtx = infoCtx[t];
+          const cw = infoCanvas[t].width;
+          const ch = infoCanvas[t].height;
+          iCtx.beginPath();
+          iCtx.moveTo(infoPadding, infoPadding - 2);
+          iCtx.lineTo(cw - infoPadding, infoPadding - 2);
+          iCtx.lineTo(cw - infoPadding, ch - infoPadding);
+          iCtx.lineTo(infoPadding, ch - infoPadding);
+          iCtx.closePath();
+          iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
+          iCtx.lineWidth = cw / 320;
+          iCtx.stroke();
 
-          (counts[plant].push(agents[plant].length),
-            counts[normal].push(agents[normal].length),
-            counts[hunter].push(agents[hunter].length),
-            (frames = 0));
-          lastTime = now;
-
-          textInfo.innerHTML = "";
-          for (const c of infoCtx) {
-            if (c === null) continue;
-            c.clearRect(
-              0,
-              0,
-              infoCanvas[plant].width,
-              infoCanvas[plant].height,
-            );
+          const minL = counts[t].length;
+          if (counts[t].length > 120) {
+            let avg = 0;
+            for (let i = 0; i < 60; i++) {
+              avg += counts[t][i];
+            }
+            avg /= 60;
+            hourCounts[t].push(avg);
+            if (hourCounts[t].length > 60) hourCounts[t].shift();
+            counts[t].splice(0, 60);
+          }
+          
+          let max = 0;
+          for (let i = 0; i < 60; i++) {
+            let value;
+            if (infoShow === "min") {
+              value = counts[t][Math.max(0, minL - 60) + i];
+              if (value > max) max = value;
+            } else if (infoShow === "hour") {
+              value = hourCounts[t][i];
+              if (value > max) max = value;
+            }
           }
 
-          textInfo.innerHTML =
-            `fps: ${Math.round(fps)}<br>` +
-            `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>` +
-            `generation: ${generation}`;
+          iCtx.beginPath();
+          let lastX;
 
-          for (let t = 1; t <= 4; t++) {
-            if (t === 2) continue;
-            const iCtx = infoCtx[t];
-            const cw = infoCanvas[t].width;
-            const ch = infoCanvas[t].height;
-            iCtx.beginPath();
-            iCtx.moveTo(infoPadding, infoPadding - 2);
-            iCtx.lineTo(cw - infoPadding, infoPadding - 2);
-            iCtx.lineTo(cw - infoPadding, ch - infoPadding);
-            iCtx.lineTo(infoPadding, ch - infoPadding);
-            iCtx.closePath();
-            iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
-            iCtx.lineWidth = cw / 320;
-            iCtx.stroke();
+          for (let i = 0; i < 60; i++) {
+            let value;
+            if (infoShow === "min")
+              value = counts[t][Math.max(0, minL - 60) + i];
+            if (infoShow === "hour") value = hourCounts[t][i];
+            if (!value) continue;
+            if (i === 0)
+              iCtx.moveTo(
+                infoPadding,
+                infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
+              );
+            else
+              iCtx.lineTo(
+                infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59,
+                infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
+              );
+            lastX =
+              infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
+          }
 
-            const minL = counts[t].length;
-            if (counts[t].length > 120) {
-              let avg = 0;
-              for (let i = 0; i < 60; i++) {
-                avg += counts[t][i];
-              }
-              avg /= 60;
-              hourCounts[t].push(avg);
-              if (hourCounts[t].length > 60) hourCounts[t].shift();
-              counts[t].splice(0, 60);
-            }
-            let max = 0;
-            for (let i = 0; i < 60; i++) {
-              let value;
-              if (infoShow === "min") {
-                value = counts[t][Math.max(0, minL - 60) + i];
-                if (value > max) max = value;
-              } else if (infoShow === "hour") {
-                value = hourCounts[t][i];
-                if (value > max) max = value;
-              }
-            }
+          if (t === plant) {
+            iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
+            iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
+          } else if (t === normal) {
+            iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
+            iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
+          }
+          iCtx.lineWidth = cw / 160;
+          iCtx.stroke();
 
-            iCtx.beginPath();
-            let lastX;
+          iCtx.lineTo(lastX, ch - infoPadding);
+          iCtx.lineTo(infoPadding, ch - infoPadding);
+          iCtx.closePath();
+          iCtx.fill();
+        }
+      }
+      //#endregion
+      //#region ============ 畫點點資訊頁 ============
+      function drawDianBrain() {
+        const vision = brainDian.vision;
+        const maxVision = brainDian.maxVision;
+        const face = brainDian.face;
+        const intent = brainDian.currentIntent;
+        const quarH = Math.PI / 4;
+        const rightStart = quarH;
+        const backStart = quarH + 0.5 * Math.PI;
+        const leftStart = quarH + Math.PI;
+        const frontStart = quarH + 1.5 * Math.PI;
+        const a = (brainDian.hp / brainDian.maxHp) * 0.8 + 0.2;
+        const r = brainDian.erg / brainDian.maxErg + 2.5;
+        const turn = brainDian.turnForce;
+        const front = brainDian.frontForce;
 
-            for (let i = 0; i < 60; i++) {
-              let value;
-              if (infoShow === "min")
-                value = counts[t][Math.max(0, minL - 60) + i];
-              if (infoShow === "hour") value = hourCounts[t][i];
-              if (!value) continue;
-              if (i === 0)
-                iCtx.moveTo(
-                  infoPadding,
-                  infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
-                );
-              else
-                iCtx.lineTo(
-                  infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59,
-                  infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
-                );
-              lastX =
-                infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
-            }
+          //決策層
+        let bCtx = brainCtx[0];
 
-            if (t === plant) {
-              iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
-              iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
-            } else if (t === normal) {
-              iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
-              iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
-            }
-            iCtx.lineWidth = cw / 160;
-            iCtx.stroke();
+        bCtx.clearRect(0, 0, 180, 180);
+        bCtx.beginPath();
+        bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
+        bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+        bCtx.lineWidth = 0.5;
+        bCtx.stroke();
+        for (let d = 0; d < 4; d++) {
+          const dir = vision[d]; //右後左前
 
-            iCtx.lineTo(lastX, ch - infoPadding);
-            iCtx.lineTo(infoPadding, ch - infoPadding);
-            iCtx.closePath();
-            iCtx.fill();
+          for (let t = 0; t < 4; t++) {
+            const type = dir[t];
+            if (type.minDist2 === Infinity) continue;
+            const distance = Math.sqrt(type.minDist2) / maxVision;
+            const angle = Math.atan2(type.closestCross, type.closestDot);
+
+            bCtx.beginPath();
+            bCtx.arc(
+              73,
+              73,
+              72 * distance,
+              quarH + ((d - 1) * Math.PI) / 2,
+              quarH + (d * Math.PI) / 2,
+            );
+            bCtx.lineTo(73, 73);
+            bCtx.closePath();
+            const c = color[t + 1];
+            bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1, 1600 * type.signal)})`;
+            bCtx.fill();
+
+            bCtx.beginPath();
+            bCtx.arc(
+              73 + 72 * distance * Math.cos(-Math.PI / 2 + angle),
+              73 + 72 * distance * Math.sin(-Math.PI / 2 + angle),
+              2,
+              0,
+              2 * Math.PI,
+            );
+            bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l + 10}%,1)`;
+            bCtx.stroke();
           }
         }
 
-        ctx.clearRect(-w, -h, 3 * w, 3 * h);
-        ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
+        bCtx.beginPath();
+        bCtx.arc(73, 73, r, 0, 2 * Math.PI);
+        bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+        bCtx.fill();
 
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(quarH - Math.PI / 2),
+          73 + r * Math.sin(quarH - Math.PI / 2),
+          2,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(quarH - Math.PI / 2),
+          73 + r * Math.sin(quarH - Math.PI / 2),
+          1,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(Math.PI * 1.5 - quarH),
+          73 + r * Math.sin(Math.PI * 1.5 - quarH),
+          2,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(Math.PI * 1.5 - quarH),
+          73 + r * Math.sin(Math.PI * 1.5 - quarH),
+          1,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+        bCtx.fill();
+
+        eatBar.style.width = `${intent[0] * 100}%`;
+        cloneBar.style.width = `${intent[1] * 100}%`;
+        fightBar.style.width = `${intent[2] * 100}%`;
+        wanderBar.style.width = `${intent[3] * 100}%`;
+
+          //行動層
+        bCtx = brainCtx[2];
+        bCtx.clearRect(0, 0, 180, 180);
+        bCtx.beginPath();
+        bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
+        bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+        bCtx.lineWidth = 0.5;
+        bCtx.stroke();
+
+        bCtx.beginPath();
+        bCtx.arc(73, 73, r, 0, 2 * Math.PI);
+        bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(face + quarH),
+          73 + r * Math.sin(face + quarH),
+          2,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(face + quarH),
+          73 + r * Math.sin(face + quarH),
+          1,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(face - quarH),
+          73 + r * Math.sin(face - quarH),
+          2,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+        bCtx.fill();
+
+        bCtx.beginPath();
+        bCtx.arc(
+          73 + r * Math.cos(face - quarH),
+          73 + r * Math.sin(face - quarH),
+          1,
+          0,
+          2 * Math.PI,
+        );
+        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+        bCtx.fill();
+
+        let px = 73;
+        let py = 73;
+        let ang = face;
+
+        bCtx.beginPath();
+        bCtx.moveTo(px, py);
+
+        for (let i = 0; i < 36; i++) {
+          const nx = px + Math.cos(ang) * front * 2;
+          const ny = py + Math.sin(ang) * front * 2;
+
+          bCtx.beginPath();
+          bCtx.moveTo(px, py);
+          bCtx.lineTo(nx, ny);
+
+          bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
+          bCtx.lineWidth = 1 + i;
+          bCtx.stroke();
+
+          bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
+          bCtx.lineWidth = 1 + i / 18;
+          bCtx.stroke();
+
+          ang += turn / 36;
+          px = nx;
+          py = ny;
+        }
+      }
+      //#endregion
+      //#region ============ 儲存動畫 ============
+      function saveAnimation() {
         if (saveAnim > 0) {
           saveAnim--;
 
@@ -2366,15 +2612,25 @@
 
           ctx.restore();
         }
+      }
+      //#endregion
+      //#endregion
+      //#region ============ 運行 ============
+      let timeStamp = 0;
+      let deadClearFrame = 0;
+      let fps = 0;
+      let lastTime = performance.now();
+      let frames = 0;
+      let showFps = false;
+      let infoShow = "min";
+      const counts = [[], [], [], [], []];
+      const hourCounts = [[], [], [], [], []];
+
+      function loop() {
         /*清理agents==========================*/
-        if (timeStamp % 5 === 0) {
-          deadClearFrame++;
-          deadClearFrame %= 6;
-          const type = agents[deadClearFrame];
-          if (type) agents[deadClearFrame] = type.filter((a) => !a.dead);
-        }
-        speciesMap.clear();
+        clearDead();
         /*agents更新==========================*/
+        speciesMap.clear();
         for (let i = 5; i > 0; i--) {
           for (const a of agents[i]) {
             if (a.dead) continue;
@@ -2382,242 +2638,16 @@
           }
         }
 
+        //資訊卡
+        fpsCount();
+        ctx.clearRect(-w, -h, 3 * w, 3 * h);
+        ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
+        saveAnimation();
         /*最老草食點點========================*/
-
-        if (!brainDian || brainDian.dead) {
-          brainDian = null;
-          for (const a of agents[normal]) {
-            if (!a.dead && a.age < 2000) {
-              brainDian = a;
-            }
-            if (brainDian) break;
-          }
-        }
-        if (brainDian) {
-          if (follow) {
-            let dx = brainDian.x - window.innerWidth / 2 / zoom - camera.x;
-            let dy = brainDian.y - window.innerHeight / 2 / zoom - camera.y;
-            if (dx > w / 2) {
-              camera.x += w;
-              dx -= w;
-            }
-            if (dx < -w / 2) {
-              camera.x -= w;
-              dx += w;
-            }
-            if (dy > h / 2) {
-              camera.y += h;
-              dy -= h;
-            }
-            if (dy < -h / 2) {
-              camera.y -= h;
-              dy += h;
-            }
-            const dist = Math.hypot(dx, dy);
-            if (dist > 0) {
-              const move = (dist - 0) * 0.05;
-              camera.x += (dx / dist) * move;
-              camera.y += (dy / dist) * move;
-            }
-          }
-          const vision = brainDian.vision;
-          const maxVision = brainDian.maxVision;
-          const face = brainDian.face;
-          const intent = brainDian.currentIntent;
-          const quarH = Math.PI / 4;
-          const rightStart = quarH;
-          const backStart = quarH + 0.5 * Math.PI;
-          const leftStart = quarH + Math.PI;
-          const frontStart = quarH + 1.5 * Math.PI;
-          const a = (brainDian.hp / brainDian.maxHp) * 0.8 + 0.2;
-          const r = brainDian.erg / brainDian.maxErg + 2.5;
-          const turn = brainDian.turnForce;
-          const front = brainDian.frontForce;
-
-          //決策層
-          let bCtx = brainCtx[0];
-
-          bCtx.clearRect(0, 0, 180, 180);
-          bCtx.beginPath();
-          bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
-          bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
-          bCtx.lineWidth = 0.5;
-          bCtx.stroke();
-          for (let d = 0; d < 4; d++) {
-            const dir = vision[d]; //右後左前
-
-            for (let t = 0; t < 4; t++) {
-              const type = dir[t];
-              if (type.minDist2 === Infinity) continue;
-              const distance = Math.sqrt(type.minDist2) / maxVision;
-              const angle = Math.atan2(type.closestCross, type.closestDot);
-
-              bCtx.beginPath();
-              bCtx.arc(
-                73,
-                73,
-                72 * distance,
-                quarH + ((d - 1) * Math.PI) / 2,
-                quarH + (d * Math.PI) / 2,
-              );
-              bCtx.lineTo(73, 73);
-              bCtx.closePath();
-              const c = color[t + 1];
-              bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1, 1600 * type.signal)})`;
-              bCtx.fill();
-
-              bCtx.beginPath();
-              bCtx.arc(
-                73 + 72 * distance * Math.cos(-Math.PI / 2 + angle),
-                73 + 72 * distance * Math.sin(-Math.PI / 2 + angle),
-                2,
-                0,
-                2 * Math.PI,
-              );
-              bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l + 10}%,1)`;
-              bCtx.stroke();
-            }
-          }
-
-          bCtx.beginPath();
-          bCtx.arc(73, 73, r, 0, 2 * Math.PI);
-          bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(quarH - Math.PI / 2),
-            73 + r * Math.sin(quarH - Math.PI / 2),
-            2,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(quarH - Math.PI / 2),
-            73 + r * Math.sin(quarH - Math.PI / 2),
-            1,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(Math.PI * 1.5 - quarH),
-            73 + r * Math.sin(Math.PI * 1.5 - quarH),
-            2,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(Math.PI * 1.5 - quarH),
-            73 + r * Math.sin(Math.PI * 1.5 - quarH),
-            1,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-          bCtx.fill();
-
-          eatBar.style.width = `${intent[0] * 100}%`;
-          cloneBar.style.width = `${intent[1] * 100}%`;
-          fightBar.style.width = `${intent[2] * 100}%`;
-          wanderBar.style.width = `${intent[3] * 100}%`;
-
-          //行動層
-          bCtx = brainCtx[2];
-          bCtx.clearRect(0, 0, 180, 180);
-          bCtx.beginPath();
-          bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
-          bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
-          bCtx.lineWidth = 0.5;
-          bCtx.stroke();
-
-          bCtx.beginPath();
-          bCtx.arc(73, 73, r, 0, 2 * Math.PI);
-          bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(face + quarH),
-            73 + r * Math.sin(face + quarH),
-            2,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(face + quarH),
-            73 + r * Math.sin(face + quarH),
-            1,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(face - quarH),
-            73 + r * Math.sin(face - quarH),
-            2,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-          bCtx.fill();
-
-          bCtx.beginPath();
-          bCtx.arc(
-            73 + r * Math.cos(face - quarH),
-            73 + r * Math.sin(face - quarH),
-            1,
-            0,
-            2 * Math.PI,
-          );
-          bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-          bCtx.fill();
-
-          let px = 73;
-          let py = 73;
-          let ang = face;
-
-          bCtx.beginPath();
-          bCtx.moveTo(px, py);
-
-          for (let i = 0; i < 36; i++) {
-            const nx = px + Math.cos(ang) * front * 2;
-            const ny = py + Math.sin(ang) * front * 2;
-
-            bCtx.beginPath();
-            bCtx.moveTo(px, py);
-            bCtx.lineTo(nx, ny);
-
-            bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
-            bCtx.lineWidth = 1 + i;
-            bCtx.stroke();
-
-            bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
-            bCtx.lineWidth = 1 + i / 18;
-            bCtx.stroke();
-
-            ang += turn / 36;
-            px = nx;
-            py = ny;
-          }
+        if (!brainDian || brainDian.dead) newBrainDian();
+        else {
+          if (follow) followBrainDian();
+          drawDianBrain();
         }
 
         //滅絕
