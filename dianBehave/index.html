@@ -497,6 +497,7 @@
           this.cell = null;
           this.cellIdx = null;
           this.age = data?.age ?? 0;
+          this.seedAge = data?.seedAge ?? 0;
           this.vx = 0;
           this.vy = 0;
           this.dead = data?.dead ?? false;
@@ -512,6 +513,10 @@
         //#region ============ 行為 ============
         //#region ============ 老化 ============
         aging() {
+          if (this.seedAge < seedDelay) {
+            seedAge++;
+            return false;
+          }
           this.age++;
           if (this.age >= 5000) {
             const range = Math.ceil((this.age - 5000) / 120);
@@ -587,16 +592,14 @@
         //#endregion
         //#region ============ 繁殖 ============
         clone() {
-          setTimeout(() => {
-            const n = new producer({ x: this.x, y: this.y });
-            if (n.x > w) n.x -= w;
-            if (n.x < 0) n.x += w;
-            if (n.y > h) n.y -= h;
-            if (n.y < 0) n.y += h;
-            const nKey = toKey(n.x, n.y);
-            addToCell(nKey, n);
-            agents[n.type].push(n);
-          }, seedDelay);
+          const n = new producer({ x: this.x, y: this.y });
+          if (n.x > w) n.x -= w;
+          if (n.x < 0) n.x += w;
+          if (n.y > h) n.y -= h;
+          if (n.y < 0) n.y += h;
+          const nKey = toKey(n.x, n.y);
+          addToCell(nKey, n);
+          agents[n.type].push(n);
         }
         //#endregion
         //#region ============ 移動 ============
@@ -644,7 +647,7 @@
         //#endregion
         //#region ============ 運行 ============
         update() {
-          this.aging();
+          if (!this.aging()) return;
           if (Math.random() < 0.47 && this.age < 5000) this.grow();
           if (this.deadCheck()) return;
           if (this.age > 1000 && this.age % 600 === 0 && this.hp > 1000)
@@ -1938,6 +1941,7 @@
             x: a.x,
             y: a.y,
             age: a.age,
+            seedAge: a.seedAge,
             dead: a.dead,
             erg: a.erg,
             hp: a.hp,
