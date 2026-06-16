@@ -659,40 +659,47 @@
         //#endregion
         //#region ============ 渲染 ============
         draw() {
+          const h = 200;
+          const s = 20 + (30 * this.age) / 5000;
+          const l = 60 - (30 * this.age) / 5000;
+          const drawX = this.x+this.offsetX;
+          const drawY = this.y+this.offsetY;
           this.radius = this.hp ** 0.3 * 0.8;
           for (let ox = -w; ox <= w; ox += w) {
             for (let oy = -h; oy <= h; oy += h) {
+              const cx = drawX+ox;
+              const cy = drawY+oy;
               ctx.beginPath();
-              ctx.fillStyle = `hsla(200, ${20 + (30 * this.age) / 5000}%, ${30 - (15 * this.age) / 5000}%, 0.8)`;
+              ctx.fillStyle = `hsla(200, ${s}, ${l}%, 0.8)`;
               ctx.arc(
-                this.x + this.offsetX + ox,
-                this.y + this.offsetY + oy,
+                cx,
+                cy,
                 this.radius*0.2,
                 0,
                 2 * Math.PI,
               );
               ctx.fill();
               const grad = ctx.createRadialGradient(
-                this.x+this.offsetX+ox,
-                this.y+this.offsetY+oy,
+                cx,
+                cy,
                 this.radius*0.7,
-                this.x+this.offsetX+ox,
-                this.y+this.offsetY+oy,
+                cx,
+                cy,
                 this.radius,
               );
               grad.addColorStop(
                 0,
-                `hsla(200, ${20 + (30 * this.age) / 5000}%, ${60 - (30 * this.age) / 5000}%, 0.5)`,
+                `hsla(200, ${s}%, ${l}%, 0.5)`,
               );
               grad.addColorStop(
                 1,
-                `hsla(200, ${20 + (30 * this.age) / 5000}%, ${60 - (30 * this.age) / 5000}%, 0)`,
+                `hsla(200, ${s}%, ${l}%, 0)`,
               );
               ctx.beginPath();
               ctx.fillStyle = grad;
               ctx.arc(
-                this.x + this.offsetX + ox,
-                this.y + this.offsetY + oy,
+                cx,
+                cy,
                 this.radius,
                 0,
                 2 * Math.PI,
