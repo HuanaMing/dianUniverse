@@ -659,51 +659,59 @@
         //#endregion
         //#region ============ 渲染 ============
         draw() {
-          const h = 200;
           const s = 20 + (30 * this.age) / 5000;
           const l = 60 - (30 * this.age) / 5000;
-          const drawX = this.x+this.offsetX;
-          const drawY = this.y+this.offsetY;
+
+          const drawX = this.x + this.offsetX;
+          const drawY = this.y + this.offsetY;
+
           this.radius = this.hp ** 0.3 * 0.8;
+
           for (let ox = -w; ox <= w; ox += w) {
             for (let oy = -h; oy <= h; oy += h) {
-              const cx = drawX+ox;
-              const cy = drawY+oy;
+              const cx = drawX + ox;
+              const cy = drawY + oy;
+
+              // 核心粒子（真正中心）
               ctx.beginPath();
-              ctx.fillStyle = `hsla(200, ${s}, ${l}%, 0.8)`;
-              ctx.arc(
-                cx,
-                cy,
-                this.radius*0.2,
-                0,
-                2 * Math.PI,
-              );
+              ctx.fillStyle = `hsla(200, ${s}%, ${l}%, 0.9)`;
+              ctx.arc(cx, cy, this.radius * 0.25, 0, Math.PI * 2);
               ctx.fill();
-              const grad = ctx.createRadialGradient(
+
+              // 內光層（強能量）
+              const inner = ctx.createRadialGradient(
                 cx,
                 cy,
-                this.radius*0.7,
-                cx,
-                cy,
-                this.radius,
-              );
-              grad.addColorStop(
                 0,
-                `hsla(200, ${s}%, ${l}%, 0.5)`,
+                cx,
+                cy,
+                this.radius * 0.6,
               );
-              grad.addColorStop(
-                1,
-                `hsla(200, ${s}%, ${l}%, 0)`,
-              );
+
+              inner.addColorStop(0, `hsla(200, ${s}%, ${l}%, 0.35)`);
+              inner.addColorStop(1, `hsla(200, ${s}%, ${l}%, 0)`);
+
+              ctx.fillStyle = inner;
               ctx.beginPath();
-              ctx.fillStyle = grad;
-              ctx.arc(
+              ctx.arc(cx, cy, this.radius * 0.6, 0, Math.PI * 2);
+              ctx.fill();
+
+              // 🌊 外光層（環境衰減）
+              const outer = ctx.createRadialGradient(
+                cx,
+                cy,
+                this.radius * 0.6,
                 cx,
                 cy,
                 this.radius,
-                0,
-                2 * Math.PI,
               );
+
+              outer.addColorStop(0, `hsla(200, ${s}%, ${l}%, 0.15)`);
+              outer.addColorStop(1, `hsla(200, ${s}%, ${l}%, 0)`);
+
+              ctx.fillStyle = outer;
+              ctx.beginPath();
+              ctx.arc(cx, cy, this.radius, 0, Math.PI * 2);
               ctx.fill();
             }
           }
