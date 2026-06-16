@@ -513,7 +513,7 @@
         //#region ============ 行為 ============
         //#region ============ 老化 ============
         aging() {
-          if (this.seedAge < seedDelay && this.hp<20) {
+          if (this.seedAge < seedDelay && this.hp < 20) {
             this.seedAge++;
             return false;
           }
@@ -662,8 +662,24 @@
           this.radius = this.hp ** 0.3 * 0.8;
           for (let ox = -w; ox <= w; ox += w) {
             for (let oy = -h; oy <= h; oy += h) {
+              const grad = ctx.createRadialGradient(
+                this.x+this.offsetX+ox,
+                this.y+this.offsetY+oy,
+                0,
+                this.x+this.offsetX+ox,
+                this.y+this.offsetY+oy,
+                this.radius,
+              );
+              grad.addColorStop(
+                0,
+                `hsla(200, ${20 + (30 * this.age) / 5000}%, ${60 - (30 * this.age) / 5000}%, 0.8)`,
+              );
+              grad.addColorStop(
+                1,
+                `hsla(200, ${20 + (30 * this.age) / 5000}%, ${60 - (30 * this.age) / 5000}%, 0)`,
+              );
               ctx.beginPath();
-              ctx.fillStyle = `hsla(200, ${20 + (30 * this.age) / 5000}%, ${60 - (30 * this.age) / 5000}%, 0.8)`;
+              ctx.fillStyle = grad;
               ctx.arc(
                 this.x + this.offsetX + ox,
                 this.y + this.offsetY + oy,
@@ -2206,7 +2222,6 @@
             );
           }
           drawInfo();
-
         }
       }
       //#endregion
@@ -2340,7 +2355,7 @@
             if (hourCounts[t].length > 60) hourCounts[t].shift();
             counts[t].splice(0, 60);
           }
-          
+
           let max = 0;
           for (let i = 0; i < 60; i++) {
             let value;
@@ -2372,8 +2387,7 @@
                 infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59,
                 infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
               );
-            lastX =
-              infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
+            lastX = infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
           }
 
           if (t === plant) {
@@ -2409,7 +2423,7 @@
         const turn = brainDian.turnForce;
         const front = brainDian.frontForce;
 
-          //決策層
+        //決策層
         let bCtx = brainCtx[0];
 
         bCtx.clearRect(0, 0, 180, 180);
@@ -2508,7 +2522,7 @@
         fightBar.style.width = `${intent[2] * 100}%`;
         wanderBar.style.width = `${intent[3] * 100}%`;
 
-          //行動層
+        //行動層
         bCtx = brainCtx[2];
         bCtx.clearRect(0, 0, 180, 180);
         bCtx.beginPath();
