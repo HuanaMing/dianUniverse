@@ -2629,7 +2629,14 @@
       function loop() {
         /*清理agents==========================*/
         clearDead();
-        /*agents更新==========================*/
+
+        /*畫布重置==========================*/
+        ctx.clearRect(-w, -h, 3 * w, 3 * h);
+        ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
+        saveAnimation();
+        /*資訊卡更新==========================*/
+        fpsCount();
+        /*agents更新&畫==========================*/
         speciesMap.clear();
         for (let i = 5; i > 0; i--) {
           for (const a of agents[i]) {
@@ -2637,12 +2644,6 @@
             a.update();
           }
         }
-
-        //資訊卡
-        fpsCount();
-        ctx.clearRect(-w, -h, 3 * w, 3 * h);
-        ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
-        saveAnimation();
         /*最老草食點點========================*/
         if (!brainDian || brainDian.dead) newBrainDian();
         else {
