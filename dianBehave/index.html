@@ -721,12 +721,12 @@
             fertilizerMap.set(key, (fertilizerMap.get(key) || 0) + value);
           }
           this.hp *= 0.98;
-          if (this.hp <= 1) this.hp = 0;
         }
         //#endregion
         //#region ============ 死亡 ============
         deadCheck() {
-          if (this.hp <= 0 && !this.dead) {
+          if (this.hp <= 1 && !this.dead) {
+            this.hp = 0;
             removeFromCell(this.cell, this);
             this.dead = true;
             return true;
