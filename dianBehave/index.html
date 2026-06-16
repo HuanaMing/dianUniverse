@@ -1251,26 +1251,7 @@
         //#endregion
         //#region ============ 探索 ============
         wander() {
-          if (this.mode === "wander" && this.wandering === false) {
-            this.wandering = true;
-            this.wanderTime = 0;
-            this.wanderStart = { x: this.x, y: this.y };
-            this.wanderMove = 1;
-          }
-
-          if (this.mode === "wander") {
-            this.wanderTime++;
-            this.wanderMove += this.vx * this.vx + this.vy * this.vy;
-          }
-
-          if (this.mode !== "wander" && this.wandering === true) {
-            this.wanderCredit =
-              Math.hypot(
-                this.x - this.wanderStart.x,
-                this.y - this.wanderStart.y,
-              ) / this.wanderMove;
-            this.wandering = false;
-          }
+          //wander就是晃來晃去甚麼都不做 :3
         }
         //#endregion
         //#region ============ 死亡 ============
