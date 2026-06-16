@@ -662,6 +662,16 @@
           this.radius = this.hp ** 0.3 * 0.8;
           for (let ox = -w; ox <= w; ox += w) {
             for (let oy = -h; oy <= h; oy += h) {
+              ctx.beginPath();
+              ctx.fillStyle = `hsla(200, ${20 + (30 * this.age) / 5000}%, ${30 - (15 * this.age) / 5000}%, 0.8)`;
+              ctx.arc(
+                this.x + this.offsetX + ox,
+                this.y + this.offsetY + oy,
+                this.radius*0.2,
+                0,
+                2 * Math.PI,
+              );
+              ctx.fill();
               const grad = ctx.createRadialGradient(
                 this.x+this.offsetX+ox,
                 this.y+this.offsetY+oy,
