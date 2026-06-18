@@ -2331,8 +2331,8 @@
     function drawChart(type, orgValue, species) {
       //數據長度
       const iCtx = infoCtx[type];
-      const cw = infoCanvas[t].width;
-      const ch = infoCanvas[t].height;
+      const cw = infoCanvas[type].width;
+      const ch = infoCanvas[type].height;
       const minL = orgValue.length;
       let max = 0;
       for (let i = 0; i < 60; i++) {
