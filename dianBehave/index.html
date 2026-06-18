@@ -2180,23 +2180,30 @@
     //#endregion
     //#region ============ 更新物種更替表 ============
     function updateSpeciesInfo() {
-      for (const [k, v] of speciesInfo) {
-        v.push(speciesMap.get(k) || 0);
-
-        if (v.length > 60) v.shift();
+      const species =new set();
+      for(const [k,v] of speciesMap) {
+        species.add(k);
+      }
+      for(const [k,v] of speciesInfo) {
+        species.add(k);
+      }
+      for(const s of species) {
+        const v = speciesMap.get(s) || 0;
+        const infoV = speciesInfo.get(s) || [];
+        infoV.push(v);
+        if (infoV.length > 60) infoV.shift();
 
         let allZero = true;
-
-        for (const c of v) {
+        for (const c of infoV) {
           if (c !== 0) {
             allZero = false;
             break;
           }
         }
         if (allZero) {
-          speciesInfo.delete(k);
+          speciesInfo.delete(s);
         } else {
-          speciesInfo.set(k,v)
+          speciesInfo.set(s,infoV)
         }
       }
     }
