@@ -2350,7 +2350,7 @@
       let max = 0;
       if(!species) {
         for (let i = 0; i < 60; i++) {
-          let value = orgValue[Math.max(0, minL - 59) + i];
+          let value = orgValue[Math.max(0, minL - 60) + i];
           if (value > max) max = value;
         }
       } else if(species) {
@@ -2365,7 +2365,7 @@
 
       for (let i = 0; i < 60; i++) {
         let value;
-        value = orgValue[Math.max(0, minL - 59) + i];
+        value = orgValue[Math.max(0, minL - 60) + i];
 
         if (!value && value !== 0) continue;
         if (i === 0)
@@ -2388,7 +2388,7 @@
         iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
         iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
       }
-      
+
       if(species) {
         iCtx.strokeStyle = `hsla(${(360 * species) / 1e7}, 100%, 50%, 1)`;
         iCtx.fillStyle = "transparent";
