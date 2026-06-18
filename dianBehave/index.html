@@ -1805,7 +1805,6 @@
           const display = infoDiv.style.display;
           if (display === "none") {
             infoDiv.style.display = "block";
-          } else if (display === "block" && infoShow === "min") {
             infoShow = "hour";
           } else if (display === "block" && infoShow === "hour") {
             infoShow = "species";
@@ -2193,7 +2192,11 @@
             break;
           }
         }
-        if (allZero) speciesInfo.delete(k);
+        if (allZero) {
+          speciesInfo.delete(k);
+        } else {
+          speciesInfo.set(k,v)
+        }
       }
     }
     //#endregion
