@@ -1805,6 +1805,7 @@
           const display = infoDiv.style.display;
           if (display === "none") {
             infoDiv.style.display = "block";
+          } else if (display === "block" && infoShow === "min") {
             infoShow = "hour";
           } else if (display === "block" && infoShow === "hour") {
             infoShow = "species";
