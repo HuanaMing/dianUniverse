@@ -1808,6 +1808,8 @@
           } else if (display === "block" && infoShow === "min") {
             infoShow = "hour";
           } else if (display === "block" && infoShow === "hour") {
+            infoShow = "species";
+          } else if (display === "block" && infoShow === "species") {
             infoDiv.style.display = "none";
             infoShow = "min";
           }
