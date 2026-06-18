@@ -2387,7 +2387,9 @@
       } else if (type === normal) {
         iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
         iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
-      } else {
+      }
+      
+      if(species) {
         iCtx.strokeStyle = `hsla(${(360 * species) / 1e7}, 100%, 50%, 1)`;
         iCtx.fillStyle = "transparent";
       }
