@@ -1,2727 +1,2730 @@
 <!doctype html>
 <html lang="zh-Hant">
-  <head>
-    <meta charset="UTF-8" />
-    <title>點點行為演化</title>
-    <style>
-      body {
-        background: #021d2f;
-        color: #ddd;
-        text-align: center;
-        font-family: sans-serif;
-        overflow: hidden;
-      }
-      #bgCanvas {
-        position: absolute;
-        background: transparent;
-      }
-      #canvas {
-        position: absolute;
-        background: transparent;
-      }
-      .infoCanvas {
-        background: transparent;
-        margin: 5px;
-      }
-      #infoDiv {
-        position: absolute;
-        background: hsla(240, 10%, 10%, 0.08);
-        backdrop-filter: blur(3px);
-        border: 1px solid rgba(120, 220, 255, 0.3);
-        border-radius: 10px;
-        width: 360px;
-        max-height: 640px;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-      }
-      #textInfo {
-        font-size: 12px;
-        background: transparent;
-      }
 
-      #brainDiv {
-        position: absolute;
-        background: hsla(240, 10%, 10%, 0.08);
-        backdrop-filter: blur(3px);
-        border: 1px solid rgba(120, 220, 255, 0.3);
-        border-radius: 10px;
-        width: 800px;
-        min-height: 30px;
-        max-height: 640px;
-        left: 50%;
-        top: 50%;
-        transform: translate(-50%, -50%);
-        display: grid;
-        grid-template-columns: 200px 1fr 200px;
-      }
-      .brainPanel {
-        position: relative;
-        padding: 14px;
-        border-right: 1px solid #1d2a36;
-        overflow: auto;
-      }
-      .bar {
-        flex: 1;
-        height: 8px;
-        background: #1c2a38;
-        border-radius: 5px;
-        overflow: hidden;
-      }
-      .fill {
-        height: 100%;
-        background: #3ddc97;
-      }
-      #neuroGraph {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        display: block;
-        inset: 0;
-      }
-      #inputGraph {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        display: block;
-      }
-      #steeringGraph {
-        position: absolute;
-        left: 10px;
-        top: 10px;
-        display: block;
-      }
-      .brainCenter {
-        position: relative;
-        padding: 14px;
-      }
-      .header {
-        font-size: 13px;
-        margin-bottom: 10px;
-        opacity: 0.8;
-      }
-      .brainCard {
-        background: hsla(200, 30%, 10%, 0.4);
-        border: 1px solid hsla(200, 30%, 40%, 0.4);
-        border-radius: 12px;
-        padding: 10px;
-        margin-bottom: 10px;
-      }
-      .row {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-      }
-      .title {
-        font-size: 12px;
-        opacity: 0.7;
-        margin-bottom: 6px;
-      }
-    </style>
-  </head>
-  <!-- #region ============ Body ============ -->
-  <body>
-    <!-- #region ============ 主要畫面 ============ -->
-    <canvas id="bgCanvas"></canvas>
-    <canvas id="canvas"></canvas>
-    <!-- #endregion -->
-    <!-- #region ============ 世界資訊畫面 ============ -->
-    <div id="infoDiv">
-      <div id="textInfo"></div>
-      <canvas
-        width="320"
-        height="180"
-        class="infoCanvas"
-        id="plantInfoCanvas"
-      ></canvas>
-      <canvas
-        width="320"
-        height="180"
-        class="infoCanvas"
-        id="normalInfoCanvas"
-      ></canvas>
-      <canvas
-        width="320"
-        height="180"
-        class="infoCanvas"
-        id="hunterInfoCanvas"
-      ></canvas>
-    </div>
-    <!-- #endregion -->
-    <!-- #region ============ 點點資訊畫面 ============ -->
-    <div id="brainDiv">
-      <div class="brainPanel">
-        <div class="header">⚖️ 決策</div>
-        <div
-          class="brainCard"
-          style="
+<head>
+  <meta charset="UTF-8" />
+  <title>點點行為演化</title>
+  <style>
+    body {
+      background: #021d2f;
+      color: #ddd;
+      text-align: center;
+      font-family: sans-serif;
+      overflow: hidden;
+    }
+
+    #bgCanvas {
+      position: absolute;
+      background: transparent;
+    }
+
+    #canvas {
+      position: absolute;
+      background: transparent;
+    }
+
+    .infoCanvas {
+      background: transparent;
+      margin: 5px;
+    }
+
+    #infoDiv {
+      position: absolute;
+      background: hsla(240, 10%, 10%, 0.08);
+      backdrop-filter: blur(3px);
+      border: 1px solid rgba(120, 220, 255, 0.3);
+      border-radius: 10px;
+      width: 360px;
+      max-height: 640px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    #textInfo {
+      font-size: 12px;
+      background: transparent;
+    }
+
+    #brainDiv {
+      position: absolute;
+      background: hsla(240, 10%, 10%, 0.08);
+      backdrop-filter: blur(3px);
+      border: 1px solid rgba(120, 220, 255, 0.3);
+      border-radius: 10px;
+      width: 800px;
+      min-height: 30px;
+      max-height: 640px;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      display: grid;
+      grid-template-columns: 200px 1fr 200px;
+    }
+
+    .brainPanel {
+      position: relative;
+      padding: 14px;
+      border-right: 1px solid #1d2a36;
+      overflow: auto;
+    }
+
+    .bar {
+      flex: 1;
+      height: 8px;
+      background: #1c2a38;
+      border-radius: 5px;
+      overflow: hidden;
+    }
+
+    .fill {
+      height: 100%;
+      background: #3ddc97;
+    }
+
+    #neuroGraph {
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      display: block;
+      inset: 0;
+    }
+
+    #inputGraph {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: block;
+    }
+
+    #steeringGraph {
+      position: absolute;
+      left: 10px;
+      top: 10px;
+      display: block;
+    }
+
+    .brainCenter {
+      position: relative;
+      padding: 14px;
+    }
+
+    .header {
+      font-size: 13px;
+      margin-bottom: 10px;
+      opacity: 0.8;
+    }
+
+    .brainCard {
+      background: hsla(200, 30%, 10%, 0.4);
+      border: 1px solid hsla(200, 30%, 40%, 0.4);
+      border-radius: 12px;
+      padding: 10px;
+      margin-bottom: 10px;
+    }
+
+    .row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .title {
+      font-size: 12px;
+      opacity: 0.7;
+      margin-bottom: 6px;
+    }
+  </style>
+</head>
+<!-- #region ============ Body ============ -->
+
+<body>
+  <!-- #region ============ 主要畫面 ============ -->
+  <canvas id="bgCanvas"></canvas>
+  <canvas id="canvas"></canvas>
+  <!-- #endregion -->
+  <!-- #region ============ 世界資訊畫面 ============ -->
+  <div id="infoDiv">
+    <div id="textInfo"></div>
+    <canvas width="320" height="180" class="infoCanvas" id="plantInfoCanvas"></canvas>
+    <canvas width="320" height="180" class="infoCanvas" id="normalInfoCanvas"></canvas>
+    <canvas width="320" height="180" class="infoCanvas" id="hunterInfoCanvas"></canvas>
+  </div>
+  <!-- #endregion -->
+  <!-- #region ============ 點點資訊畫面 ============ -->
+  <div id="brainDiv">
+    <div class="brainPanel">
+      <div class="header">⚖️ 決策</div>
+      <div class="brainCard" style="
             position: relative;
             width: 145px;
             height: 145px;
             background: transparent;
             border: 0px;
-          "
-        >
-          <canvas id="inputGraph">雷達圖</canvas>
+          ">
+        <canvas id="inputGraph">雷達圖</canvas>
+      </div>
+      <div class="brainCard">
+        <div class="row">
+          <div class="title">🍔</div>
+          <div class="bar">
+            <div class="fill" id="eatBar" style="background: hsla(200, 40%, 40%, 0.8)"></div>
+          </div>
         </div>
-        <div class="brainCard">
-          <div class="row">
-            <div class="title">🍔</div>
-            <div class="bar">
-              <div
-                class="fill"
-                id="eatBar"
-                style="background: hsla(200, 40%, 40%, 0.8)"
-              ></div>
-            </div>
+        <div class="row">
+          <div class="title">🧬</div>
+          <div class="bar">
+            <div class="fill" id="cloneBar" style="background: hsla(50, 20%, 60%, 0.8)"></div>
           </div>
-          <div class="row">
-            <div class="title">🧬</div>
-            <div class="bar">
-              <div
-                class="fill"
-                id="cloneBar"
-                style="background: hsla(50, 20%, 60%, 0.8)"
-              ></div>
-            </div>
+        </div>
+        <div class="row">
+          <div class="title">🥊</div>
+          <div class="bar">
+            <div class="fill" id="fightBar" style="background: hsla(350, 40%, 50%, 0.8)"></div>
           </div>
-          <div class="row">
-            <div class="title">🥊</div>
-            <div class="bar">
-              <div
-                class="fill"
-                id="fightBar"
-                style="background: hsla(350, 40%, 50%, 0.8)"
-              ></div>
-            </div>
-          </div>
-          <div class="row">
-            <div class="title">☁️</div>
-            <div class="bar">
-              <div
-                class="fill"
-                id="wanderBar"
-                style="background: hsla(50, 5%, 60%, 0.8)"
-              ></div>
-            </div>
+        </div>
+        <div class="row">
+          <div class="title">☁️</div>
+          <div class="bar">
+            <div class="fill" id="wanderBar" style="background: hsla(50, 5%, 60%, 0.8)"></div>
           </div>
         </div>
       </div>
-      <div class="brainCenter">
-        <div class="header">💭 思考</div>
-        <div class="brainCard" style="position: relative">
-          <canvas id="neuroGraph" style="background: red">神經網路圖</canvas>
-        </div>
+    </div>
+    <div class="brainCenter">
+      <div class="header">💭 思考</div>
+      <div class="brainCard" style="position: relative">
+        <canvas id="neuroGraph" style="background: red">神經網路圖</canvas>
       </div>
-      <div class="brainPanel">
-        <div class="header">⚙️ 行動</div>
-        <div
-          class="brainCard"
-          style="
+    </div>
+    <div class="brainPanel">
+      <div class="header">⚙️ 行動</div>
+      <div class="brainCard" style="
             position: relative;
             width: 145px;
             height: 145px;
             background: transparent;
             border: 0px;
-          "
-        >
-          <canvas id="steeringGraph">方向盤</canvas>
-        </div>
+          ">
+        <canvas id="steeringGraph">方向盤</canvas>
       </div>
     </div>
-    <!-- #endregion -->
-    <!-- #endregion -->
-    <!-- #region ============ 程式碼 ============ -->
-    <script>
-      //#region ============ 初始化 ============
-      //#region ============ 網頁物件定義 ============
-      const infoDiv = document.getElementById("infoDiv");
-      infoDiv.style.display = "none";
-      const brainDiv = document.getElementById("brainDiv");
-      brainDiv.style.display = "none";
-      const textInfo = document.getElementById("textInfo");
-      const canvas = document.getElementById("canvas");
-      const ctx = canvas.getContext("2d");
-      const bgCanvas = document.getElementById("bgCanvas");
-      const bgCtx = bgCanvas.getContext("2d");
-      const brainCanvas = [
-        document.getElementById("inputGraph"),
-        document.getElementById("neuroGraph"),
-        document.getElementById("steeringGraph"),
-      ];
+  </div>
+  <!-- #endregion -->
+  <!-- #endregion -->
+  <!-- #region ============ 程式碼 ============ -->
+  <script>
+    //#region ============ 初始化 ============
+    //#region ============ 網頁物件定義 ============
+    const infoDiv = document.getElementById("infoDiv");
+    infoDiv.style.display = "none";
+    const brainDiv = document.getElementById("brainDiv");
+    brainDiv.style.display = "none";
+    const textInfo = document.getElementById("textInfo");
+    const canvas = document.getElementById("canvas");
+    const ctx = canvas.getContext("2d");
+    const bgCanvas = document.getElementById("bgCanvas");
+    const bgCtx = bgCanvas.getContext("2d");
+    const brainCanvas = [
+      document.getElementById("inputGraph"),
+      document.getElementById("neuroGraph"),
+      document.getElementById("steeringGraph"),
+    ];
 
-      brainCanvas[0].width = 145;
-      brainCanvas[0].height = 145;
-      brainCanvas[2].width = 145;
-      brainCanvas[2].height = 145;
-      const brainCtx = [
-        document.getElementById("inputGraph").getContext("2d"),
-        document.getElementById("neuroGraph").getContext("2d"),
-        document.getElementById("steeringGraph").getContext("2d"),
-      ];
-      const eatBar = document.getElementById("eatBar");
-      const cloneBar = document.getElementById("cloneBar");
-      const fightBar = document.getElementById("fightBar");
-      const wanderBar = document.getElementById("wanderBar");
+    brainCanvas[0].width = 145;
+    brainCanvas[0].height = 145;
+    brainCanvas[2].width = 145;
+    brainCanvas[2].height = 145;
+    const brainCtx = [
+      document.getElementById("inputGraph").getContext("2d"),
+      document.getElementById("neuroGraph").getContext("2d"),
+      document.getElementById("steeringGraph").getContext("2d"),
+    ];
+    const eatBar = document.getElementById("eatBar");
+    const cloneBar = document.getElementById("cloneBar");
+    const fightBar = document.getElementById("fightBar");
+    const wanderBar = document.getElementById("wanderBar");
 
-      const infoCanvas = [
-        null,
-        document.getElementById("plantInfoCanvas"),
-        null,
-        document.getElementById("normalInfoCanvas"),
-        document.getElementById("hunterInfoCanvas"),
-      ];
-      const infoCtx = [
-        null,
-        document.getElementById("plantInfoCanvas").getContext("2d"),
-        null,
-        document.getElementById("normalInfoCanvas").getContext("2d"),
-        document.getElementById("hunterInfoCanvas").getContext("2d"),
-      ];
-      //#endregion.
-      //#region ============ 鏡頭設定 ============
-      let w = window.innerWidth;
-      let h = window.innerHeight;
-      for (const c of [canvas, bgCanvas]) {
-        c.style.left = "0px";
-        c.style.top = "0px";
-        c.width = w;
-        c.height = h;
-      }
-      let camera = { x: 0, y: 0 };
-      let zoom = 1;
-      let newZoom = 1;
-      let infoPadding = 12.5;
-      //#endregion.
-      //#region ============ 功能開關 ============
-      let grid = false;
-      let follow = false;
-      //#endregion
-      //#region ============ 世界常數 ============
-      let maxDistX = w / 2;
-      let maxDistY = h / 2;
-      let maxGridX = 64;
-      let maxGridY = 32;
-      let sizeX = window.innerWidth / maxGridX;
-      let sizeY = window.innerHeight / maxGridY;
-      let size = (sizeX + sizeY) / 2;
-      const dir = [
-        [1, 0],
-        [-1, 0],
-        [0, 1],
-        [0, -1],
-      ];
-      //#endregion.
-      //#region ============ 世界資料 ============
-      let fertilizerMap = new Map();
-      const rangeCache = [];
-      let generation = 0;
-      //#endregion
-      //#region ============ 生命常數 ============
-      const none = 0;
-      const plant = 1;
-      const food = 2;
-      const normal = 3;
-      const hunter = 4;
+    const infoCanvas = [
+      null,
+      document.getElementById("plantInfoCanvas"),
+      null,
+      document.getElementById("normalInfoCanvas"),
+      document.getElementById("hunterInfoCanvas"),
+    ];
+    const infoCtx = [
+      null,
+      document.getElementById("plantInfoCanvas").getContext("2d"),
+      null,
+      document.getElementById("normalInfoCanvas").getContext("2d"),
+      document.getElementById("hunterInfoCanvas").getContext("2d"),
+    ];
+    //#endregion.
+    //#region ============ 鏡頭設定 ============
+    let w = window.innerWidth;
+    let h = window.innerHeight;
+    for (const c of [canvas, bgCanvas]) {
+      c.style.left = "0px";
+      c.style.top = "0px";
+      c.width = w;
+      c.height = h;
+    }
+    let camera = { x: 0, y: 0 };
+    let zoom = 1;
+    let newZoom = 1;
+    let infoPadding = 12.5;
+    //#endregion.
+    //#region ============ 功能開關 ============
+    let grid = false;
+    let follow = false;
+    //#endregion
+    //#region ============ 世界常數 ============
+    let maxDistX = w / 2;
+    let maxDistY = h / 2;
+    let maxGridX = 64;
+    let maxGridY = 32;
+    let sizeX = window.innerWidth / maxGridX;
+    let sizeY = window.innerHeight / maxGridY;
+    let size = (sizeX + sizeY) / 2;
+    const dir = [
+      [1, 0],
+      [-1, 0],
+      [0, 1],
+      [0, -1],
+    ];
+    //#endregion.
+    //#region ============ 世界資料 ============
+    let fertilizerMap = new Map();
+    const rangeCache = [];
+    let generation = 0;
+    //#endregion
+    //#region ============ 生命常數 ============
+    const none = 0;
+    const plant = 1;
+    const food = 2;
+    const normal = 3;
+    const hunter = 4;
 
-      let seedDelay = 0;
+    let seedDelay = 0;
 
-      const OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
-      const SELF_NODE = 4; //hp, erg, faceSin, faceCos
-      const INTENT_OUT_NODE = 4; //吃，生，打，晃
-      const MOTOR_OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
-      const INTENT_COUNT = 4;
-      const MOTOR_OUT_NODE = 6; //轉向，前進，type*4
+    const OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
+    const SELF_NODE = 4; //hp, erg, faceSin, faceCos
+    const INTENT_OUT_NODE = 4; //吃，生，打，晃
+    const MOTOR_OTHER_NODE = 64; //face前/後/左/右最近的type1/2/3/4距離，dot，cross，平均訊號強度
+    const INTENT_COUNT = 4;
+    const MOTOR_OUT_NODE = 6; //轉向，前進，type*4
 
-      const intent = 0;
-      const eat = 1;
-      const clone = 2;
-      const fight = 3;
-      const wander = 4;
-      const MAX_POOL = 20;
-      const color = [
-        {},
-        { h: 200, s: 40, l: 40, a: 0.8 },
-        { h: 40, s: 0, l: 80, a: 0.8 },
-        { h: 35, s: 60, l: 60, a: 0.8 },
-        { h: 350, s: 40, l: 50, a: 0.8 },
-      ];
-      //#endregion
-      //#region ============ 生命資料 ============
-      let agents = [[], [], [], [], [], []];
-      let brainDian = null;
-      let evolutionPool = [[], [], [], [], []];
-      const grids = []; //grids[key] = agents
-      const speciesMap = new Map();
-      //#endregion
-      //#region ============ 進度存取 ============
-      //#region ============ 取得/建立資料庫 ============
-      let db;
-      let saveAnim = 0;
-      const request = indexedDB.open("dianBehaveDB", 1);
+    const intent = 0;
+    const eat = 1;
+    const clone = 2;
+    const fight = 3;
+    const wander = 4;
+    const MAX_POOL = 20;
+    const color = [
+      {},
+      { h: 200, s: 40, l: 40, a: 0.8 },
+      { h: 40, s: 0, l: 80, a: 0.8 },
+      { h: 35, s: 60, l: 60, a: 0.8 },
+      { h: 350, s: 40, l: 50, a: 0.8 },
+    ];
+    //#endregion
+    //#region ============ 生命資料 ============
+    let agents = [[], [], [], [], [], []];
+    let brainDian = null;
+    let evolutionPool = [[], [], [], [], []];
+    const grids = []; //grids[key] = agents
+    const speciesMap = new Map(); //及時
+    const speciesInfo = new Map(); //歷史
+    //#endregion
+    //#region ============ 進度存取 ============
+    //#region ============ 取得/建立資料庫 ============
+    let db;
+    let saveAnim = 0;
+    const request = indexedDB.open("dianBehaveDB", 1);
 
-      request.onupgradeneeded = function (e) {
-        db = e.target.result;
-        db.createObjectStore("world");
+    request.onupgradeneeded = function (e) {
+      db = e.target.result;
+      db.createObjectStore("world");
+    };
+
+    request.onsuccess = function (e) {
+      db = e.target.result;
+      loadWorld();
+    };
+
+    request.onerror = function (e) {
+      console.error("DB error", e);
+    };
+    //#endregion
+    //#region ============ 存檔 ============
+    function saveWorld() {
+      const data = {
+        fertilizer: Array.from(fertilizerMap),
+        plant: serializePlant(),
+        food: serializeFood(),
+        normal: serializeNormal(),
+        camera: {
+          pos: camera,
+          zoom: zoom,
+          newZoom: newZoom,
+        },
+        world: {
+          w: w,
+          h: h,
+        },
       };
 
-      request.onsuccess = function (e) {
-        db = e.target.result;
-        loadWorld();
+      const tx = db.transaction("world", "readwrite");
+      const store = tx.objectStore("world");
+
+      store.put(data, "mainSave"); // key = "mainSave"
+
+      tx.oncomplete = () => {
+        saveAnim = 60;
       };
+    }
 
-      request.onerror = function (e) {
-        console.error("DB error", e);
-      };
-      //#endregion
-      //#region ============ 存檔 ============
-      function saveWorld() {
-        const data = {
-          fertilizer: Array.from(fertilizerMap),
-          plant: serializePlant(),
-          food: serializeFood(),
-          normal: serializeNormal(),
-          camera: {
-            pos: camera,
-            zoom: zoom,
-            newZoom: newZoom,
-          },
-          world: {
-            w: w,
-            h: h,
-          },
-        };
+    setInterval(() => {
+      saveWorld();
+    }, 60000); // 每 60 秒存一次
+    //#endregion
+    //#region ============ 讀檔 ============
+    function loadWorld() {
+      const tx = db.transaction("world", "readonly");
+      const store = tx.objectStore("world");
 
-        const tx = db.transaction("world", "readwrite");
-        const store = tx.objectStore("world");
+      const req = store.get("mainSave");
 
-        store.put(data, "mainSave"); // key = "mainSave"
-
-        tx.oncomplete = () => {
-          saveAnim = 60;
-        };
-      }
-
-      setInterval(() => {
-        saveWorld();
-      }, 60000); // 每 60 秒存一次
-      //#endregion
-      //#region ============ 讀檔 ============
-      function loadWorld() {
-        const tx = db.transaction("world", "readonly");
-        const store = tx.objectStore("world");
-
-        const req = store.get("mainSave");
-
-        req.onsuccess = () => {
-          const data = req.result;
-          //沒存檔
-          if (!data) {
-            resize();
-            loop();
-            console.log("歡迎加入點點宇宙!");
-            return;
-          }
-
-          //有存檔
-          camera = data.camera.pos;
-          zoom = data.camera.zoom;
-          newZoom = data.camera.newZoom;
-          w = data.world.w;
-          h = data.world.h;
+      req.onsuccess = () => {
+        const data = req.result;
+        //沒存檔
+        if (!data) {
           resize();
-
-          fertilizerMap = new Map(data.fertilizer);
-
-          for (const d of data.plant || []) {
-            let p = new producer(null, d);
-            addToCell(toKey(p.x, p.y), p);
-            agents[plant].push(p);
-          }
-
-          for (const d of data.food || []) {
-            let f = new Food(null, d);
-            addToCell(toKey(f.x, f.y), f);
-            agents[food].push(f);
-          }
-
-          for (const d of data.normal || []) {
-            let n = new normalDian(null, null, null, d);
-            addToCell(toKey(n.x, n.y), n);
-            agents[normal].push(n);
-          }
-          console.log("歡迎回來!");
           loop();
-        };
+          console.log("歡迎加入點點宇宙!");
+          return;
+        }
 
-        return true;
-      }
-      //#endregion
-      //#region ============ 刪檔 ============
-      function deleteWorld() {
-        grids.length = 0;
-        fertilizerMap.clear();
-        for (const t of agents) t.length = 0;
-        evolutionPool = [[], [], [], [], []];
-        generation = 0;
-      }
-      //#endregion
-      //#endregion
-      //#endregion
-      //#region ============ 生產者 ============
-      class producer {
-        //#region ============ 創建 ============
-        constructor(parent, data) {
-          if (parent && !data) {
-            const angle = Math.random() * Math.PI * 2;
-            const r = Math.random();
-            let dist = 0;
-            if (r < 0.001) {
-              dist = 5 * Math.random() * size;
-            } else if (r < 0.01) {
-              dist = 2 * Math.random() * size;
-            } else {
-              dist = Math.random() * size;
-            }
-            this.x = parent.x + Math.cos(angle) * dist;
-            this.y = parent.y + Math.sin(angle) * dist;
-          } else if (!parent && data) {
-            this.x = data.x;
-            this.y = data.y;
+        //有存檔
+        camera = data.camera.pos;
+        zoom = data.camera.zoom;
+        newZoom = data.camera.newZoom;
+        w = data.world.w;
+        h = data.world.h;
+        resize();
+
+        fertilizerMap = new Map(data.fertilizer);
+
+        for (const d of data.plant || []) {
+          let p = new producer(null, d);
+          addToCell(toKey(p.x, p.y), p);
+          agents[plant].push(p);
+        }
+
+        for (const d of data.food || []) {
+          let f = new Food(null, d);
+          addToCell(toKey(f.x, f.y), f);
+          agents[food].push(f);
+        }
+
+        for (const d of data.normal || []) {
+          let n = new normalDian(null, null, null, d);
+          addToCell(toKey(n.x, n.y), n);
+          agents[normal].push(n);
+        }
+        console.log("歡迎回來!");
+        loop();
+      };
+
+      return true;
+    }
+    //#endregion
+    //#region ============ 刪檔 ============
+    function deleteWorld() {
+      grids.length = 0;
+      fertilizerMap.clear();
+      for (const t of agents) t.length = 0;
+      evolutionPool = [[], [], [], [], []];
+      generation = 0;
+    }
+    //#endregion
+    //#endregion
+    //#endregion
+    //#region ============ 生產者 ============
+    class producer {
+      //#region ============ 創建 ============
+      constructor(parent, data) {
+        if (parent && !data) {
+          const angle = Math.random() * Math.PI * 2;
+          const r = Math.random();
+          let dist = 0;
+          if (r < 0.001) {
+            dist = 5 * Math.random() * size;
+          } else if (r < 0.01) {
+            dist = 2 * Math.random() * size;
           } else {
-            this.x = Math.random() * w;
-            this.y = Math.random() * h;
+            dist = Math.random() * size;
           }
-          this.offsetX = 0;
-          this.offsetY = 0;
-          this.cell = null;
-          this.cellIdx = null;
-          this.age = data?.age ?? 0;
-          this.seedAge = data?.seedAge ?? 0;
-          this.vx = 0;
-          this.vy = 0;
-          this.dead = data?.dead ?? false;
+          this.x = parent.x + Math.cos(angle) * dist;
+          this.y = parent.y + Math.sin(angle) * dist;
+        } else if (!parent && data) {
+          this.x = data.x;
+          this.y = data.y;
+        } else {
+          this.x = Math.random() * w;
+          this.y = Math.random() * h;
+        }
+        this.offsetX = 0;
+        this.offsetY = 0;
+        this.cell = null;
+        this.cellIdx = null;
+        this.age = data?.age ?? 0;
+        this.seedAge = data?.seedAge ?? 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.dead = data?.dead ?? false;
 
-          this.type = plant;
-          this.erg = data?.erg ?? 0;
-          this.hp = data?.hp ?? 5;
-          this.radius = this.hp ** 0.3;
-          this.maxHp = 10000;
-          this.maxVision = 50;
-        }
-        //#endregion
-        //#region ============ 行為 ============
-        //#region ============ 老化 ============
-        aging() {
-          if (this.seedAge < seedDelay && this.hp < 20) {
-            this.seedAge++;
-            return false;
-          }
-          this.age++;
-          if (this.age >= 5000) {
-            const range = Math.ceil((this.age - 5000) / 120);
-            const cache = rangeCache[range] || createNearCache(range);
-            const thisKey = this.cell;
-            const cx = keyToCellX(thisKey);
-            const cy = keyToCellY(thisKey);
-            let count = cache.length / 2;
-            const value = (this.hp * 0.002) / count;
-            for (let i = 0; i < cache.length; i += 2) {
-              const dx = cache[i];
-              const dy = cache[i + 1];
-              const dist2 = Math.max(0.25, dx * dx + dy * dy);
-              const nx = (cx + dx + maxGridX) % maxGridX;
-              const ny = (cy + dy + maxGridY) % maxGridY;
-              const key = cellToKey(nx, ny);
-              fertilizerMap.set(key, (fertilizerMap.get(key) || 1) + value);
-            }
-            this.hp *= 0.98;
-          }
-          return true;
-        }
-        //#endregion
-        //#region ============ 生長 ============
-        grow() {
-          let shadowed = 0;
-          const range = 2;
-          const thisKey = this.cell;
-          const cx = keyToCellX(thisKey);
-          const cy = keyToCellY(thisKey);
-          const cache = rangeCache[range] || createNearCache(range);
-          for (let i = 0; i < cache.length; i += 2) {
-            const dx = cache[i];
-            const dy = cache[i + 1];
-            const nx = (cx + dx + maxGridX) % maxGridX;
-            const ny = (cy + dy + maxGridY) % maxGridY;
-            const key = cellToKey(nx, ny);
-            for (const a of getCell(key)) {
-              if (a.type !== plant) continue;
-              if (a.hp <= this.hp) continue;
-              let dx = a.x - this.x;
-              let dy = a.y - this.y;
-              if (dx > maxDistX) dx = -w + dx;
-              if (dx < -maxDistX) dx = w + dx;
-              if (dy > maxDistY) dy = -h + dy;
-              if (dy < -maxDistY) dy = h + dy;
-              const dist = Math.hypot(dx, dy);
-              const minDist = a.radius + this.radius;
-              if (dist < minDist) {
-                shadowed += minDist - dist;
-                if (shadowed > this.radius) break;
-              }
-            }
-          }
-          this.hp += Math.random() * 2 * (1 - (2 * shadowed) / this.radius);
-
-          const fertilizer = fertilizerMap.get(thisKey);
-          if (fertilizer > 0) {
-            let growth = fertilizer / 20;
-            if (
-              fertilizer > 100 &&
-              Math.random() < fertilizer / 1000 &&
-              this.age > 1000 &&
-              this.hp > 1000
-            ) {
-              this.clone();
-              growth = 50;
-            } else if (this.hp < this.maxHp) {
-              this.hp += growth / 5;
-            }
-            fertilizerMap.set(thisKey, fertilizer - growth);
-          }
-        }
-        //#endregion
-        //#region ============ 繁殖 ============
-        clone() {
-          const n = new producer({ x: this.x, y: this.y });
-          if (n.x > w) n.x -= w;
-          if (n.x < 0) n.x += w;
-          if (n.y > h) n.y -= h;
-          if (n.y < 0) n.y += h;
-          const nKey = toKey(n.x, n.y);
-          addToCell(nKey, n);
-          agents[n.type].push(n);
-        }
-        //#endregion
-        //#region ============ 移動 ============
-        move() {
-          this.offsetX = 0;
-          this.offsetY = 0;
-          const range = 2;
-          const thisKey = this.cell;
-          const cx = keyToCellX(thisKey);
-          const cy = keyToCellY(thisKey);
-          const cache = rangeCache[range] || createNearCache(range);
-          for (let i = 0; i < cache.length; i += 2) {
-            const dx = cache[i];
-            const dy = cache[i + 1];
-            const nx = (cx + dx + maxGridX) % maxGridX;
-            const ny = (cy + dy + maxGridY) % maxGridY;
-            const key = cellToKey(nx, ny);
-            for (const a of getCell(key)) {
-              if (a.type !== normal && a.type !== hunter) continue;
-              let dx = a.x - this.x;
-              let dy = a.y - this.y;
-              if (dx > maxDistX) dx = -w + dx;
-              if (dx < -maxDistX) dx = w + dx;
-              if (dy > maxDistY) dy = -h + dy;
-              if (dy < -maxDistY) dy = h + dy;
-              const dist = Math.hypot(dx, dy);
-              const minDist = this.radius + 2.5;
-              if (dist < minDist) {
-                this.offsetX -= (dx / dist) * (minDist - dist) * 0.2;
-                this.offsetY -= (dy / dist) * (minDist - dist) * 0.2;
-              }
-            }
-          }
-        }
-        //#endregion
-        //#region ============ 死亡 ============
-        deadCheck() {
-          if (this.hp <= 1 && !this.dead) {
-            removeFromCell(this.cell, this);
-            this.dead = true;
-            return true;
-          }
-        }
-        //#endregion
-        //#endregion
-        //#region ============ 運行 ============
-        update() {
-          if (!this.aging()) return;
-          if (Math.random() < 0.47 && this.age < 5000) this.grow();
-          if (this.deadCheck()) return;
-          if (this.age > 1000 && this.age % 600 === 0 && this.hp > 1000)
-            this.clone();
-          this.move();
-          if (this.hp > 10) this.draw();
-        }
-        //#endregion
-        //#region ============ 渲染 ============
-        draw() {
-          const s = 20 + (30 * this.age) / 5000;
-          const l = 60 - (30 * this.age) / 5000;
-
-          const drawX = this.x + this.offsetX;
-          const drawY = this.y + this.offsetY;
-
-          this.radius = this.hp ** 0.3 * 0.8;
-
-          for (let ox = -w; ox <= w; ox += w) {
-            for (let oy = -h; oy <= h; oy += h) {
-              const cx = drawX + ox;
-              const cy = drawY + oy;
-
-              ctx.beginPath();
-              ctx.fillStyle = `hsla(200, ${s}%, ${l}%, 0.8)`;
-              ctx.arc(cx, cy, this.radius, 0, Math.PI * 2);
-              ctx.fill();
-            }
-          }
-        }
-        //#endregion
+        this.type = plant;
+        this.erg = data?.erg ?? 0;
+        this.hp = data?.hp ?? 5;
+        this.radius = this.hp ** 0.3;
+        this.maxHp = 10000;
+        this.maxVision = 50;
       }
       //#endregion
-      //#region ============ 食物 ============
-      class Food {
-        //#region ============ 創建 ============
-        constructor(parent, data) {
-          this.x = data?.x ?? parent.x;
-          this.y = data?.y ?? parent.y;
-          this.cell = toKey(this.x, this.y);
-          this.cellIdx = null;
-
-          this.age = data?.age ?? 0;
-          this.vx = 0;
-          this.vy = 0;
-          this.dead = data?.dead ?? false;
-
-          this.type = 2;
-          this.hp = data?.erg ?? (parent?.erg || 0) + (parent?.hp || 0) + 50;
-          this.maxHp = data?.maxHp ?? this.hp;
-          this.maxVision = 50;
+      //#region ============ 行為 ============
+      //#region ============ 老化 ============
+      aging() {
+        if (this.seedAge < seedDelay && this.hp < 20) {
+          this.seedAge++;
+          return false;
         }
-        //#endregion
-        //#region ============ 行為 ============
-        //#region ============ 老化 ============
-        aging() {
-          const range = Math.ceil(this.age / 500);
+        this.age++;
+        if (this.age >= 5000) {
+          const range = Math.ceil((this.age - 5000) / 120);
           const cache = rangeCache[range] || createNearCache(range);
           const thisKey = this.cell;
           const cx = keyToCellX(thisKey);
           const cy = keyToCellY(thisKey);
-          const value = (this.hp * 0.04) / cache.length;
+          let count = cache.length / 2;
+          const value = (this.hp * 0.002) / count;
           for (let i = 0; i < cache.length; i += 2) {
             const dx = cache[i];
             const dy = cache[i + 1];
-            const dist2 = dx * dx + dy * dy;
+            const dist2 = Math.max(0.25, dx * dx + dy * dy);
             const nx = (cx + dx + maxGridX) % maxGridX;
             const ny = (cy + dy + maxGridY) % maxGridY;
             const key = cellToKey(nx, ny);
-            fertilizerMap.set(key, (fertilizerMap.get(key) || 0) + value);
+            fertilizerMap.set(key, (fertilizerMap.get(key) || 1) + value);
           }
           this.hp *= 0.98;
         }
-        //#endregion
-        //#region ============ 死亡 ============
-        deadCheck() {
-          if (this.hp <= 1 && !this.dead) {
-            this.hp = 0;
-            removeFromCell(this.cell, this);
-            this.dead = true;
-            return true;
-          }
-        }
-        //#endregion
-        //#endregion
-        //#region ============ 運行 ============
-        update() {
-          if (this.deadCheck()) return;
-          this.age++;
-          if (this.age > 100 && Math.random() < 0.5) this.aging();
-          this.draw();
-        }
-        //#endregion
-        //#region ============ 渲染 ============
-        draw() {
-          for (let ox = -w; ox <= w; ox += w) {
-            for (let oy = -h; oy <= h; oy += h) {
-              ctx.beginPath();
-              ctx.fillStyle = "hsla(40, 0%, 80%, 0.8)";
-              ctx.arc(
-                this.x + ox,
-                this.y + oy,
-                this.hp ** 0.3 / 5,
-                0,
-                2 * Math.PI,
-              );
-              ctx.fill();
-            }
-          }
-        }
-        //#endregion
+        return true;
       }
       //#endregion
-      //#region ============ 草食點點 ============
-      class normalDian {
-        //#region ============ 創建 ============
-        constructor(parent, x, y, data) {
-          //#region ============ 腦 ============
-          if (parent && !data) {
-            this.intentBrain = new IntentBrain(parent.intentBrain);
-            this.eatBrain = new SteeringBrain(parent.eatBrain);
-            this.cloneBrain = new SteeringBrain(parent.cloneBrain);
-            this.fightBrain = new SteeringBrain(parent.fightBrain);
-            this.wanderBrain = new SteeringBrain(parent.wanderBrain);
-          } else if (!parent && data) {
-            this.intentBrain = deserializeBrain(data.intentBrain, "intent");
-            this.eatBrain = deserializeBrain(data.eatBrain, "steering");
-            this.cloneBrain = deserializeBrain(data.cloneBrain, "steering");
-            this.fightBrain = deserializeBrain(data.fightBrain, "steering");
-            this.wanderBrain = deserializeBrain(data.wanderBrain, "steering");
-          } else {
-            this.intentBrain = new IntentBrain();
-            this.eatBrain = new SteeringBrain();
-            this.cloneBrain = new SteeringBrain();
-            this.fightBrain = new SteeringBrain();
-            this.wanderBrain = new SteeringBrain();
-          }
-          //#endregion
-          //#region ============ 身體 ============
-          /*狀態數值==========*/
-          this.hp = data?.hp ?? 100;
-          this.erg = data?.erg ?? 50;
-          this.age = data?.age ?? 0;
-          this.wave = data?.wave ?? 0;
-
-          this.x = data?.x ?? x ?? Math.random() * canvas.width;
-          this.y = data?.y ?? y ?? Math.random() * canvas.height;
-          this.vx = data?.vx ?? 0;
-          this.vy = data?.vy ?? 0;
-          this.cell = toKey(this.x, this.y);
-          this.cellIdx = null;
-
-          this.face = data?.face ?? Math.PI * 2 * Math.random();
-          this.turnForce = data?.turnForce ?? 0;
-          this.frontForce = data?.frontForce ?? 0;
-
-          this.vision = [];
-          for (let d = 0; d < 4; d++) {
-            const arr = [];
-            for (let t = 0; t < 4; t++) {
-              arr.push({
-                signal: 0,
-                closest: null,
-                minDist2: Infinity,
-                closestDot: 0,
-                closestCross: 0,
-              });
-            }
-            this.vision.push(arr);
-          }
-
-          this.mode = data?.mode ?? "";
-          this.keep = data?.keep ?? 0;
-          this.currentIntent = data?.currentIntent ?? [];
-
-          this.pregnent = data?.pregnent ?? -1;
-
-          this.fightCooldown = data?.fightCooldown ?? 0;
-          this.targetType = data?.targetType ?? 0;
-
-          /*基礎數值==========*/
-          this.type = normal;
-          this.newGen = false;
-          this.maxHp = 100;
-          this.maxErg = 200;
-          this.maxSpeed = 5;
-          this.maxAge = 5000;
-          this.atk = 5;
-
-          if (parent && parent.bias !== undefined) {
-            const scale = 1e10;
-            // 轉成整數基因
-            const gene = Math.floor(parent.bias * scale);
-            // 前7位鎖住（10位 - 3位變異）
-            const head = Math.floor(gene / 1e3);
-            // 後3位突變
-            const tail = Math.floor(Math.random() * 1e3);
-            this.bias = (head * 1e3 + tail) / scale;
-          } else if (!parent && data) {
-            this.bias = data.bias;
-          } else {
-            this.bias = Math.floor(Math.random() * 1e10) / 1e10;
-          }
-          this.species = Math.floor(this.bias * 1e7);
-
-          this.nextBuffer = new Float32Array(
-            this.intentBrain.nodes.length +
-              this.eatBrain.nodes.length +
-              this.cloneBrain.nodes.length +
-              this.fightBrain.nodes.length +
-              this.wanderBrain.nodes.length,
-          );
-
-          this.maxVision = 300;
-          this.maxTurnSpeed = Math.PI / 5;
-          //#endregion
-        }
-        //#endregion
-        //#region ============ 行為 ============
-        //#region ============ 觀察 ============
-        input() {
-          //初始化，左後右前
-          for (let d = 0; d < 4; d++) {
-            for (let t = 0; t < 4; t++) {
-              const v = this.vision[d][t];
-              v.signal = 0;
-              v.closest = null;
-              v.minDist2 = Infinity;
-              v.closestDot = 0;
-              v.closestCross = 0;
-            }
-          }
-          const range = Math.ceil(this.maxVision / size);
-          const fx = Math.cos(this.face);
-          const fy = Math.sin(this.face);
-          const thisKey = this.cell;
-          const cx = keyToCellX(thisKey);
-          const cy = keyToCellY(thisKey);
-          const cache = rangeCache[range] || createNearCache(range);
-          for (let i = 0; i < cache.length; i += 2) {
-            const dx = cache[i];
-            const dy = cache[i + 1];
-            const nx = (cx + dx + maxGridX) % maxGridX;
-            const ny = (cy + dy + maxGridY) % maxGridY;
-            const key = cellToKey(nx, ny);
-            const agentInCell = getCell(key);
-            if (agentInCell.length === 0 || !agentInCell) continue;
-
-            for (const a of agentInCell) {
-              if (a === this) continue;
-              if ((a.hp <= 20 || a.dead) && a.type === plant) continue;
-              let dx = a.x - this.x;
-              let dy = a.y - this.y;
-              if (dx > maxDistX) dx = -w + dx;
-              if (dx < -maxDistX) dx = w + dx;
-              if (dy > maxDistY) dy = -h + dy;
-              if (dy < -maxDistY) dy = h + dy;
-              const dist2 = dx * dx + dy * dy;
-              if (dist2 > this.maxVision * this.maxVision) continue;
-              const invDist = 1 / Math.sqrt(dist2);
-
-              let cross = (fx * dy - fy * dx) * invDist; //正右負左
-              let dot = (fx * dx + fy * dy) * invDist; //正前負後
-
-              if (cross > 0 && Math.abs(dot) <= 0.7071) {
-                //0.7071 = 0.5^0.5
-                this.vision[0][a.type - 1].signal +=
-                  a.hp / a.maxHp / (dist2 + 1);
-                if (dist2 < this.vision[0][a.type - 1].minDist2) {
-                  this.vision[0][a.type - 1].closest = a;
-                  this.vision[0][a.type - 1].closestDot = dot;
-                  this.vision[0][a.type - 1].closestCross = cross;
-                  this.vision[0][a.type - 1].minDist2 = dist2;
-                }
-              } else if (dot < 0 && Math.abs(cross) < 0.7071) {
-                this.vision[1][a.type - 1].signal +=
-                  a.hp / a.maxHp / (dist2 + 1);
-                if (dist2 < this.vision[1][a.type - 1].minDist2) {
-                  this.vision[1][a.type - 1].closest = a;
-                  this.vision[1][a.type - 1].closestDot = dot;
-                  this.vision[1][a.type - 1].closestCross = cross;
-                  this.vision[1][a.type - 1].minDist2 = dist2;
-                }
-              } else if (cross < 0 && Math.abs(dot) <= 0.7071) {
-                this.vision[2][a.type - 1].signal +=
-                  a.hp / a.maxHp / (dist2 + 1);
-                if (dist2 < this.vision[2][a.type - 1].minDist2) {
-                  this.vision[2][a.type - 1].closest = a;
-                  this.vision[2][a.type - 1].closestDot = dot;
-                  this.vision[2][a.type - 1].closestCross = cross;
-                  this.vision[2][a.type - 1].minDist2 = dist2;
-                }
-              } else if (dot > 0 && Math.abs(cross) < 0.7071) {
-                this.vision[3][a.type - 1].signal +=
-                  a.hp / a.maxHp / (dist2 + 1);
-                if (dist2 < this.vision[3][a.type - 1].minDist2) {
-                  this.vision[3][a.type - 1].closest = a;
-                  this.vision[3][a.type - 1].closestDot = dot;
-                  this.vision[3][a.type - 1].closestCross = cross;
-                  this.vision[3][a.type - 1].minDist2 = dist2;
-                }
-              }
+      //#region ============ 生長 ============
+      grow() {
+        let shadowed = 0;
+        const range = 2;
+        const thisKey = this.cell;
+        const cx = keyToCellX(thisKey);
+        const cy = keyToCellY(thisKey);
+        const cache = rangeCache[range] || createNearCache(range);
+        for (let i = 0; i < cache.length; i += 2) {
+          const dx = cache[i];
+          const dy = cache[i + 1];
+          const nx = (cx + dx + maxGridX) % maxGridX;
+          const ny = (cy + dy + maxGridY) % maxGridY;
+          const key = cellToKey(nx, ny);
+          for (const a of getCell(key)) {
+            if (a.type !== plant) continue;
+            if (a.hp <= this.hp) continue;
+            let dx = a.x - this.x;
+            let dy = a.y - this.y;
+            if (dx > maxDistX) dx = -w + dx;
+            if (dx < -maxDistX) dx = w + dx;
+            if (dy > maxDistY) dy = -h + dy;
+            if (dy < -maxDistY) dy = h + dy;
+            const dist = Math.hypot(dx, dy);
+            const minDist = a.radius + this.radius;
+            if (dist < minDist) {
+              shadowed += minDist - dist;
+              if (shadowed > this.radius) break;
             }
           }
         }
-        //#endregion
-        //#region ============ 決策 ============
-        intent() {
-          const brain = this.intentBrain;
-          const nodes = this.intentBrain.nodes;
-          const connects = this.intentBrain.connects;
-          //初始化
-          let idx = 0;
-          for (let dir = 0; dir < 4; dir++) {
-            for (let type = 0; type < 4; type++) {
-              if (this.vision[dir][type].minDist2 !== Infinity) {
-                nodes[idx++].value = 1 / (this.vision[dir][type].minDist2 + 1);
-                nodes[idx++].value = this.vision[dir][type].signal;
-                nodes[idx++].value = this.vision[dir][type].closestDot;
-                nodes[idx++].value = this.vision[dir][type].closestCross;
-              } else {
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-              }
+        this.hp += Math.random() * 2 * (1 - (2 * shadowed) / this.radius);
+
+        const fertilizer = fertilizerMap.get(thisKey);
+        if (fertilizer > 0) {
+          let growth = fertilizer / 20;
+          if (
+            fertilizer > 100 &&
+            Math.random() < fertilizer / 1000 &&
+            this.age > 1000 &&
+            this.hp > 1000
+          ) {
+            this.clone();
+            growth = 50;
+          } else if (this.hp < this.maxHp) {
+            this.hp += growth / 5;
+          }
+          fertilizerMap.set(thisKey, fertilizer - growth);
+        }
+      }
+      //#endregion
+      //#region ============ 繁殖 ============
+      clone() {
+        const n = new producer({ x: this.x, y: this.y });
+        if (n.x > w) n.x -= w;
+        if (n.x < 0) n.x += w;
+        if (n.y > h) n.y -= h;
+        if (n.y < 0) n.y += h;
+        const nKey = toKey(n.x, n.y);
+        addToCell(nKey, n);
+        agents[n.type].push(n);
+      }
+      //#endregion
+      //#region ============ 移動 ============
+      move() {
+        this.offsetX = 0;
+        this.offsetY = 0;
+        const range = 2;
+        const thisKey = this.cell;
+        const cx = keyToCellX(thisKey);
+        const cy = keyToCellY(thisKey);
+        const cache = rangeCache[range] || createNearCache(range);
+        for (let i = 0; i < cache.length; i += 2) {
+          const dx = cache[i];
+          const dy = cache[i + 1];
+          const nx = (cx + dx + maxGridX) % maxGridX;
+          const ny = (cy + dy + maxGridY) % maxGridY;
+          const key = cellToKey(nx, ny);
+          for (const a of getCell(key)) {
+            if (a.type !== normal && a.type !== hunter) continue;
+            let dx = a.x - this.x;
+            let dy = a.y - this.y;
+            if (dx > maxDistX) dx = -w + dx;
+            if (dx < -maxDistX) dx = w + dx;
+            if (dy > maxDistY) dy = -h + dy;
+            if (dy < -maxDistY) dy = h + dy;
+            const dist = Math.hypot(dx, dy);
+            const minDist = this.radius + 2.5;
+            if (dist < minDist) {
+              this.offsetX -= (dx / dist) * (minDist - dist) * 0.2;
+              this.offsetY -= (dy / dist) * (minDist - dist) * 0.2;
             }
           }
-          nodes[idx++].value = Math.pow(1 - this.erg / this.maxErg, 2); //之後加ergSensitivity和hpSensitivity
-          nodes[idx++].value = Math.pow(1 - this.hp / this.maxHp, 2);
-          nodes[idx++].value = Math.pow(this.age / this.maxAge, 2);
-          nodes[idx++].value = this.bias;
-
-          //計算
-
-          //上一幀資訊用來回流
-          const next = this.nextBuffer.fill(0);
-          for (const c of connects) {
-            if (!c.enable || c.forward) continue;
-            next[c.outId] += Math.tanh(c.weight * nodes[c.inId].value);
-          }
-
-          //propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
-          const outByIn = brain.outByIn;
-          for (const id of brain.order) {
-            const n = nodes[id];
-            const edges = outByIn[id];
-            if (!edges || edges.length === 0) continue;
-            for (const c of edges) {
-              if (!c.enable) continue;
-              next[c.outId] += Math.tanh(c.weight * n.value);
-            }
-          }
-
-          // activate
-          for (let i = 0; i < nodes.length; i++) {
-            nodes[i].value = Math.tanh(next[i]);
-          }
-
-          const l = INTENT_OUT_NODE + SELF_NODE + OTHER_NODE;
-          //輸出結果
-          const eat = nodes[l - 4].value; //吃
-          const clone = nodes[l - 3].value; //生
-          const fight = nodes[l - 2].value; //打
-          const wander = nodes[l - 1].value; //晃
-          return softMax([eat, clone, fight, wander]);
         }
-        //#endregion
-        //#region ============ 行動 ============
-        steering(brain, intent = [0, 0, 0, 0]) {
-          const nodes = brain.nodes;
-          const connects = brain.connects;
-          //初始化
-          let idx = 0;
-          for (let dir = 0; dir < 4; dir++) {
-            for (let type = 0; type < 4; type++) {
-              if (this.vision[dir][type].minDist2 !== Infinity) {
-                nodes[idx++].value = 1 / (this.vision[dir][type].minDist2 + 1);
-                nodes[idx++].value = this.vision[dir][type].signal;
-                nodes[idx++].value = this.vision[dir][type].closestDot;
-                nodes[idx++].value = this.vision[dir][type].closestCross;
-              } else {
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-                nodes[idx++].value = 0;
-              }
-            }
-          }
-          nodes[idx++].value = Math.pow(1 - this.erg / this.maxErg, 2); //之後加ergSensitivity和hpSensitivity
-          nodes[idx++].value = Math.pow(1 - this.hp / this.maxHp, 2);
-          nodes[idx++].value = Math.pow(this.age / this.maxAge, 2);
-          nodes[idx++].value = this.bias;
-          nodes[idx++].value = intent[0] * 2 - 1;
-          nodes[idx++].value = intent[1] * 2 - 1;
-          nodes[idx++].value = intent[2] * 2 - 1;
-          nodes[idx++].value = intent[3] * 2 - 1;
-
-          //計算
-          const next = this.nextBuffer.fill(0);
-          //上一幀資訊用來回流
-          for (const c of connects) {
-            if (!c.enable || c.forward) continue;
-            next[c.outId] += Math.tanh(c.weight * nodes[c.inId].value);
-          }
-          // propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
-          const outByIn = brain.outByIn;
-          for (const id of brain.order) {
-            const n = nodes[id];
-            const edges = outByIn[id];
-            if (!edges || edges.length === 0) continue;
-            for (const c of edges) {
-              if (!c.enable) continue;
-              next[c.outId] += Math.tanh(c.weight * n.value);
-            }
-          }
-
-          // activate
-          for (let i = 0; i < nodes.length; i++) {
-            nodes[i].value = Math.tanh(next[i]);
-          }
-
-          const l =
-            MOTOR_OTHER_NODE + SELF_NODE + INTENT_COUNT + MOTOR_OUT_NODE;
-          //輸出結果
-          const turn = nodes[l - 2].value; //轉向
-          const move = nodes[l - 1].value; //動力
-          this.turnForce = turn;
-          this.frontForce = move;
-          const faceFactor = move < 0 ? 0.3 : 1;
-          if (this.mode === "fight") {
-            let maxIdx = null;
-            let maxValue = -Infinity;
-            for (let i = 3; i <= 6; i++) {
-              if (nodes[l - i].value > maxValue) {
-                maxIdx = i;
-                maxValue = nodes[l - i].value;
-              }
-            }
-            this.targetType = 0;
-            if (maxIdx) this.targetType = maxIdx - 2;
-          }
-
-          this.face += turn * this.maxTurnSpeed;
-          this.face %= Math.PI * 2;
-          this.vx = Math.cos(this.face) * this.maxSpeed * move * faceFactor;
-          this.vy = Math.sin(this.face) * this.maxSpeed * move * faceFactor;
-        }
-        //#endregion
-        //#region ============ 移動 ============
-        move() {
-          this.maxSpeed = 1.5 + (2.5 * this.erg) / this.maxErg;
-          if (this.pregnent > 0)
-            this.maxSpeed += 1.5 * (this.pregnent / 1900 - 1);
-          const nx = this.x + this.vx;
-          const ny = this.y + this.vy;
-          this.x = nx;
-          this.y = ny;
-          if (nx > w) this.x -= w;
-          if (nx < 0) this.x += w;
-          if (ny > h) this.y -= h;
-          if (ny < 0) this.y += h;
-          this.erg -=
-            0.04 * Math.abs(this.frontForce) +
-            0.04 * Math.abs(this.turnForce) +
-            0.02;
-          if (this.erg < 0) {
-            this.hp += this.erg;
-            this.erg = 0;
-          }
-          const newCell = toKey(this.x, this.y);
-          if (newCell !== this.cell) addToCell(newCell, this);
-        }
-        //#endregion
-        //#region ============ 生病 ============
-        sick() {
-          let foodSignal = 0;
-          for (const d of this.vision) {
-            foodSignal += d[food - 1].signal;
-          }
-          if (foodSignal > 0.01) this.hp -= foodSignal;
-        }
-        //#endregion
-        //#region ============ 繁殖 ============
-        clone() {
-          if (this.pregnent === 0) {
-            this.pregnent = -1;
-            const dir = [
-              [0, -1],
-              [0, 1],
-              [1, 0],
-              [-1, 0],
-            ];
-            const randomDir = dir[Math.floor(Math.random() * 4)];
-            let dx = (randomDir[0] * size) / 10;
-            let dy = (randomDir[1] * size) / 10;
-            let n;
-            if (Math.random() < 0.05) {
-              n = new normalDian(null, this.x + dx, this.y + dy);
-            } else {
-              n = new normalDian(this, this.x + dx, this.y + dy);
-            }
-
-            addToCell(toKey(n.x, n.y), n);
-            agents[n.type].push(n);
-            this.x -= dx;
-            this.y -= dy;
-          }
-          if (this.pregnent > 0) {
-            this.pregnent--;
-            return;
-          }
-
-          if (this.mode !== "clone") return;
-          if (this.erg * 2 < this.maxErg) {
-            return;
-          }
-
-          if (this.pregnent === -1) {
-            this.pregnent = 1900;
-            this.erg -= 50;
-            this.keep = 0;
-          }
-        }
-        //#endregion
-        //#region ============ 進食 ============
-        eat() {
-          if (this.mode !== "eat") return;
-          if (this.erg >= this.maxErg) {
-            this.keep = 0;
-            return;
-          }
-          this.erg -= 0.01;
-          let target = this.vision[3][plant - 1].closest;
-
-          if (!target) {
-            this.sick();
-            return;
-          }
-
-          const dist2 = this.vision[3][plant - 1].minDist2;
-          if (dist2 > 25) {
-            this.sick();
-            return;
-          }
-          const bite = 10 * (1 - dist2 / 25);
-          let dx = target.x - this.x;
-          let dy = target.y - this.y;
-          if (dx > maxDistX) dx = -w + dx;
-          if (dx < -maxDistX) dx = w + dx;
-          if (dy > maxDistY) dy = -h + dy;
-          if (dy < -maxDistY) dy = h + dy;
-          if (target.hp > 10 * bite) {
-            target.hp -= 10 * bite;
-            this.erg += bite;
-            target.x -= 0.01 * dx;
-            target.y -= 0.01 * dy;
-            target.x = (target.x + w) % w;
-            target.y = (target.y + h) % h;
-            const newCell = toKey(target.x, target.y);
-            if (newCell !== target.cell) addToCell(newCell, target);
-          } else {
-            this.erg += target.hp / 10;
-            target.hp = 0;
-          }
-          this.sick();
-        }
-        //#endregion
-        //#region ============ 戰鬥 ============
-        fight() {
-          if (this.fightCooldown > 0) this.fightCooldown--;
-          if (this.fightCooldown > 0 || this.mode !== "fight") return false;
-
-          this.erg -= this.atk / 20;
-          let closest = null;
-          let minDist2 = this.maxSpeed * this.maxSpeed;
-          const dist2 = this.vision[3][this.targetType - 1].minDist2;
-          if (dist2 < minDist2) {
-            closest = this.vision[3][this.targetType - 1].closest;
-            minDist2 = dist2;
-          }
-          if (!closest) {
-            return false;
-          }
-          let dx = closest.x - this.x;
-          let dy = closest.y - this.y;
-          if (dx > maxDistX) dx = -w + dx;
-          if (dx < -maxDistX) dx = w + dx;
-          if (dy > maxDistY) dy = -h + dy;
-          if (dy < -maxDistY) dy = h + dy;
-
-          closest.hp -= this.atk;
-          this.erg -= minDist2 / this.maxSpeed;
-          this.vx = dx * 0.8;
-          this.vy = dy * 0.8;
-          this.move();
-          this.fightCooldown = 20;
-          this.keep = 0;
-        }
-        //#endregion
-        //#region ============ 探索 ============
-        wander() {
-          //wander就是晃來晃去甚麼都不做 :3
-        }
-        //#endregion
-        //#region ============ 死亡 ============
-        die() {
+      }
+      //#endregion
+      //#region ============ 死亡 ============
+      deadCheck() {
+        if (this.hp <= 1 && !this.dead) {
           removeFromCell(this.cell, this);
           this.dead = true;
-          if (this.age * 1.5 > this.maxAge) {
-            const b = evolutionPool[this.type];
-            b.push(this);
-            if (b.length > MAX_POOL) b.shift();
-          }
-          if (!this.newGen) {
-            const n = new Food(this);
-            addToCell(toKey(n.x, n.y), n);
-            agents[n.type].push(n);
-          }
-        }
-        //#endregion
-        //#region ============ 老化 ============
-        aging() {
-          this.age++;
-          if (this.age > this.maxAge)
-            this.hp =
-              this.hp * (1 - (this.age - this.maxAge) / this.maxAge) - 0.01;
-        }
-        //#endregion
-        //#endregion
-        //#region ============ 渲染 ============
-        draw() {
-          const a = (this.hp / this.maxHp) * 0.8 + 0.2;
-          let r = this.erg / this.maxErg + 2.5;
-          if (this.pregnent > 0) r += 2.5 * (1 - this.pregnent / 1900);
-          const eye1X = r * Math.cos(this.face - Math.PI / 6);
-          const eye1Y = r * Math.sin(this.face - Math.PI / 6);
-          const eye2X = r * Math.cos(this.face + Math.PI / 6);
-          const eye2Y = r * Math.sin(this.face + Math.PI / 6);
-          const speciesColor = `hsla(${(360 * this.species) / 1e7}, ${10 + (speciesMap.get(this.species) / agents[3].length) * 90}%, ${40 + (((this.bias * 1e10) % 1000) / 1000) * 20}%, ${a})`;
-          const wave = (Math.sin(this.wave) * Math.PI) / 12;
-
-          for (let ox = -w; ox <= w; ox += w) {
-            for (let oy = -h; oy <= h; oy += h) {
-              //漸層
-              let tailGrad = ctx.createLinearGradient(
-                this.x + ox - 0.7 * r * Math.cos(this.face),
-                this.y + oy - 0.7 * r * Math.sin(this.face),
-                this.x +
-                  ox -
-                  r * Math.cos(this.face) -
-                  0.8 *
-                    (1 + this.frontForce / 2) *
-                    r *
-                    Math.cos(
-                      this.face - this.turnForce * this.maxTurnSpeed + wave,
-                    ),
-                this.y +
-                  oy -
-                  r * Math.sin(this.face) -
-                  0.8 *
-                    (1 + this.frontForce / 2) *
-                    r *
-                    Math.sin(
-                      this.face - this.turnForce * this.maxTurnSpeed + wave,
-                    ),
-              );
-              tailGrad.addColorStop(
-                0,
-                `hsla(${color[normal].h}, ${color[normal].s}%, ${color[normal].l}%, ${a})`,
-              );
-              tailGrad.addColorStop(1, speciesColor);
-
-              //身體尾巴
-              ctx.beginPath();
-              ctx.fillStyle = tailGrad;
-
-              ctx.moveTo(
-                this.x +
-                  ox -
-                  r * Math.cos(this.face) -
-                  (1 + this.frontForce / 2) *
-                    r *
-                    Math.cos(
-                      this.face - this.turnForce * this.maxTurnSpeed + wave,
-                    ),
-                this.y +
-                  oy -
-                  r * Math.sin(this.face) -
-                  (1 + this.frontForce / 2) *
-                    r *
-                    Math.sin(
-                      this.face - this.turnForce * this.maxTurnSpeed + wave,
-                    ),
-              );
-              ctx.lineTo(
-                this.x + ox - r * Math.cos(this.face + Math.PI / 4),
-                this.y + oy - r * Math.sin(this.face + Math.PI / 4),
-              );
-              ctx.arc(
-                this.x + ox,
-                this.y + oy,
-                r,
-                this.face - (Math.PI * 2.7) / 4,
-                this.face + (Math.PI * 2.7) / 4,
-              );
-              ctx.lineTo(
-                this.x + ox - r * Math.cos(this.face - Math.PI / 4),
-                this.y + oy - r * Math.sin(this.face - Math.PI / 4),
-              );
-              ctx.closePath();
-              ctx.fill();
-
-              if (this === brainDian) {
-                ctx.lineWidth = 0.2;
-                ctx.strokeStyle = "white";
-                ctx.stroke();
-              }
-
-              //眼睛
-
-              ctx.beginPath();
-              ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
-              ctx.arc(
-                this.x + ox + eye1X,
-                this.y + oy + eye1Y,
-                1.5,
-                0,
-                2 * Math.PI,
-              );
-              ctx.fill();
-              ctx.beginPath();
-              ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
-              ctx.arc(
-                this.x + ox + eye1X,
-                this.y + oy + eye1Y,
-                1,
-                0,
-                2 * Math.PI,
-              );
-              ctx.fill();
-
-              ctx.beginPath();
-              ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
-              ctx.arc(
-                this.x + ox + eye2X,
-                this.y + oy + eye2Y,
-                1.5,
-                0,
-                2 * Math.PI,
-              );
-              ctx.fill();
-              ctx.beginPath();
-              ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
-              ctx.arc(
-                this.x + ox + eye2X,
-                this.y + oy + eye2Y,
-                1,
-                0,
-                2 * Math.PI,
-              );
-              ctx.fill();
-            }
-          }
-        }
-        //#endregion
-        //#region ============ 運行 ============
-        update() {
-          //觀察
-          if (this.age % 5 === 0) {
-            this.input();
-            //做甚麼
-            this.currentIntent = this.intent();
-            if (this.keep <= 0) {
-              let max = -Infinity;
-              let idx = null;
-              const ints = this.currentIntent;
-              const modes = ["eat", "clone", "fight", "wander"];
-              for (let i = 0; i < ints.length; i++) {
-                if (ints[i] > max) {
-                  max = ints[i];
-                  idx = i;
-                }
-              }
-              this.mode = modes[idx];
-              this.keep = 2;
-            }
-
-            if (this.mode === "eat")
-              this.steering(this.eatBrain, this.currentIntent);
-            else if (this.mode === "clone")
-              this.steering(this.cloneBrain, this.currentIntent);
-            else if (this.mode === "fight")
-              this.steering(this.fightBrain, this.currentIntent);
-            else if (this.mode === "wander")
-              this.steering(this.wanderBrain, this.currentIntent);
-            this.keep -= Math.random(); //計畫Math.random()*keepness基因化
-          }
-          //繁殖
-          this.clone();
-          //進食
-          this.eat();
-          //晃
-          this.wander();
-          //打架&移動
-          if (!this.fight()) this.move();
-          //死亡
-          this.aging();
-          if (this.hp <= 0) {
-            this.die();
-            return;
-          }
-          //時間
-          speciesMap.set(this.species, (speciesMap.get(this.species) || 0) + 1);
-          this.wave += this.frontForce;
-          this.draw();
-        }
-        //#endregion
-      }
-      //#endregion
-      //#region ============ 點點腦 ============
-      //#region ============ 決策腦 ============
-      class IntentBrain {
-        constructor(brain, data) {
-          //讀紀錄
-          if (data) {
-            this.nodes = data.nodes.map((n) => new Node(n.id, n.depth));
-            this.connects = data.connects.map(
-              (c) =>
-                new Connect(c.inId, c.outId, c.weight, c.enable, c.forward),
-            );
-
-            //全新
-          } else if (!brain) {
-            this.nodes = [];
-            for (let i = 0; i < OTHER_NODE + SELF_NODE; i++)
-              this.nodes.push(new Node(this.nodes.length, 0));
-
-            for (let i = 0; i < INTENT_OUT_NODE; i++)
-              this.nodes.push(new Node(this.nodes.length, 1));
-
-            this.connects = [];
-            let l = this.nodes.length;
-            for (let i = 0; i < l - INTENT_OUT_NODE; i++) {
-              if (Math.random() < 0.5) {
-                for (let j = 0; j < INTENT_OUT_NODE; j++) {
-                  if (Math.random() < 0.5)
-                    this.connects.push(
-                      new Connect(
-                        this.nodes[i].id,
-                        this.nodes[l - j - 1].id,
-                        Math.random() * 2 - 1,
-                      ),
-                    );
-                }
-              }
-            }
-
-            //遺傳
-          } else {
-            this.nodes = [];
-            for (const n of brain.nodes) {
-              this.nodes.push(n.clone());
-            }
-            this.connects = [];
-            for (const c of brain.connects) {
-              this.connects.push(c.clone());
-            }
-            if (Math.random() < 0.1) {
-              const inId = Math.floor(Math.random() * this.nodes.length);
-              const outId = Math.floor(Math.random() * this.nodes.length);
-              const inDepth = this.nodes[inId].depth;
-              const outDepth = this.nodes[outId].depth;
-              let forward = true;
-              if (inDepth > outDepth) forward = false;
-              if (inDepth !== outDepth)
-                this.connects.push(
-                  new Connect(
-                    inId,
-                    outId,
-                    Math.random() * 2 - 1,
-                    true,
-                    forward,
-                  ),
-                );
-            }
-            if (Math.random() < 0.05 && this.connects.length > 0) {
-              const c =
-                this.connects[Math.floor(Math.random() * this.connects.length)];
-              if (c.enable) {
-                const inDepth = this.nodes[c.inId].depth;
-                const outDepth = this.nodes[c.outId].depth;
-
-                const newId = this.nodes.length;
-                const newDepth = (inDepth + outDepth) / 2;
-                if (inDepth !== outDepth) {
-                  //關閉舊連線
-                  c.enable = false;
-                  const newNode = new Node(newId, newDepth);
-                  this.nodes.push(newNode);
-                  //拆成兩段
-                  this.connects.push(
-                    new Connect(c.inId, newId, c.weight, true, c.forward),
-                  );
-                  this.connects.push(
-                    new Connect(
-                      newId,
-                      c.outId,
-                      Math.random() * 2 - 1,
-                      true,
-                      c.forward,
-                    ),
-                  );
-                }
-              }
-            }
-          }
-
-          //排序計算順序
-          this.order = [];
-          let l = this.nodes.length;
-          const inNodesCount = Array(l).fill(0);
-          const outNodesId = Array(l)
-            .fill()
-            .map(() => []);
-          this.outByIn = Array(l)
-            .fill()
-            .map(() => []);
-          for (const c of this.connects) {
-            //每個node輸出的其他nodeId
-            if (c.forward) outNodesId[c.inId].push(c.outId);
-            this.outByIn[c.inId].push(c);
-            //每個node有幾個輸入node
-            if (c.forward) inNodesCount[c.outId]++;
-          }
-          //沒輸入的當起點
-          const queue = [];
-          for (let i = 0; i < l; i++) {
-            if (inNodesCount[i] === 0) queue.push(i);
-          }
-          //排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
-          const order = [];
-          let time = 0;
-          while (queue.length > 0 && time <= 1000) {
-            //取queue的第一個id放進order
-            time++;
-            const n = queue.shift();
-            this.order.push(n);
-            //以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
-            for (const next of outNodesId[n]) {
-              inNodesCount[next]--;
-              if (inNodesCount[next] === 0) {
-                queue.push(next);
-              }
-            }
-          }
-        }
-      }
-      //#endregion
-      //#region ============ 行動腦 ============
-      class SteeringBrain {
-        constructor(brain, data) {
-          //讀紀錄
-          if (data) {
-            this.nodes = data.nodes.map((n) => new Node(n.id, n.depth));
-            this.connects = data.connects.map(
-              (c) =>
-                new Connect(c.inId, c.outId, c.weight, c.enable, c.forward),
-            );
-
-            //全新
-          } else if (!brain) {
-            this.nodes = [];
-            for (
-              let i = 0;
-              i < MOTOR_OTHER_NODE + INTENT_COUNT + SELF_NODE;
-              i++
-            )
-              this.nodes.push(new Node(this.nodes.length, 0));
-            for (let i = 0; i < MOTOR_OUT_NODE; i++)
-              this.nodes.push(new Node(this.nodes.length, 1));
-
-            this.connects = [];
-            let l = this.nodes.length;
-            for (let i = 0; i < l - MOTOR_OUT_NODE; i++) {
-              if (Math.random() < 0.5) {
-                for (let j = 0; j < MOTOR_OUT_NODE; j++) {
-                  if (Math.random() < 0.5)
-                    this.connects.push(
-                      new Connect(
-                        this.nodes[i].id,
-                        this.nodes[l - j - 1].id,
-                        Math.random() * 2 - 1,
-                      ),
-                    );
-                }
-              }
-            }
-
-            //遺傳
-          } else {
-            this.nodes = [];
-            for (const n of brain.nodes) {
-              this.nodes.push(n.clone());
-            }
-            this.connects = [];
-            for (const c of brain.connects) {
-              this.connects.push(c.clone());
-            }
-            if (Math.random() < 0.1) {
-              const inId = Math.floor(Math.random() * this.nodes.length);
-              const outId = Math.floor(Math.random() * this.nodes.length);
-              const inDepth = this.nodes[inId].depth;
-              const outDepth = this.nodes[outId].depth;
-              let forward = true;
-              if (inDepth > outDepth) forward = false;
-              if (inDepth !== outDepth)
-                this.connects.push(
-                  new Connect(
-                    inId,
-                    outId,
-                    Math.random() * 2 - 1,
-                    true,
-                    forward,
-                  ),
-                );
-            }
-            if (Math.random() < 0.05 && this.connects.length > 0) {
-              const c =
-                this.connects[Math.floor(Math.random() * this.connects.length)];
-              if (c.enable) {
-                const inDepth = this.nodes[c.inId].depth;
-                const outDepth = this.nodes[c.outId].depth;
-
-                const newId = this.nodes.length;
-                const newDepth = (inDepth + outDepth) / 2;
-                if (inDepth !== outDepth) {
-                  //關閉舊連線
-                  c.enable = false;
-                  const newNode = new Node(newId, newDepth);
-                  this.nodes.push(newNode);
-                  //拆成兩段
-                  this.connects.push(
-                    new Connect(c.inId, newId, c.weight, true, c.forward),
-                  );
-                  this.connects.push(
-                    new Connect(
-                      newId,
-                      c.outId,
-                      Math.random() * 2 - 1,
-                      true,
-                      c.forward,
-                    ),
-                  );
-                }
-              }
-            }
-          }
-          //排序計算順序
-          this.order = [];
-          let l = this.nodes.length;
-          const inNodesCount = Array(l).fill(0);
-          const outNodesId = Array(l)
-            .fill()
-            .map(() => []);
-          this.outByIn = Array(l)
-            .fill()
-            .map(() => []);
-          for (const c of this.connects) {
-            //每個node輸出的其他nodeId
-            if (c.forward) outNodesId[c.inId].push(c.outId);
-            this.outByIn[c.inId].push(c);
-            //每個node有幾個輸入node
-            if (c.forward) inNodesCount[c.outId]++;
-          }
-          //沒輸入的當起點
-          const queue = [];
-          for (let i = 0; i < l; i++) {
-            if (inNodesCount[i] === 0) queue.push(i);
-          }
-          //排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
-          const order = [];
-          let time = 0;
-          while (queue.length > 0 && time <= 1000) {
-            //取queue的第一個id放進order
-            time++;
-            const n = queue.shift();
-            this.order.push(n);
-            //以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
-            for (const next of outNodesId[n]) {
-              inNodesCount[next]--;
-              if (inNodesCount[next] === 0) {
-                queue.push(next);
-              }
-            }
-          }
-        }
-      }
-      //#endregion
-      //#region ============ 神經元 ============
-      class Node {
-        constructor(id, depth, value = 0) {
-          this.id = id;
-          this.value = 0;
-          this.depth = depth;
-        }
-        clone() {
-          return new Node(this.id, this.depth);
-        }
-      }
-      //#endregion
-      //#region ============ 神經 ============
-      class Connect {
-        constructor(inId, outId, weight, enable = true, forward = true) {
-          this.forward = forward;
-          this.enable = enable;
-          this.inId = inId;
-          this.outId = outId;
-          this.weight = weight;
-        }
-        clone() {
-          let w = this.weight;
-          if (Math.random() < 0.1) {
-            w += (Math.random() * 2 - 1) * 0.5; // 小幅變動
-          }
-          if (Math.random() < 0.1) {
-            w = Math.random() * 2 - 1; // 重置
-          }
-          let enable = this.enable;
-          if (Math.random() < 0.1) {
-            enable = !this.enable; //關閉or開啟
-          }
-          return new Connect(this.inId, this.outId, w, enable, this.forward);
-        }
-      }
-      //#endregion
-      //#endregion
-      //#region ============ 操作反應 ============
-      window.addEventListener("keydown", (e) => {
-        const key = e.code;
-        if (e.ctrlKey && e.shiftKey) {
-          //刪檔
-          if (key === "KeyZ") deleteWorld();
-        }
-        if (!e.shiftKey && e.ctrlKey) {
-          //存檔
-          if (key === "KeyS") {
-            e.preventDefault();
-            saveWorld();
-          }
-        }
-
-        if (e.shiftKey && !e.ctrlKey) {
-          //世界縮放
-          if (
-            key === "ArrowDown" ||
-            key === "ArrowUp" ||
-            key === "ArrowLeft" ||
-            key === "ArrowRight" ||
-            key === "Space"
-          )
-            editWorldSzie(key);
-        }
-        if (!e.shiftKey && !e.ctrlKey) {
-          //繪製格線
-          if (key === "KeyG") {
-            grid = !grid;
-            drawGrid();
-          }
-          //顯示世界資訊
-          if (key === "KeyF") {
-            const display = infoDiv.style.display;
-            if (display === "none") {
-              infoDiv.style.display = "block";
-            } else if (display === "block" && infoShow === "min") {
-              infoShow = "hour";
-            } else if (display === "block" && infoShow === "hour") {
-              infoDiv.style.display = "none";
-              infoShow = "min";
-            }
-            showFps = !showFps;
-          }
-          //顯示點點資訊
-          if (key === "KeyB") {
-            const display = brainDiv.style.display;
-            if (display === "none") {
-              brainDiv.style.display = "grid";
-            } else if (display === "grid") {
-              brainDiv.style.display = "none";
-            }
-          }
-          //鏡頭縮放
-          if (key === "ArrowUp" || key === "ArrowDown" || key === "Space")
-            editZoomSize(key);
-
-          //鏡頭移動
-          if (
-            key === "KeyW" ||
-            key === "KeyS" ||
-            key === "KeyA" ||
-            key === "KeyD"
-          )
-            moveCamera(key);
-
-          //鏡頭跟隨
-          if (key === "KeyQ") follow = !follow;
-        }
-      });
-      //#endregion
-      //#region ============ 工具函數 ============
-      //#region ============ 存取區塊資料 ============
-      /*查詢區塊內生物資料==============*/
-      function getCell(key) {
-        if (grids[key] === undefined) {
-          grids[key] = [];
-        }
-        return grids[key];
-      }
-      /*新增生物至區塊==============*/
-      function addToCell(key, agent) {
-        if (agent.cell !== null && agent.cellIdx !== null)
-          removeFromCell(agent.cell, agent);
-        agent.cell = key;
-        const newCell = getCell(key);
-        agent.cellIdx = newCell.length;
-        newCell.push(agent);
-      }
-      /*從區塊移除生物==============*/
-      function removeFromCell(key, agent) {
-        const idx = agent.cellIdx;
-        const cell = getCell(key);
-        cell[idx] = cell[cell.length - 1];
-        cell[idx].cellIdx = idx;
-        cell.pop();
-      }
-      /*查詢所在區塊代號==========*/
-      function toKey(x, y) {
-        const cellX = (x / sizeX) | 0;
-        const cellY = (y / sizeY) | 0;
-        return cellX | (cellY << 10);
-      }
-      /*產生區塊代號==========*/
-      function cellToKey(cellX, cellY) {
-        return cellX | (cellY << 10);
-      }
-      /*解碼區塊代號==========*/
-      function keyToCellX(key) {
-        return key & (maxGridX - 1);
-      }
-      function keyToCellY(key) {
-        return key >> 10;
-      }
-      //#endregion
-      //#region ============ 存取DNA訊息 ============
-      function serializeBrain(brain) {
-        return {
-          nodes: brain.nodes.map((n) => ({
-            id: n.id,
-            depth: n.depth,
-          })),
-          connects: brain.connects.map((c) => ({
-            inId: c.inId,
-            outId: c.outId,
-            weight: c.weight,
-            enable: c.enable,
-            forward: c.forward,
-          })),
-        };
-      }
-
-      //生產者
-      function serializePlant() {
-        const plantData = [];
-        for (const a of agents[plant]) {
-          const result = {
-            x: a.x,
-            y: a.y,
-            age: a.age,
-            seedAge: a.seedAge,
-            dead: a.dead,
-            erg: a.erg,
-            hp: a.hp,
-          };
-          plantData.push(result);
-        }
-        return plantData;
-      }
-
-      //食物
-      function serializeFood() {
-        const foodData = [];
-        for (const a of agents[food]) {
-          const result = {
-            x: a.x,
-            y: a.y,
-            age: a.age,
-            dead: a.dead,
-            erg: a.erg,
-            hp: a.hp,
-            maxHp: a.maxHp,
-          };
-          foodData.push(result);
-        }
-        return foodData;
-      }
-
-      //草食點點
-      function serializeNormal() {
-        const normalData = [];
-        for (const a of agents[normal]) {
-          const result = {
-            x: a.x,
-            y: a.y,
-            vx: a.vx,
-            vy: a.vy,
-            age: a.age,
-            dead: a.dead,
-            erg: a.erg,
-            hp: a.hp,
-            intentBrain: serializeBrain(a.intentBrain),
-            eatBrain: serializeBrain(a.eatBrain),
-            cloneBrain: serializeBrain(a.cloneBrain),
-            fightBrain: serializeBrain(a.fightBrain),
-            wanderBrain: serializeBrain(a.wanderBrain),
-            wave: a.wave,
-
-            face: a.face,
-            turnForce: a.turnForce,
-            frontForce: a.frontForce,
-
-            mode: a.mode,
-            keep: a.keep,
-            currentIntent: a.currentIntent,
-
-            pregnent: a.pregnent,
-
-            fightCooldown: a.fightCooldown,
-            targetType: a.targetType,
-
-            bias: a.bias,
-          };
-          normalData.push(result);
-        }
-        return normalData;
-      }
-      function deserializeBrain(data, region) {
-        if (!data?.nodes || !data?.connects) {
-          return region === "intent"
-            ? new IntentBrain(null)
-            : new SteeringBrain(null);
-        }
-
-        const brain =
-          region === "intent"
-            ? new IntentBrain(null, data)
-            : new SteeringBrain(null, data);
-
-        return brain;
-      }
-      //#endregion
-      //#region ============ 建立範圍快取 ============
-      function createNearCache(range) {
-        rangeCache[range] = [];
-        const cache = rangeCache[range];
-        for (
-          let x = Math.max(-maxGridX / 2, -range);
-          x <= Math.min(maxGridX / 2, range);
-          x++
-        ) {
-          for (
-            let y = Math.max(-maxGridY / 2, -range);
-            y <= Math.min(maxGridY / 2, range);
-            y++
-          ) {
-            if (x * x + y * y < range * range) {
-              cache.push(x);
-              cache.push(y);
-            }
-          }
-        }
-        return cache;
-      }
-      //#endregion
-      //#region ============ 初始化世界常數 ============
-      function resize() {
-        const cellSize = Math.sqrt((w * h) / 2048);
-        maxDistX = w / 2;
-        maxDistY = h / 2;
-
-        maxGridX = 1;
-        while (cellSize * maxGridX * 2 <= w) {
-          maxGridX *= 2;
-        }
-        maxGridY = 1;
-        while (cellSize * maxGridY * 2 <= h) {
-          maxGridY *= 2;
-        }
-
-        sizeX = w / maxGridX;
-        sizeY = h / maxGridY;
-        size = (sizeX + sizeY) / 2;
-
-        for (const c of [canvas, bgCanvas]) {
-          c.width = window.innerWidth;
-          c.height = window.innerHeight;
-          c.style.left = "0px";
-          c.style.top = "0px";
-        }
-
-        for (let t = plant; t <= hunter; t++) {
-          for (const a of agents[t]) {
-            if (!a.dead) {
-              a.x = (a.x + w) % w;
-              a.y = (a.y + h) % h;
-              addToCell(toKey(a.x, a.y), a);
-            }
-          }
-        }
-        const nfer = new Map();
-        for (const [k, v] of fertilizerMap) {
-          const cx = keyToCellX(k);
-          const cy = keyToCellY(k);
-          if (cx >= maxGridX || cx < 0 || cy >= maxGridY || cy < 0) continue;
-          const key = toKey(cx, cy);
-          nfer.set(key, v);
-        }
-        fertilizerMap.clear();
-        for (const [k, v] of nfer) {
-          fertilizerMap.set(k, v);
-        }
-
-        rangeCache.length = 0;
-
-        const mh = h * 0.9;
-        infoDiv.style.maxHeight = mh + "px";
-        infoDiv.style.width = (mh / 16) * 9 + "px";
-        infoDiv.style.borderRadius = mh / 64 + "px";
-        textInfo.style.width = (mh / 16) * 9 + "px";
-        textInfo.style.fontSize = (mh / 640) * 12 + "px";
-        for (const c of document.getElementsByClassName("infoCanvas")) {
-          c.width = (mh / 16) * 8;
-          c.height = (((mh / 16) * 8) / 16) * 9;
-          c.style.margin = mh / 128 + "px";
-        }
-        infoPadding = (mh / 16) * 8 * 0.05;
-
-        if (grid) {
-          bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
-          for (let ox = -w; ox <= w; ox += w) {
-            for (let oy = -h; oy <= h; oy += h) {
-              for (let y = 0; y <= maxGridY; y += 1) {
-                bgCtx.beginPath();
-                bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-                bgCtx.lineWidth = 2;
-                bgCtx.moveTo(0 + ox, y * sizeY + oy);
-                bgCtx.lineTo(w + ox, y * sizeY + oy);
-                bgCtx.stroke();
-              }
-              for (let x = 0; x <= maxGridX; x += 1) {
-                bgCtx.beginPath();
-                bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-                bgCtx.lineWidth = 2;
-                bgCtx.moveTo(x * sizeX + ox, 0 + oy);
-                bgCtx.lineTo(x * sizeX + ox, h + oy);
-                bgCtx.stroke();
-              }
-            }
-          }
-        }
-      }
-      //#endregion
-      //#region ============ 編輯世界邊界 ============
-      function editWorldSzie(key) {
-        if (key === "Space") {
-          newZoom = 1;
-          w = window.innerWidth;
-          h = window.innerHeight;
-          resize();
-          return;
-        } else if (key === "ArrowDown") h += 10.1 / zoom;
-        else if (key === "ArrowUp") h -= 10.1 / zoom;
-        else if (key === "ArrowRight") w += 10.1 / zoom;
-        else if (key === "ArrowLeft") w -= 10.1 / zoom;
-        newZoom = zoom;
-        if (Math.abs(h - window.innerHeight / zoom) < 10 / zoom)
-          h = window.innerHeight / zoom;
-        if (Math.abs(w - window.innerWidth / zoom) < 10 / zoom)
-          w = window.innerWidth / zoom;
-        resize();
-        if (dir === "down" || dir === "up")
-          drawGrid(Math.abs(h - window.innerHeight / zoom) < 10 / zoom);
-        if (dir === "right" || dir === "left")
-          drawGrid(Math.abs(w - window.innerWidth / zoom) < 10 / zoom);
-      }
-      //#endregion
-      //#region ============ 編輯鏡頭 ============
-      function editZoomSize(key) {
-        if (key === "ArrowUp") zoom += 0.1;
-        else if (key === "ArrowDown") zoom -= 0.1;
-        else if (key === "Space") {
-          follow = false;
-          camera.x = 0;
-          camera.y = 0;
-          zoom = newZoom;
-        }
-        if (zoom < 1) zoom = 1;
-        drawGrid();
-      }
-      function moveCamera(key) {
-        if (key === "KeyW") camera.y -= 10;
-        if (key === "KeyS") camera.y += 10;
-        if (key === "KeyA") camera.x -= 10;
-        if (key === "KeyD") camera.x += 10;
-        follow = false;
-        drawGrid();
-      }
-      //#endregion
-      //#region ============ 計算fps ============
-      function fpsCount() {
-        frames++;
-        const now = performance.now();
-        const delta = now - lastTime;
-        if (delta >= 1000) {
-          fps = (frames * 1000) / delta;
-
-          (counts[plant].push(agents[plant].length),
-            counts[normal].push(agents[normal].length),
-            counts[hunter].push(agents[hunter].length),
-            (frames = 0));
-          lastTime = now;
-
-          textInfo.innerHTML = "";
-          for (const c of infoCtx) {
-            if (c === null) continue;
-            c.clearRect(
-              0,
-              0,
-              infoCanvas[plant].width,
-              infoCanvas[plant].height,
-            );
-          }
-          drawInfo();
-        }
-      }
-      //#endregion
-      //#region ============ 清除死亡點點 ============
-      function clearDead() {
-        if (timeStamp % 5 === 0) {
-          deadClearFrame++;
-          deadClearFrame %= 6;
-          const type = agents[deadClearFrame];
-          if (type) agents[deadClearFrame] = type.filter((a) => !a.dead);
-        }
-      }
-      //#endregion
-      //#region ============ 找新目標點點 ============
-      function newBrainDian() {
-        brainDian = null;
-        for (const a of agents[normal]) {
-          if (!a.dead && a.age < 2000) {
-            brainDian = a;
-          }
-          if (brainDian) break;
-        }
-      }
-      //#endregion
-      //#region ============ 鏡頭跟隨 ============
-      function followBrainDian() {
-        let dx = brainDian.x - window.innerWidth / 2 / zoom - camera.x;
-        let dy = brainDian.y - window.innerHeight / 2 / zoom - camera.y;
-        if (dx > w / 2) {
-          camera.x += w;
-          dx -= w;
-        }
-        if (dx < -w / 2) {
-          camera.x -= w;
-          dx += w;
-        }
-        if (dy > h / 2) {
-          camera.y += h;
-          dy -= h;
-        }
-        if (dy < -h / 2) {
-          camera.y -= h;
-          dy += h;
-        }
-        const dist = Math.hypot(dx, dy);
-        if (dist > 0) {
-          const move = (dist - 0) * 0.05;
-          camera.x += (dx / dist) * move;
-          camera.y += (dy / dist) * move;
-        }
-      }
-      //#endregion
-      //#region ============ 數學函數 ============
-      function softMax(arr = []) {
-        const max = Math.max(...arr);
-
-        const exps = arr.map((v) => Math.exp(v - max));
-
-        let sum = 0;
-        for (const e of exps) sum += e;
-
-        return exps.map((e) => e / sum);
-      }
-      //#endregion
-      //#endregion
-      //#region ============ 渲染 ============
-      //#region ============ 劃格線 ============
-      function drawGrid(fit = false) {
-        bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
-        if (grid) {
-          bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
-          bgCtx.setTransform(
-            zoom,
-            0,
-            0,
-            zoom,
-            -camera.x * zoom,
-            -camera.y * zoom,
-          );
-          for (let y = 0; y <= maxGridY; y += 1) {
-            bgCtx.beginPath();
-            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-            if (fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
-            bgCtx.lineWidth = 1;
-            bgCtx.moveTo(0, y * sizeY);
-            bgCtx.lineTo(w, y * sizeY);
-            bgCtx.stroke();
-          }
-          for (let x = 0; x <= maxGridX; x += 1) {
-            bgCtx.beginPath();
-            bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
-            if (fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
-            bgCtx.lineWidth = 1;
-            bgCtx.moveTo(x * sizeX, 0);
-            bgCtx.lineTo(x * sizeX, h);
-            bgCtx.stroke();
-          }
-        }
-      }
-      //#endregion
-      //#region ============ 畫世界資訊頁 ============
-      function drawInfo() {
-        textInfo.innerHTML =
-          `fps: ${Math.round(fps)}<br>` +
-          `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>` +
-          `generation: ${generation}`;
-
-        for (let t = 1; t <= 4; t++) {
-          if (t === 2) continue;
-          const iCtx = infoCtx[t];
-          const cw = infoCanvas[t].width;
-          const ch = infoCanvas[t].height;
-          iCtx.beginPath();
-          iCtx.moveTo(infoPadding, infoPadding - 2);
-          iCtx.lineTo(cw - infoPadding, infoPadding - 2);
-          iCtx.lineTo(cw - infoPadding, ch - infoPadding);
-          iCtx.lineTo(infoPadding, ch - infoPadding);
-          iCtx.closePath();
-          iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
-          iCtx.lineWidth = cw / 320;
-          iCtx.stroke();
-
-          const minL = counts[t].length;
-          if (counts[t].length > 120) {
-            let avg = 0;
-            for (let i = 0; i < 60; i++) {
-              avg += counts[t][i];
-            }
-            avg /= 60;
-            hourCounts[t].push(avg);
-            if (hourCounts[t].length > 60) hourCounts[t].shift();
-            counts[t].splice(0, 60);
-          }
-
-          let max = 0;
-          for (let i = 0; i < 60; i++) {
-            let value;
-            if (infoShow === "min") {
-              value = counts[t][Math.max(0, minL - 60) + i];
-              if (value > max) max = value;
-            } else if (infoShow === "hour") {
-              value = hourCounts[t][i];
-              if (value > max) max = value;
-            }
-          }
-
-          iCtx.beginPath();
-          let lastX;
-
-          for (let i = 0; i < 60; i++) {
-            let value;
-            if (infoShow === "min")
-              value = counts[t][Math.max(0, minL - 60) + i];
-            if (infoShow === "hour") value = hourCounts[t][i];
-            if (!value) continue;
-            if (i === 0)
-              iCtx.moveTo(
-                infoPadding,
-                infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
-              );
-            else
-              iCtx.lineTo(
-                infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59,
-                infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
-              );
-            lastX = infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
-          }
-
-          if (t === plant) {
-            iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
-            iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
-          } else if (t === normal) {
-            iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
-            iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
-          }
-          iCtx.lineWidth = cw / 160;
-          iCtx.stroke();
-
-          iCtx.lineTo(lastX, ch - infoPadding);
-          iCtx.lineTo(infoPadding, ch - infoPadding);
-          iCtx.closePath();
-          iCtx.fill();
-        }
-      }
-      //#endregion
-      //#region ============ 畫點點資訊頁 ============
-      function drawDianBrain() {
-        const vision = brainDian.vision;
-        const maxVision = brainDian.maxVision;
-        const face = brainDian.face;
-        const intent = brainDian.currentIntent;
-        const quarH = Math.PI / 4;
-        const rightStart = quarH;
-        const backStart = quarH + 0.5 * Math.PI;
-        const leftStart = quarH + Math.PI;
-        const frontStart = quarH + 1.5 * Math.PI;
-        const a = (brainDian.hp / brainDian.maxHp) * 0.8 + 0.2;
-        const r = brainDian.erg / brainDian.maxErg + 2.5;
-        const turn = brainDian.turnForce;
-        const front = brainDian.frontForce;
-
-        //決策層
-        let bCtx = brainCtx[0];
-
-        bCtx.clearRect(0, 0, 180, 180);
-        bCtx.beginPath();
-        bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
-        bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
-        bCtx.lineWidth = 0.5;
-        bCtx.stroke();
-        for (let d = 0; d < 4; d++) {
-          const dir = vision[d]; //右後左前
-
-          for (let t = 0; t < 4; t++) {
-            const type = dir[t];
-            if (type.minDist2 === Infinity) continue;
-            const distance = Math.sqrt(type.minDist2) / maxVision;
-            const angle = Math.atan2(type.closestCross, type.closestDot);
-
-            bCtx.beginPath();
-            bCtx.arc(
-              73,
-              73,
-              72 * distance,
-              quarH + ((d - 1) * Math.PI) / 2,
-              quarH + (d * Math.PI) / 2,
-            );
-            bCtx.lineTo(73, 73);
-            bCtx.closePath();
-            const c = color[t + 1];
-            bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1, 1600 * type.signal)})`;
-            bCtx.fill();
-
-            bCtx.beginPath();
-            bCtx.arc(
-              73 + 72 * distance * Math.cos(-Math.PI / 2 + angle),
-              73 + 72 * distance * Math.sin(-Math.PI / 2 + angle),
-              2,
-              0,
-              2 * Math.PI,
-            );
-            bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l + 10}%,1)`;
-            bCtx.stroke();
-          }
-        }
-
-        bCtx.beginPath();
-        bCtx.arc(73, 73, r, 0, 2 * Math.PI);
-        bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(quarH - Math.PI / 2),
-          73 + r * Math.sin(quarH - Math.PI / 2),
-          2,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(quarH - Math.PI / 2),
-          73 + r * Math.sin(quarH - Math.PI / 2),
-          1,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(Math.PI * 1.5 - quarH),
-          73 + r * Math.sin(Math.PI * 1.5 - quarH),
-          2,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(Math.PI * 1.5 - quarH),
-          73 + r * Math.sin(Math.PI * 1.5 - quarH),
-          1,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-        bCtx.fill();
-
-        eatBar.style.width = `${intent[0] * 100}%`;
-        cloneBar.style.width = `${intent[1] * 100}%`;
-        fightBar.style.width = `${intent[2] * 100}%`;
-        wanderBar.style.width = `${intent[3] * 100}%`;
-
-        //行動層
-        bCtx = brainCtx[2];
-        bCtx.clearRect(0, 0, 180, 180);
-        bCtx.beginPath();
-        bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
-        bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
-        bCtx.lineWidth = 0.5;
-        bCtx.stroke();
-
-        bCtx.beginPath();
-        bCtx.arc(73, 73, r, 0, 2 * Math.PI);
-        bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(face + quarH),
-          73 + r * Math.sin(face + quarH),
-          2,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(face + quarH),
-          73 + r * Math.sin(face + quarH),
-          1,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(face - quarH),
-          73 + r * Math.sin(face - quarH),
-          2,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
-        bCtx.fill();
-
-        bCtx.beginPath();
-        bCtx.arc(
-          73 + r * Math.cos(face - quarH),
-          73 + r * Math.sin(face - quarH),
-          1,
-          0,
-          2 * Math.PI,
-        );
-        bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
-        bCtx.fill();
-
-        let px = 73;
-        let py = 73;
-        let ang = face;
-
-        bCtx.beginPath();
-        bCtx.moveTo(px, py);
-
-        for (let i = 0; i < 36; i++) {
-          const nx = px + Math.cos(ang) * front * 2;
-          const ny = py + Math.sin(ang) * front * 2;
-
-          bCtx.beginPath();
-          bCtx.moveTo(px, py);
-          bCtx.lineTo(nx, ny);
-
-          bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
-          bCtx.lineWidth = 1 + i;
-          bCtx.stroke();
-
-          bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
-          bCtx.lineWidth = 1 + i / 18;
-          bCtx.stroke();
-
-          ang += turn / 36;
-          px = nx;
-          py = ny;
-        }
-      }
-      //#endregion
-      //#region ============ 儲存動畫 ============
-      function saveAnimation() {
-        if (saveAnim > 0) {
-          saveAnim--;
-
-          ctx.save();
-
-          ctx.translate(canvas.width - 30, 30);
-          ctx.rotate(saveAnim * 0.1);
-
-          ctx.font = "10px Arial";
-          ctx.textAlign = "center";
-
-          ctx.fillText("🦈", 0, 0);
-
-          ctx.restore();
+          return true;
         }
       }
       //#endregion
       //#endregion
       //#region ============ 運行 ============
-      let timeStamp = 0;
-      let deadClearFrame = 0;
-      let fps = 0;
-      let lastTime = performance.now();
-      let frames = 0;
-      let showFps = false;
-      let infoShow = "min";
-      const counts = [[], [], [], [], []];
-      const hourCounts = [[], [], [], [], []];
-
-      function loop() {
-        /*清理agents==========================*/
-        clearDead();
-
-        /*畫布重置==========================*/
-        ctx.clearRect(-w, -h, 3 * w, 3 * h);
-        ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
-        saveAnimation();
-        /*資訊卡更新==========================*/
-        fpsCount();
-        /*agents更新&畫==========================*/
-        speciesMap.clear();
-        for (let i = 5; i > 0; i--) {
-          for (const a of agents[i]) {
-            if (a.dead) continue;
-            a.update();
-          }
-        }
-        /*最老草食點點========================*/
-        if (!brainDian || brainDian.dead) newBrainDian();
-        else {
-          if (follow) followBrainDian();
-          drawDianBrain();
-        }
-
-        //滅絕
-        if (agents[normal].length <= 3) {
-          generation++;
-
-          // 沒進化資料 → fallback
-
-          const survive = [];
-          for (const a of agents[normal]) survive.push(a);
-          if (survive.length > 0) {
-            for (let i = 0; i < 70; i++) {
-              // 取倖存者DNA
-              const parent =
-                survive[Math.floor(Math.random() * survive.length)];
-              const d = new normalDian(parent);
-              d.newGen = true;
-              addToCell(toKey(d.x, d.y), d);
-              agents[d.type].push(d);
-            }
-          }
-          if (evolutionPool[normal].length === 0) {
-            for (let i = 0; i < 100; i++) {
-              const d = new normalDian();
-              addToCell(toKey(d.x, d.y), d);
-              agents[d.type].push(d);
-            }
-          } else {
-            for (let i = 0; i < 70; i++) {
-              // 依機率取 DNA
-              const pool = evolutionPool[normal];
-              const parent = pool[Math.floor(Math.random() * pool.length)];
-
-              const d = new normalDian(parent);
-              d.newGen = true;
-              addToCell(toKey(d.x, d.y), d);
-              agents[d.type].push(d);
-            }
-          }
-
-          //植物復甦
-          if (agents[plant].length < (maxGridX * maxGridY) / 2) {
-            for (let i = 0; i < (maxGridX * maxGridY) / 2; i++) {
-              const n = new producer();
-              n.hp = 10000 * Math.random();
-              n.age = Math.floor(5000 * Math.random());
-              addToCell(toKey(n.x, n.y), n);
-              agents[n.type].push(n);
-            }
-          }
-          let times = 0;
-          seedDelay = 0;
-          while (agents[plant].length < (w * h) / 2100 && times < 1000000) {
-            times++;
-            for (const p of agents[plant]) {
-              if (!p.dead) p.update();
-            }
-          }
-          seedDelay = 2000;
-        }
-
-        for (const [k, v] of fertilizerMap) {
-          let next = v * 0.998;
-          if (v > 50 && Math.random() <= v / 1000) {
-            setTimeout(() => {
-              const n = new producer({
-                x: (keyToCellX(k) + Math.random()) * sizeX,
-                y: (keyToCellY(k) + Math.random()) * sizeY,
-              });
-              if (n.x > w) n.x -= w;
-              if (n.x < 0) n.x += w;
-              if (n.y > h) n.y -= h;
-              if (n.y < 0) n.y += h;
-              const nKey = toKey(n.x, n.y);
-              addToCell(nKey, n);
-              agents[n.type].push(n);
-            }, 10000);
-            next -= 50;
-          }
-          if (next < 1) {
-            fertilizerMap.delete(k);
-            continue;
-          }
-          fertilizerMap.set(k, next);
-        }
-        timeStamp++;
-        requestAnimationFrame(loop);
+      update() {
+        if (!this.aging()) return;
+        if (Math.random() < 0.47 && this.age < 5000) this.grow();
+        if (this.deadCheck()) return;
+        if (this.age > 1000 && this.age % 600 === 0 && this.hp > 1000)
+          this.clone();
+        this.move();
+        if (this.hp > 10) this.draw();
       }
       //#endregion
-    </script>
-    <!-- #endregion -->
-  </body>
+      //#region ============ 渲染 ============
+      draw() {
+        const s = 20 + (30 * this.age) / 5000;
+        const l = 60 - (30 * this.age) / 5000;
+
+        const drawX = this.x + this.offsetX;
+        const drawY = this.y + this.offsetY;
+
+        this.radius = this.hp ** 0.3 * 0.8;
+
+        for (let ox = -w; ox <= w; ox += w) {
+          for (let oy = -h; oy <= h; oy += h) {
+            const cx = drawX + ox;
+            const cy = drawY + oy;
+
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(200, ${s}%, ${l}%, 0.8)`;
+            ctx.arc(cx, cy, this.radius, 0, Math.PI * 2);
+            ctx.fill();
+          }
+        }
+      }
+      //#endregion
+    }
+    //#endregion
+    //#region ============ 食物 ============
+    class Food {
+      //#region ============ 創建 ============
+      constructor(parent, data) {
+        this.x = data?.x ?? parent.x;
+        this.y = data?.y ?? parent.y;
+        this.cell = toKey(this.x, this.y);
+        this.cellIdx = null;
+
+        this.age = data?.age ?? 0;
+        this.vx = 0;
+        this.vy = 0;
+        this.dead = data?.dead ?? false;
+
+        this.type = 2;
+        this.hp = data?.erg ?? (parent?.erg || 0) + (parent?.hp || 0) + 50;
+        this.maxHp = data?.maxHp ?? this.hp;
+        this.maxVision = 50;
+      }
+      //#endregion
+      //#region ============ 行為 ============
+      //#region ============ 老化 ============
+      aging() {
+        const range = Math.ceil(this.age / 500);
+        const cache = rangeCache[range] || createNearCache(range);
+        const thisKey = this.cell;
+        const cx = keyToCellX(thisKey);
+        const cy = keyToCellY(thisKey);
+        const value = (this.hp * 0.04) / cache.length;
+        for (let i = 0; i < cache.length; i += 2) {
+          const dx = cache[i];
+          const dy = cache[i + 1];
+          const dist2 = dx * dx + dy * dy;
+          const nx = (cx + dx + maxGridX) % maxGridX;
+          const ny = (cy + dy + maxGridY) % maxGridY;
+          const key = cellToKey(nx, ny);
+          fertilizerMap.set(key, (fertilizerMap.get(key) || 0) + value);
+        }
+        this.hp *= 0.98;
+      }
+      //#endregion
+      //#region ============ 死亡 ============
+      deadCheck() {
+        if (this.hp <= 1 && !this.dead) {
+          this.hp = 0;
+          removeFromCell(this.cell, this);
+          this.dead = true;
+          return true;
+        }
+      }
+      //#endregion
+      //#endregion
+      //#region ============ 運行 ============
+      update() {
+        if (this.deadCheck()) return;
+        this.age++;
+        if (this.age > 100 && Math.random() < 0.5) this.aging();
+        this.draw();
+      }
+      //#endregion
+      //#region ============ 渲染 ============
+      draw() {
+        for (let ox = -w; ox <= w; ox += w) {
+          for (let oy = -h; oy <= h; oy += h) {
+            ctx.beginPath();
+            ctx.fillStyle = "hsla(40, 0%, 80%, 0.8)";
+            ctx.arc(
+              this.x + ox,
+              this.y + oy,
+              this.hp ** 0.3 / 5,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fill();
+          }
+        }
+      }
+      //#endregion
+    }
+    //#endregion
+    //#region ============ 草食點點 ============
+    class normalDian {
+      //#region ============ 創建 ============
+      constructor(parent, x, y, data) {
+        //#region ============ 腦 ============
+        if (parent && !data) {
+          this.intentBrain = new IntentBrain(parent.intentBrain);
+          this.eatBrain = new SteeringBrain(parent.eatBrain);
+          this.cloneBrain = new SteeringBrain(parent.cloneBrain);
+          this.fightBrain = new SteeringBrain(parent.fightBrain);
+          this.wanderBrain = new SteeringBrain(parent.wanderBrain);
+        } else if (!parent && data) {
+          this.intentBrain = deserializeBrain(data.intentBrain, "intent");
+          this.eatBrain = deserializeBrain(data.eatBrain, "steering");
+          this.cloneBrain = deserializeBrain(data.cloneBrain, "steering");
+          this.fightBrain = deserializeBrain(data.fightBrain, "steering");
+          this.wanderBrain = deserializeBrain(data.wanderBrain, "steering");
+        } else {
+          this.intentBrain = new IntentBrain();
+          this.eatBrain = new SteeringBrain();
+          this.cloneBrain = new SteeringBrain();
+          this.fightBrain = new SteeringBrain();
+          this.wanderBrain = new SteeringBrain();
+        }
+        //#endregion
+        //#region ============ 身體 ============
+        /*狀態數值==========*/
+        this.hp = data?.hp ?? 100;
+        this.erg = data?.erg ?? 50;
+        this.age = data?.age ?? 0;
+        this.wave = data?.wave ?? 0;
+
+        this.x = data?.x ?? x ?? Math.random() * canvas.width;
+        this.y = data?.y ?? y ?? Math.random() * canvas.height;
+        this.vx = data?.vx ?? 0;
+        this.vy = data?.vy ?? 0;
+        this.cell = toKey(this.x, this.y);
+        this.cellIdx = null;
+
+        this.face = data?.face ?? Math.PI * 2 * Math.random();
+        this.turnForce = data?.turnForce ?? 0;
+        this.frontForce = data?.frontForce ?? 0;
+
+        this.vision = [];
+        for (let d = 0; d < 4; d++) {
+          const arr = [];
+          for (let t = 0; t < 4; t++) {
+            arr.push({
+              signal: 0,
+              closest: null,
+              minDist2: Infinity,
+              closestDot: 0,
+              closestCross: 0,
+            });
+          }
+          this.vision.push(arr);
+        }
+
+        this.mode = data?.mode ?? "";
+        this.keep = data?.keep ?? 0;
+        this.currentIntent = data?.currentIntent ?? [];
+
+        this.pregnent = data?.pregnent ?? -1;
+
+        this.fightCooldown = data?.fightCooldown ?? 0;
+        this.targetType = data?.targetType ?? 0;
+
+        /*基礎數值==========*/
+        this.type = normal;
+        this.newGen = false;
+        this.maxHp = 100;
+        this.maxErg = 200;
+        this.maxSpeed = 5;
+        this.maxAge = 5000;
+        this.atk = 5;
+
+        if (parent && parent.bias !== undefined) {
+          const scale = 1e10;
+          // 轉成整數基因
+          const gene = Math.floor(parent.bias * scale);
+          // 前7位鎖住（10位 - 3位變異）
+          const head = Math.floor(gene / 1e3);
+          // 後3位突變
+          const tail = Math.floor(Math.random() * 1e3);
+          this.bias = (head * 1e3 + tail) / scale;
+        } else if (!parent && data) {
+          this.bias = data.bias;
+        } else {
+          this.bias = Math.floor(Math.random() * 1e10) / 1e10;
+        }
+        this.species = Math.floor(this.bias * 1e7);
+
+        this.nextBuffer = new Float32Array(
+          this.intentBrain.nodes.length +
+          this.eatBrain.nodes.length +
+          this.cloneBrain.nodes.length +
+          this.fightBrain.nodes.length +
+          this.wanderBrain.nodes.length,
+        );
+
+        this.maxVision = 300;
+        this.maxTurnSpeed = Math.PI / 5;
+        //#endregion
+      }
+      //#endregion
+      //#region ============ 行為 ============
+      //#region ============ 觀察 ============
+      input() {
+        //初始化，左後右前
+        for (let d = 0; d < 4; d++) {
+          for (let t = 0; t < 4; t++) {
+            const v = this.vision[d][t];
+            v.signal = 0;
+            v.closest = null;
+            v.minDist2 = Infinity;
+            v.closestDot = 0;
+            v.closestCross = 0;
+          }
+        }
+        const range = Math.ceil(this.maxVision / size);
+        const fx = Math.cos(this.face);
+        const fy = Math.sin(this.face);
+        const thisKey = this.cell;
+        const cx = keyToCellX(thisKey);
+        const cy = keyToCellY(thisKey);
+        const cache = rangeCache[range] || createNearCache(range);
+        for (let i = 0; i < cache.length; i += 2) {
+          const dx = cache[i];
+          const dy = cache[i + 1];
+          const nx = (cx + dx + maxGridX) % maxGridX;
+          const ny = (cy + dy + maxGridY) % maxGridY;
+          const key = cellToKey(nx, ny);
+          const agentInCell = getCell(key);
+          if (agentInCell.length === 0 || !agentInCell) continue;
+
+          for (const a of agentInCell) {
+            if (a === this) continue;
+            if ((a.hp <= 20 || a.dead) && a.type === plant) continue;
+            let dx = a.x - this.x;
+            let dy = a.y - this.y;
+            if (dx > maxDistX) dx = -w + dx;
+            if (dx < -maxDistX) dx = w + dx;
+            if (dy > maxDistY) dy = -h + dy;
+            if (dy < -maxDistY) dy = h + dy;
+            const dist2 = dx * dx + dy * dy;
+            if (dist2 > this.maxVision * this.maxVision) continue;
+            const invDist = 1 / Math.sqrt(dist2);
+
+            let cross = (fx * dy - fy * dx) * invDist; //正右負左
+            let dot = (fx * dx + fy * dy) * invDist; //正前負後
+
+            if (cross > 0 && Math.abs(dot) <= 0.7071) {
+              //0.7071 = 0.5^0.5
+              this.vision[0][a.type - 1].signal +=
+                a.hp / a.maxHp / (dist2 + 1);
+              if (dist2 < this.vision[0][a.type - 1].minDist2) {
+                this.vision[0][a.type - 1].closest = a;
+                this.vision[0][a.type - 1].closestDot = dot;
+                this.vision[0][a.type - 1].closestCross = cross;
+                this.vision[0][a.type - 1].minDist2 = dist2;
+              }
+            } else if (dot < 0 && Math.abs(cross) < 0.7071) {
+              this.vision[1][a.type - 1].signal +=
+                a.hp / a.maxHp / (dist2 + 1);
+              if (dist2 < this.vision[1][a.type - 1].minDist2) {
+                this.vision[1][a.type - 1].closest = a;
+                this.vision[1][a.type - 1].closestDot = dot;
+                this.vision[1][a.type - 1].closestCross = cross;
+                this.vision[1][a.type - 1].minDist2 = dist2;
+              }
+            } else if (cross < 0 && Math.abs(dot) <= 0.7071) {
+              this.vision[2][a.type - 1].signal +=
+                a.hp / a.maxHp / (dist2 + 1);
+              if (dist2 < this.vision[2][a.type - 1].minDist2) {
+                this.vision[2][a.type - 1].closest = a;
+                this.vision[2][a.type - 1].closestDot = dot;
+                this.vision[2][a.type - 1].closestCross = cross;
+                this.vision[2][a.type - 1].minDist2 = dist2;
+              }
+            } else if (dot > 0 && Math.abs(cross) < 0.7071) {
+              this.vision[3][a.type - 1].signal +=
+                a.hp / a.maxHp / (dist2 + 1);
+              if (dist2 < this.vision[3][a.type - 1].minDist2) {
+                this.vision[3][a.type - 1].closest = a;
+                this.vision[3][a.type - 1].closestDot = dot;
+                this.vision[3][a.type - 1].closestCross = cross;
+                this.vision[3][a.type - 1].minDist2 = dist2;
+              }
+            }
+          }
+        }
+      }
+      //#endregion
+      //#region ============ 決策 ============
+      intent() {
+        const brain = this.intentBrain;
+        const nodes = this.intentBrain.nodes;
+        const connects = this.intentBrain.connects;
+        //初始化
+        let idx = 0;
+        for (let dir = 0; dir < 4; dir++) {
+          for (let type = 0; type < 4; type++) {
+            if (this.vision[dir][type].minDist2 !== Infinity) {
+              nodes[idx++].value = 1 / (this.vision[dir][type].minDist2 + 1);
+              nodes[idx++].value = this.vision[dir][type].signal;
+              nodes[idx++].value = this.vision[dir][type].closestDot;
+              nodes[idx++].value = this.vision[dir][type].closestCross;
+            } else {
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+            }
+          }
+        }
+        nodes[idx++].value = Math.pow(1 - this.erg / this.maxErg, 2); //之後加ergSensitivity和hpSensitivity
+        nodes[idx++].value = Math.pow(1 - this.hp / this.maxHp, 2);
+        nodes[idx++].value = Math.pow(this.age / this.maxAge, 2);
+        nodes[idx++].value = this.bias;
+
+        //計算
+
+        //上一幀資訊用來回流
+        const next = this.nextBuffer.fill(0);
+        for (const c of connects) {
+          if (!c.enable || c.forward) continue;
+          next[c.outId] += Math.tanh(c.weight * nodes[c.inId].value);
+        }
+
+        //propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
+        const outByIn = brain.outByIn;
+        for (const id of brain.order) {
+          const n = nodes[id];
+          const edges = outByIn[id];
+          if (!edges || edges.length === 0) continue;
+          for (const c of edges) {
+            if (!c.enable) continue;
+            next[c.outId] += Math.tanh(c.weight * n.value);
+          }
+        }
+
+        // activate
+        for (let i = 0; i < nodes.length; i++) {
+          nodes[i].value = Math.tanh(next[i]);
+        }
+
+        const l = INTENT_OUT_NODE + SELF_NODE + OTHER_NODE;
+        //輸出結果
+        const eat = nodes[l - 4].value; //吃
+        const clone = nodes[l - 3].value; //生
+        const fight = nodes[l - 2].value; //打
+        const wander = nodes[l - 1].value; //晃
+        return softMax([eat, clone, fight, wander]);
+      }
+      //#endregion
+      //#region ============ 行動 ============
+      steering(brain, intent = [0, 0, 0, 0]) {
+        const nodes = brain.nodes;
+        const connects = brain.connects;
+        //初始化
+        let idx = 0;
+        for (let dir = 0; dir < 4; dir++) {
+          for (let type = 0; type < 4; type++) {
+            if (this.vision[dir][type].minDist2 !== Infinity) {
+              nodes[idx++].value = 1 / (this.vision[dir][type].minDist2 + 1);
+              nodes[idx++].value = this.vision[dir][type].signal;
+              nodes[idx++].value = this.vision[dir][type].closestDot;
+              nodes[idx++].value = this.vision[dir][type].closestCross;
+            } else {
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+              nodes[idx++].value = 0;
+            }
+          }
+        }
+        nodes[idx++].value = Math.pow(1 - this.erg / this.maxErg, 2); //之後加ergSensitivity和hpSensitivity
+        nodes[idx++].value = Math.pow(1 - this.hp / this.maxHp, 2);
+        nodes[idx++].value = Math.pow(this.age / this.maxAge, 2);
+        nodes[idx++].value = this.bias;
+        nodes[idx++].value = intent[0] * 2 - 1;
+        nodes[idx++].value = intent[1] * 2 - 1;
+        nodes[idx++].value = intent[2] * 2 - 1;
+        nodes[idx++].value = intent[3] * 2 - 1;
+
+        //計算
+        const next = this.nextBuffer.fill(0);
+        //上一幀資訊用來回流
+        for (const c of connects) {
+          if (!c.enable || c.forward) continue;
+          next[c.outId] += Math.tanh(c.weight * nodes[c.inId].value);
+        }
+        // propagate（使用預先整理的鄰接表，避免每個節點都全掃一次 connects）
+        const outByIn = brain.outByIn;
+        for (const id of brain.order) {
+          const n = nodes[id];
+          const edges = outByIn[id];
+          if (!edges || edges.length === 0) continue;
+          for (const c of edges) {
+            if (!c.enable) continue;
+            next[c.outId] += Math.tanh(c.weight * n.value);
+          }
+        }
+
+        // activate
+        for (let i = 0; i < nodes.length; i++) {
+          nodes[i].value = Math.tanh(next[i]);
+        }
+
+        const l =
+          MOTOR_OTHER_NODE + SELF_NODE + INTENT_COUNT + MOTOR_OUT_NODE;
+        //輸出結果
+        const turn = nodes[l - 2].value; //轉向
+        const move = nodes[l - 1].value; //動力
+        this.turnForce = turn;
+        this.frontForce = move;
+        const faceFactor = move < 0 ? 0.3 : 1;
+        if (this.mode === "fight") {
+          let maxIdx = null;
+          let maxValue = -Infinity;
+          for (let i = 3; i <= 6; i++) {
+            if (nodes[l - i].value > maxValue) {
+              maxIdx = i;
+              maxValue = nodes[l - i].value;
+            }
+          }
+          this.targetType = 0;
+          if (maxIdx) this.targetType = maxIdx - 2;
+        }
+
+        this.face += turn * this.maxTurnSpeed;
+        this.face %= Math.PI * 2;
+        this.vx = Math.cos(this.face) * this.maxSpeed * move * faceFactor;
+        this.vy = Math.sin(this.face) * this.maxSpeed * move * faceFactor;
+      }
+      //#endregion
+      //#region ============ 移動 ============
+      move() {
+        this.maxSpeed = 1.5 + (2.5 * this.erg) / this.maxErg;
+        if (this.pregnent > 0)
+          this.maxSpeed += 1.5 * (this.pregnent / 1900 - 1);
+        const nx = this.x + this.vx;
+        const ny = this.y + this.vy;
+        this.x = nx;
+        this.y = ny;
+        if (nx > w) this.x -= w;
+        if (nx < 0) this.x += w;
+        if (ny > h) this.y -= h;
+        if (ny < 0) this.y += h;
+        this.erg -=
+          0.04 * Math.abs(this.frontForce) +
+          0.04 * Math.abs(this.turnForce) +
+          0.02;
+        if (this.erg < 0) {
+          this.hp += this.erg;
+          this.erg = 0;
+        }
+        const newCell = toKey(this.x, this.y);
+        if (newCell !== this.cell) addToCell(newCell, this);
+      }
+      //#endregion
+      //#region ============ 生病 ============
+      sick() {
+        let foodSignal = 0;
+        for (const d of this.vision) {
+          foodSignal += d[food - 1].signal;
+        }
+        if (foodSignal > 0.01) this.hp -= foodSignal;
+      }
+      //#endregion
+      //#region ============ 繁殖 ============
+      clone() {
+        if (this.pregnent === 0) {
+          this.pregnent = -1;
+          const dir = [
+            [0, -1],
+            [0, 1],
+            [1, 0],
+            [-1, 0],
+          ];
+          const randomDir = dir[Math.floor(Math.random() * 4)];
+          let dx = (randomDir[0] * size) / 10;
+          let dy = (randomDir[1] * size) / 10;
+          let n;
+          if (Math.random() < 0.05) {
+            n = new normalDian(null, this.x + dx, this.y + dy);
+          } else {
+            n = new normalDian(this, this.x + dx, this.y + dy);
+          }
+
+          addToCell(toKey(n.x, n.y), n);
+          agents[n.type].push(n);
+          this.x -= dx;
+          this.y -= dy;
+        }
+        if (this.pregnent > 0) {
+          this.pregnent--;
+          return;
+        }
+
+        if (this.mode !== "clone") return;
+        if (this.erg * 2 < this.maxErg) {
+          return;
+        }
+
+        if (this.pregnent === -1) {
+          this.pregnent = 1900;
+          this.erg -= 50;
+          this.keep = 0;
+        }
+      }
+      //#endregion
+      //#region ============ 進食 ============
+      eat() {
+        if (this.mode !== "eat") return;
+        if (this.erg >= this.maxErg) {
+          this.keep = 0;
+          return;
+        }
+        this.erg -= 0.01;
+        let target = this.vision[3][plant - 1].closest;
+
+        if (!target) {
+          this.sick();
+          return;
+        }
+
+        const dist2 = this.vision[3][plant - 1].minDist2;
+        if (dist2 > 25) {
+          this.sick();
+          return;
+        }
+        const bite = 10 * (1 - dist2 / 25);
+        let dx = target.x - this.x;
+        let dy = target.y - this.y;
+        if (dx > maxDistX) dx = -w + dx;
+        if (dx < -maxDistX) dx = w + dx;
+        if (dy > maxDistY) dy = -h + dy;
+        if (dy < -maxDistY) dy = h + dy;
+        if (target.hp > 10 * bite) {
+          target.hp -= 10 * bite;
+          this.erg += bite;
+          target.x -= 0.01 * dx;
+          target.y -= 0.01 * dy;
+          target.x = (target.x + w) % w;
+          target.y = (target.y + h) % h;
+          const newCell = toKey(target.x, target.y);
+          if (newCell !== target.cell) addToCell(newCell, target);
+        } else {
+          this.erg += target.hp / 10;
+          target.hp = 0;
+        }
+        this.sick();
+      }
+      //#endregion
+      //#region ============ 戰鬥 ============
+      fight() {
+        if (this.fightCooldown > 0) this.fightCooldown--;
+        if (this.fightCooldown > 0 || this.mode !== "fight") return false;
+
+        this.erg -= this.atk / 20;
+        let closest = null;
+        let minDist2 = this.maxSpeed * this.maxSpeed;
+        const dist2 = this.vision[3][this.targetType - 1].minDist2;
+        if (dist2 < minDist2) {
+          closest = this.vision[3][this.targetType - 1].closest;
+          minDist2 = dist2;
+        }
+        if (!closest) {
+          return false;
+        }
+        let dx = closest.x - this.x;
+        let dy = closest.y - this.y;
+        if (dx > maxDistX) dx = -w + dx;
+        if (dx < -maxDistX) dx = w + dx;
+        if (dy > maxDistY) dy = -h + dy;
+        if (dy < -maxDistY) dy = h + dy;
+
+        closest.hp -= this.atk;
+        this.erg -= minDist2 / this.maxSpeed;
+        this.vx = dx * 0.8;
+        this.vy = dy * 0.8;
+        this.move();
+        this.fightCooldown = 20;
+        this.keep = 0;
+      }
+      //#endregion
+      //#region ============ 探索 ============
+      wander() {
+        //wander就是晃來晃去甚麼都不做 :3
+      }
+      //#endregion
+      //#region ============ 死亡 ============
+      die() {
+        removeFromCell(this.cell, this);
+        this.dead = true;
+        if (this.age * 1.5 > this.maxAge) {
+          const b = evolutionPool[this.type];
+          b.push(this);
+          if (b.length > MAX_POOL) b.shift();
+        }
+        if (!this.newGen) {
+          const n = new Food(this);
+          addToCell(toKey(n.x, n.y), n);
+          agents[n.type].push(n);
+        }
+      }
+      //#endregion
+      //#region ============ 老化 ============
+      aging() {
+        this.age++;
+        if (this.age > this.maxAge)
+          this.hp =
+            this.hp * (1 - (this.age - this.maxAge) / this.maxAge) - 0.01;
+      }
+      //#endregion
+      //#endregion
+      //#region ============ 渲染 ============
+      draw() {
+        const a = (this.hp / this.maxHp) * 0.8 + 0.2;
+        let r = this.erg / this.maxErg + 2.5;
+        if (this.pregnent > 0) r += 2.5 * (1 - this.pregnent / 1900);
+        const eye1X = r * Math.cos(this.face - Math.PI / 6);
+        const eye1Y = r * Math.sin(this.face - Math.PI / 6);
+        const eye2X = r * Math.cos(this.face + Math.PI / 6);
+        const eye2Y = r * Math.sin(this.face + Math.PI / 6);
+        const speciesColor = `hsla(${(360 * this.species) / 1e7}, ${10 + (speciesMap.get(this.species) / agents[3].length) * 90}%, ${40 + (((this.bias * 1e10) % 1000) / 1000) * 20}%, ${a})`;
+        const wave = (Math.sin(this.wave) * Math.PI) / 12;
+
+        for (let ox = -w; ox <= w; ox += w) {
+          for (let oy = -h; oy <= h; oy += h) {
+            //漸層
+            let tailGrad = ctx.createLinearGradient(
+              this.x + ox - 0.7 * r * Math.cos(this.face),
+              this.y + oy - 0.7 * r * Math.sin(this.face),
+              this.x +
+              ox -
+              r * Math.cos(this.face) -
+              0.8 *
+              (1 + this.frontForce / 2) *
+              r *
+              Math.cos(
+                this.face - this.turnForce * this.maxTurnSpeed + wave,
+              ),
+              this.y +
+              oy -
+              r * Math.sin(this.face) -
+              0.8 *
+              (1 + this.frontForce / 2) *
+              r *
+              Math.sin(
+                this.face - this.turnForce * this.maxTurnSpeed + wave,
+              ),
+            );
+            tailGrad.addColorStop(
+              0,
+              `hsla(${color[normal].h}, ${color[normal].s}%, ${color[normal].l}%, ${a})`,
+            );
+            tailGrad.addColorStop(1, speciesColor);
+
+            //身體尾巴
+            ctx.beginPath();
+            ctx.fillStyle = tailGrad;
+
+            ctx.moveTo(
+              this.x +
+              ox -
+              r * Math.cos(this.face) -
+              (1 + this.frontForce / 2) *
+              r *
+              Math.cos(
+                this.face - this.turnForce * this.maxTurnSpeed + wave,
+              ),
+              this.y +
+              oy -
+              r * Math.sin(this.face) -
+              (1 + this.frontForce / 2) *
+              r *
+              Math.sin(
+                this.face - this.turnForce * this.maxTurnSpeed + wave,
+              ),
+            );
+            ctx.lineTo(
+              this.x + ox - r * Math.cos(this.face + Math.PI / 4),
+              this.y + oy - r * Math.sin(this.face + Math.PI / 4),
+            );
+            ctx.arc(
+              this.x + ox,
+              this.y + oy,
+              r,
+              this.face - (Math.PI * 2.7) / 4,
+              this.face + (Math.PI * 2.7) / 4,
+            );
+            ctx.lineTo(
+              this.x + ox - r * Math.cos(this.face - Math.PI / 4),
+              this.y + oy - r * Math.sin(this.face - Math.PI / 4),
+            );
+            ctx.closePath();
+            ctx.fill();
+
+            if (this === brainDian) {
+              ctx.lineWidth = 0.2;
+              ctx.strokeStyle = "white";
+              ctx.stroke();
+            }
+
+            //眼睛
+
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+            ctx.arc(
+              this.x + ox + eye1X,
+              this.y + oy + eye1Y,
+              1.5,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+            ctx.arc(
+              this.x + ox + eye1X,
+              this.y + oy + eye1Y,
+              1,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fill();
+
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(0, 0%, 100%, 1)`;
+            ctx.arc(
+              this.x + ox + eye2X,
+              this.y + oy + eye2Y,
+              1.5,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fill();
+            ctx.beginPath();
+            ctx.fillStyle = `hsla(0, 0%, 0%, 1)`;
+            ctx.arc(
+              this.x + ox + eye2X,
+              this.y + oy + eye2Y,
+              1,
+              0,
+              2 * Math.PI,
+            );
+            ctx.fill();
+          }
+        }
+      }
+      //#endregion
+      //#region ============ 運行 ============
+      update() {
+        //觀察
+        if (this.age % 5 === 0) {
+          this.input();
+          //做甚麼
+          this.currentIntent = this.intent();
+          if (this.keep <= 0) {
+            let max = -Infinity;
+            let idx = null;
+            const ints = this.currentIntent;
+            const modes = ["eat", "clone", "fight", "wander"];
+            for (let i = 0; i < ints.length; i++) {
+              if (ints[i] > max) {
+                max = ints[i];
+                idx = i;
+              }
+            }
+            this.mode = modes[idx];
+            this.keep = 2;
+          }
+
+          if (this.mode === "eat")
+            this.steering(this.eatBrain, this.currentIntent);
+          else if (this.mode === "clone")
+            this.steering(this.cloneBrain, this.currentIntent);
+          else if (this.mode === "fight")
+            this.steering(this.fightBrain, this.currentIntent);
+          else if (this.mode === "wander")
+            this.steering(this.wanderBrain, this.currentIntent);
+          this.keep -= Math.random(); //計畫Math.random()*keepness基因化
+        }
+        //繁殖
+        this.clone();
+        //進食
+        this.eat();
+        //晃
+        this.wander();
+        //打架&移動
+        if (!this.fight()) this.move();
+        //死亡
+        this.aging();
+        if (this.hp <= 0) {
+          this.die();
+          return;
+        }
+        //時間
+        speciesMap.set(this.species, (speciesMap.get(this.species) || 0) + 1);
+        this.wave += this.frontForce;
+        this.draw();
+      }
+      //#endregion
+    }
+    //#endregion
+    //#region ============ 點點腦 ============
+    //#region ============ 決策腦 ============
+    class IntentBrain {
+      constructor(brain, data) {
+        //讀紀錄
+        if (data) {
+          this.nodes = data.nodes.map((n) => new Node(n.id, n.depth));
+          this.connects = data.connects.map(
+            (c) =>
+              new Connect(c.inId, c.outId, c.weight, c.enable, c.forward),
+          );
+
+          //全新
+        } else if (!brain) {
+          this.nodes = [];
+          for (let i = 0; i < OTHER_NODE + SELF_NODE; i++)
+            this.nodes.push(new Node(this.nodes.length, 0));
+
+          for (let i = 0; i < INTENT_OUT_NODE; i++)
+            this.nodes.push(new Node(this.nodes.length, 1));
+
+          this.connects = [];
+          let l = this.nodes.length;
+          for (let i = 0; i < l - INTENT_OUT_NODE; i++) {
+            if (Math.random() < 0.5) {
+              for (let j = 0; j < INTENT_OUT_NODE; j++) {
+                if (Math.random() < 0.5)
+                  this.connects.push(
+                    new Connect(
+                      this.nodes[i].id,
+                      this.nodes[l - j - 1].id,
+                      Math.random() * 2 - 1,
+                    ),
+                  );
+              }
+            }
+          }
+
+          //遺傳
+        } else {
+          this.nodes = [];
+          for (const n of brain.nodes) {
+            this.nodes.push(n.clone());
+          }
+          this.connects = [];
+          for (const c of brain.connects) {
+            this.connects.push(c.clone());
+          }
+          if (Math.random() < 0.1) {
+            const inId = Math.floor(Math.random() * this.nodes.length);
+            const outId = Math.floor(Math.random() * this.nodes.length);
+            const inDepth = this.nodes[inId].depth;
+            const outDepth = this.nodes[outId].depth;
+            let forward = true;
+            if (inDepth > outDepth) forward = false;
+            if (inDepth !== outDepth)
+              this.connects.push(
+                new Connect(
+                  inId,
+                  outId,
+                  Math.random() * 2 - 1,
+                  true,
+                  forward,
+                ),
+              );
+          }
+          if (Math.random() < 0.05 && this.connects.length > 0) {
+            const c =
+              this.connects[Math.floor(Math.random() * this.connects.length)];
+            if (c.enable) {
+              const inDepth = this.nodes[c.inId].depth;
+              const outDepth = this.nodes[c.outId].depth;
+
+              const newId = this.nodes.length;
+              const newDepth = (inDepth + outDepth) / 2;
+              if (inDepth !== outDepth) {
+                //關閉舊連線
+                c.enable = false;
+                const newNode = new Node(newId, newDepth);
+                this.nodes.push(newNode);
+                //拆成兩段
+                this.connects.push(
+                  new Connect(c.inId, newId, c.weight, true, c.forward),
+                );
+                this.connects.push(
+                  new Connect(
+                    newId,
+                    c.outId,
+                    Math.random() * 2 - 1,
+                    true,
+                    c.forward,
+                  ),
+                );
+              }
+            }
+          }
+        }
+
+        //排序計算順序
+        this.order = [];
+        let l = this.nodes.length;
+        const inNodesCount = Array(l).fill(0);
+        const outNodesId = Array(l)
+          .fill()
+          .map(() => []);
+        this.outByIn = Array(l)
+          .fill()
+          .map(() => []);
+        for (const c of this.connects) {
+          //每個node輸出的其他nodeId
+          if (c.forward) outNodesId[c.inId].push(c.outId);
+          this.outByIn[c.inId].push(c);
+          //每個node有幾個輸入node
+          if (c.forward) inNodesCount[c.outId]++;
+        }
+        //沒輸入的當起點
+        const queue = [];
+        for (let i = 0; i < l; i++) {
+          if (inNodesCount[i] === 0) queue.push(i);
+        }
+        //排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
+        const order = [];
+        let time = 0;
+        while (queue.length > 0 && time <= 1000) {
+          //取queue的第一個id放進order
+          time++;
+          const n = queue.shift();
+          this.order.push(n);
+          //以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
+          for (const next of outNodesId[n]) {
+            inNodesCount[next]--;
+            if (inNodesCount[next] === 0) {
+              queue.push(next);
+            }
+          }
+        }
+      }
+    }
+    //#endregion
+    //#region ============ 行動腦 ============
+    class SteeringBrain {
+      constructor(brain, data) {
+        //讀紀錄
+        if (data) {
+          this.nodes = data.nodes.map((n) => new Node(n.id, n.depth));
+          this.connects = data.connects.map(
+            (c) =>
+              new Connect(c.inId, c.outId, c.weight, c.enable, c.forward),
+          );
+
+          //全新
+        } else if (!brain) {
+          this.nodes = [];
+          for (
+            let i = 0;
+            i < MOTOR_OTHER_NODE + INTENT_COUNT + SELF_NODE;
+            i++
+          )
+            this.nodes.push(new Node(this.nodes.length, 0));
+          for (let i = 0; i < MOTOR_OUT_NODE; i++)
+            this.nodes.push(new Node(this.nodes.length, 1));
+
+          this.connects = [];
+          let l = this.nodes.length;
+          for (let i = 0; i < l - MOTOR_OUT_NODE; i++) {
+            if (Math.random() < 0.5) {
+              for (let j = 0; j < MOTOR_OUT_NODE; j++) {
+                if (Math.random() < 0.5)
+                  this.connects.push(
+                    new Connect(
+                      this.nodes[i].id,
+                      this.nodes[l - j - 1].id,
+                      Math.random() * 2 - 1,
+                    ),
+                  );
+              }
+            }
+          }
+
+          //遺傳
+        } else {
+          this.nodes = [];
+          for (const n of brain.nodes) {
+            this.nodes.push(n.clone());
+          }
+          this.connects = [];
+          for (const c of brain.connects) {
+            this.connects.push(c.clone());
+          }
+          if (Math.random() < 0.1) {
+            const inId = Math.floor(Math.random() * this.nodes.length);
+            const outId = Math.floor(Math.random() * this.nodes.length);
+            const inDepth = this.nodes[inId].depth;
+            const outDepth = this.nodes[outId].depth;
+            let forward = true;
+            if (inDepth > outDepth) forward = false;
+            if (inDepth !== outDepth)
+              this.connects.push(
+                new Connect(
+                  inId,
+                  outId,
+                  Math.random() * 2 - 1,
+                  true,
+                  forward,
+                ),
+              );
+          }
+          if (Math.random() < 0.05 && this.connects.length > 0) {
+            const c =
+              this.connects[Math.floor(Math.random() * this.connects.length)];
+            if (c.enable) {
+              const inDepth = this.nodes[c.inId].depth;
+              const outDepth = this.nodes[c.outId].depth;
+
+              const newId = this.nodes.length;
+              const newDepth = (inDepth + outDepth) / 2;
+              if (inDepth !== outDepth) {
+                //關閉舊連線
+                c.enable = false;
+                const newNode = new Node(newId, newDepth);
+                this.nodes.push(newNode);
+                //拆成兩段
+                this.connects.push(
+                  new Connect(c.inId, newId, c.weight, true, c.forward),
+                );
+                this.connects.push(
+                  new Connect(
+                    newId,
+                    c.outId,
+                    Math.random() * 2 - 1,
+                    true,
+                    c.forward,
+                  ),
+                );
+              }
+            }
+          }
+        }
+        //排序計算順序
+        this.order = [];
+        let l = this.nodes.length;
+        const inNodesCount = Array(l).fill(0);
+        const outNodesId = Array(l)
+          .fill()
+          .map(() => []);
+        this.outByIn = Array(l)
+          .fill()
+          .map(() => []);
+        for (const c of this.connects) {
+          //每個node輸出的其他nodeId
+          if (c.forward) outNodesId[c.inId].push(c.outId);
+          this.outByIn[c.inId].push(c);
+          //每個node有幾個輸入node
+          if (c.forward) inNodesCount[c.outId]++;
+        }
+        //沒輸入的當起點
+        const queue = [];
+        for (let i = 0; i < l; i++) {
+          if (inNodesCount[i] === 0) queue.push(i);
+        }
+        //排序計算順序：從queue拿出node計算，並將輸入node都計算完的node放入queue，直到queue清空
+        const order = [];
+        let time = 0;
+        while (queue.length > 0 && time <= 1000) {
+          //取queue的第一個id放進order
+          time++;
+          const n = queue.shift();
+          this.order.push(n);
+          //以該id為輸入的nodes輸入node數量-1，如果數量=0就加進queue內
+          for (const next of outNodesId[n]) {
+            inNodesCount[next]--;
+            if (inNodesCount[next] === 0) {
+              queue.push(next);
+            }
+          }
+        }
+      }
+    }
+    //#endregion
+    //#region ============ 神經元 ============
+    class Node {
+      constructor(id, depth, value = 0) {
+        this.id = id;
+        this.value = 0;
+        this.depth = depth;
+      }
+      clone() {
+        return new Node(this.id, this.depth);
+      }
+    }
+    //#endregion
+    //#region ============ 神經 ============
+    class Connect {
+      constructor(inId, outId, weight, enable = true, forward = true) {
+        this.forward = forward;
+        this.enable = enable;
+        this.inId = inId;
+        this.outId = outId;
+        this.weight = weight;
+      }
+      clone() {
+        let w = this.weight;
+        if (Math.random() < 0.1) {
+          w += (Math.random() * 2 - 1) * 0.5; // 小幅變動
+        }
+        if (Math.random() < 0.1) {
+          w = Math.random() * 2 - 1; // 重置
+        }
+        let enable = this.enable;
+        if (Math.random() < 0.1) {
+          enable = !this.enable; //關閉or開啟
+        }
+        return new Connect(this.inId, this.outId, w, enable, this.forward);
+      }
+    }
+    //#endregion
+    //#endregion
+    //#region ============ 操作反應 ============
+    window.addEventListener("keydown", (e) => {
+      const key = e.code;
+      if (e.ctrlKey && e.shiftKey) {
+        //刪檔
+        if (key === "KeyZ") deleteWorld();
+      }
+      if (!e.shiftKey && e.ctrlKey) {
+        //存檔
+        if (key === "KeyS") {
+          e.preventDefault();
+          saveWorld();
+        }
+      }
+
+      if (e.shiftKey && !e.ctrlKey) {
+        //世界縮放
+        if (
+          key === "ArrowDown" ||
+          key === "ArrowUp" ||
+          key === "ArrowLeft" ||
+          key === "ArrowRight" ||
+          key === "Space"
+        )
+          editWorldSzie(key);
+      }
+      if (!e.shiftKey && !e.ctrlKey) {
+        //繪製格線
+        if (key === "KeyG") {
+          grid = !grid;
+          drawGrid();
+        }
+        //顯示世界資訊
+        if (key === "KeyF") {
+          const display = infoDiv.style.display;
+          if (display === "none") {
+            infoDiv.style.display = "block";
+          } else if (display === "block" && infoShow === "min") {
+            infoShow = "hour";
+          } else if (display === "block" && infoShow === "hour") {
+            infoDiv.style.display = "none";
+            infoShow = "min";
+          }
+          showFps = !showFps;
+        }
+        //顯示點點資訊
+        if (key === "KeyB") {
+          const display = brainDiv.style.display;
+          if (display === "none") {
+            brainDiv.style.display = "grid";
+          } else if (display === "grid") {
+            brainDiv.style.display = "none";
+          }
+        }
+        //鏡頭縮放
+        if (key === "ArrowUp" || key === "ArrowDown" || key === "Space")
+          editZoomSize(key);
+
+        //鏡頭移動
+        if (
+          key === "KeyW" ||
+          key === "KeyS" ||
+          key === "KeyA" ||
+          key === "KeyD"
+        )
+          moveCamera(key);
+
+        //鏡頭跟隨
+        if (key === "KeyQ") follow = !follow;
+      }
+    });
+    //#endregion
+    //#region ============ 工具函數 ============
+    //#region ============ 存取區塊資料 ============
+    /*查詢區塊內生物資料==============*/
+    function getCell(key) {
+      if (grids[key] === undefined) {
+        grids[key] = [];
+      }
+      return grids[key];
+    }
+    /*新增生物至區塊==============*/
+    function addToCell(key, agent) {
+      if (agent.cell !== null && agent.cellIdx !== null)
+        removeFromCell(agent.cell, agent);
+      agent.cell = key;
+      const newCell = getCell(key);
+      agent.cellIdx = newCell.length;
+      newCell.push(agent);
+    }
+    /*從區塊移除生物==============*/
+    function removeFromCell(key, agent) {
+      const idx = agent.cellIdx;
+      const cell = getCell(key);
+      cell[idx] = cell[cell.length - 1];
+      cell[idx].cellIdx = idx;
+      cell.pop();
+    }
+    /*查詢所在區塊代號==========*/
+    function toKey(x, y) {
+      const cellX = (x / sizeX) | 0;
+      const cellY = (y / sizeY) | 0;
+      return cellX | (cellY << 10);
+    }
+    /*產生區塊代號==========*/
+    function cellToKey(cellX, cellY) {
+      return cellX | (cellY << 10);
+    }
+    /*解碼區塊代號==========*/
+    function keyToCellX(key) {
+      return key & (maxGridX - 1);
+    }
+    function keyToCellY(key) {
+      return key >> 10;
+    }
+    //#endregion
+    //#region ============ 存取DNA訊息 ============
+    function serializeBrain(brain) {
+      return {
+        nodes: brain.nodes.map((n) => ({
+          id: n.id,
+          depth: n.depth,
+        })),
+        connects: brain.connects.map((c) => ({
+          inId: c.inId,
+          outId: c.outId,
+          weight: c.weight,
+          enable: c.enable,
+          forward: c.forward,
+        })),
+      };
+    }
+
+    //生產者
+    function serializePlant() {
+      const plantData = [];
+      for (const a of agents[plant]) {
+        const result = {
+          x: a.x,
+          y: a.y,
+          age: a.age,
+          seedAge: a.seedAge,
+          dead: a.dead,
+          erg: a.erg,
+          hp: a.hp,
+        };
+        plantData.push(result);
+      }
+      return plantData;
+    }
+
+    //食物
+    function serializeFood() {
+      const foodData = [];
+      for (const a of agents[food]) {
+        const result = {
+          x: a.x,
+          y: a.y,
+          age: a.age,
+          dead: a.dead,
+          erg: a.erg,
+          hp: a.hp,
+          maxHp: a.maxHp,
+        };
+        foodData.push(result);
+      }
+      return foodData;
+    }
+
+    //草食點點
+    function serializeNormal() {
+      const normalData = [];
+      for (const a of agents[normal]) {
+        const result = {
+          x: a.x,
+          y: a.y,
+          vx: a.vx,
+          vy: a.vy,
+          age: a.age,
+          dead: a.dead,
+          erg: a.erg,
+          hp: a.hp,
+          intentBrain: serializeBrain(a.intentBrain),
+          eatBrain: serializeBrain(a.eatBrain),
+          cloneBrain: serializeBrain(a.cloneBrain),
+          fightBrain: serializeBrain(a.fightBrain),
+          wanderBrain: serializeBrain(a.wanderBrain),
+          wave: a.wave,
+
+          face: a.face,
+          turnForce: a.turnForce,
+          frontForce: a.frontForce,
+
+          mode: a.mode,
+          keep: a.keep,
+          currentIntent: a.currentIntent,
+
+          pregnent: a.pregnent,
+
+          fightCooldown: a.fightCooldown,
+          targetType: a.targetType,
+
+          bias: a.bias,
+        };
+        normalData.push(result);
+      }
+      return normalData;
+    }
+    function deserializeBrain(data, region) {
+      if (!data?.nodes || !data?.connects) {
+        return region === "intent"
+          ? new IntentBrain(null)
+          : new SteeringBrain(null);
+      }
+
+      const brain =
+        region === "intent"
+          ? new IntentBrain(null, data)
+          : new SteeringBrain(null, data);
+
+      return brain;
+    }
+    //#endregion
+    //#region ============ 建立範圍快取 ============
+    function createNearCache(range) {
+      rangeCache[range] = [];
+      const cache = rangeCache[range];
+      for (
+        let x = Math.max(-maxGridX / 2, -range);
+        x <= Math.min(maxGridX / 2, range);
+        x++
+      ) {
+        for (
+          let y = Math.max(-maxGridY / 2, -range);
+          y <= Math.min(maxGridY / 2, range);
+          y++
+        ) {
+          if (x * x + y * y < range * range) {
+            cache.push(x);
+            cache.push(y);
+          }
+        }
+      }
+      return cache;
+    }
+    //#endregion
+    //#region ============ 初始化世界常數 ============
+    function resize() {
+      const cellSize = Math.sqrt((w * h) / 2048);
+      maxDistX = w / 2;
+      maxDistY = h / 2;
+
+      maxGridX = 1;
+      while (cellSize * maxGridX * 2 <= w) {
+        maxGridX *= 2;
+      }
+      maxGridY = 1;
+      while (cellSize * maxGridY * 2 <= h) {
+        maxGridY *= 2;
+      }
+
+      sizeX = w / maxGridX;
+      sizeY = h / maxGridY;
+      size = (sizeX + sizeY) / 2;
+
+      for (const c of [canvas, bgCanvas]) {
+        c.width = window.innerWidth;
+        c.height = window.innerHeight;
+        c.style.left = "0px";
+        c.style.top = "0px";
+      }
+
+      for (let t = plant; t <= hunter; t++) {
+        for (const a of agents[t]) {
+          if (!a.dead) {
+            a.x = (a.x + w) % w;
+            a.y = (a.y + h) % h;
+            addToCell(toKey(a.x, a.y), a);
+          }
+        }
+      }
+      const nfer = new Map();
+      for (const [k, v] of fertilizerMap) {
+        const cx = keyToCellX(k);
+        const cy = keyToCellY(k);
+        if (cx >= maxGridX || cx < 0 || cy >= maxGridY || cy < 0) continue;
+        const key = toKey(cx, cy);
+        nfer.set(key, v);
+      }
+      fertilizerMap.clear();
+      for (const [k, v] of nfer) {
+        fertilizerMap.set(k, v);
+      }
+
+      rangeCache.length = 0;
+
+      const mh = h * 0.9;
+      infoDiv.style.maxHeight = mh + "px";
+      infoDiv.style.width = (mh / 16) * 9 + "px";
+      infoDiv.style.borderRadius = mh / 64 + "px";
+      textInfo.style.width = (mh / 16) * 9 + "px";
+      textInfo.style.fontSize = (mh / 640) * 12 + "px";
+      for (const c of document.getElementsByClassName("infoCanvas")) {
+        c.width = (mh / 16) * 8;
+        c.height = (((mh / 16) * 8) / 16) * 9;
+        c.style.margin = mh / 128 + "px";
+      }
+      infoPadding = (mh / 16) * 8 * 0.05;
+
+      if (grid) {
+        bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
+        for (let ox = -w; ox <= w; ox += w) {
+          for (let oy = -h; oy <= h; oy += h) {
+            for (let y = 0; y <= maxGridY; y += 1) {
+              bgCtx.beginPath();
+              bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+              bgCtx.lineWidth = 2;
+              bgCtx.moveTo(0 + ox, y * sizeY + oy);
+              bgCtx.lineTo(w + ox, y * sizeY + oy);
+              bgCtx.stroke();
+            }
+            for (let x = 0; x <= maxGridX; x += 1) {
+              bgCtx.beginPath();
+              bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+              bgCtx.lineWidth = 2;
+              bgCtx.moveTo(x * sizeX + ox, 0 + oy);
+              bgCtx.lineTo(x * sizeX + ox, h + oy);
+              bgCtx.stroke();
+            }
+          }
+        }
+      }
+    }
+    //#endregion
+    //#region ============ 編輯世界邊界 ============
+    function editWorldSzie(key) {
+      if (key === "Space") {
+        newZoom = 1;
+        w = window.innerWidth;
+        h = window.innerHeight;
+        resize();
+        return;
+      } else if (key === "ArrowDown") h += 10.1 / zoom;
+      else if (key === "ArrowUp") h -= 10.1 / zoom;
+      else if (key === "ArrowRight") w += 10.1 / zoom;
+      else if (key === "ArrowLeft") w -= 10.1 / zoom;
+      newZoom = zoom;
+      if (Math.abs(h - window.innerHeight / zoom) < 10 / zoom)
+        h = window.innerHeight / zoom;
+      if (Math.abs(w - window.innerWidth / zoom) < 10 / zoom)
+        w = window.innerWidth / zoom;
+      resize();
+      if (dir === "down" || dir === "up")
+        drawGrid(Math.abs(h - window.innerHeight / zoom) < 10 / zoom);
+      if (dir === "right" || dir === "left")
+        drawGrid(Math.abs(w - window.innerWidth / zoom) < 10 / zoom);
+    }
+    //#endregion
+    //#region ============ 編輯鏡頭 ============
+    function editZoomSize(key) {
+      if (key === "ArrowUp") zoom += 0.1;
+      else if (key === "ArrowDown") zoom -= 0.1;
+      else if (key === "Space") {
+        follow = false;
+        camera.x = 0;
+        camera.y = 0;
+        zoom = newZoom;
+      }
+      if (zoom < 1) zoom = 1;
+      drawGrid();
+    }
+    function moveCamera(key) {
+      if (key === "KeyW") camera.y -= 10;
+      if (key === "KeyS") camera.y += 10;
+      if (key === "KeyA") camera.x -= 10;
+      if (key === "KeyD") camera.x += 10;
+      follow = false;
+      drawGrid();
+    }
+    //#endregion
+    //#region ============ 計算fps ============
+    function fpsCount() {
+      frames++;
+      const now = performance.now();
+      const delta = now - lastTime;
+      if (delta >= 1000) {
+        fps = (frames * 1000) / delta;
+
+        (counts[plant].push(agents[plant].length),
+          counts[normal].push(agents[normal].length),
+          counts[hunter].push(agents[hunter].length),
+          (frames = 0));
+        lastTime = now;
+
+        textInfo.innerHTML = "";
+        for (const c of infoCtx) {
+          if (c === null) continue;
+          c.clearRect(
+            0,
+            0,
+            infoCanvas[plant].width,
+            infoCanvas[plant].height,
+          );
+        }
+        drawInfo();
+      }
+    }
+    //#endregion
+    //#region ============ 更新物種更替表 ============
+    function updateSpeciesInfo() {
+      for (const [k, v] of speciesInfo) {
+        v.push(speciesMap.get(k) || 0);
+
+        if (v.length > 60) v.shift();
+
+        let allZero = true;
+
+        for (const c of v) {
+          if (c !== 0) {
+            allZero = false;
+            break;
+          }
+        }
+        if (allZero) speciesInfo.delete(k);
+      }
+    }
+    //#endregion
+    //#region ============ 清除死亡點點 ============
+    function clearDead() {
+      if (timeStamp % 5 === 0) {
+        deadClearFrame++;
+        deadClearFrame %= 6;
+        const type = agents[deadClearFrame];
+        if (type) agents[deadClearFrame] = type.filter((a) => !a.dead);
+      }
+    }
+    //#endregion
+    //#region ============ 找新目標點點 ============
+    function newBrainDian() {
+      brainDian = null;
+      for (const a of agents[normal]) {
+        if (!a.dead && a.age < 2000) {
+          brainDian = a;
+        }
+        if (brainDian) break;
+      }
+    }
+    //#endregion
+    //#region ============ 鏡頭跟隨 ============
+    function followBrainDian() {
+      let dx = brainDian.x - window.innerWidth / 2 / zoom - camera.x;
+      let dy = brainDian.y - window.innerHeight / 2 / zoom - camera.y;
+      if (dx > w / 2) {
+        camera.x += w;
+        dx -= w;
+      }
+      if (dx < -w / 2) {
+        camera.x -= w;
+        dx += w;
+      }
+      if (dy > h / 2) {
+        camera.y += h;
+        dy -= h;
+      }
+      if (dy < -h / 2) {
+        camera.y -= h;
+        dy += h;
+      }
+      const dist = Math.hypot(dx, dy);
+      if (dist > 0) {
+        const move = (dist - 0) * 0.05;
+        camera.x += (dx / dist) * move;
+        camera.y += (dy / dist) * move;
+      }
+    }
+    //#endregion
+    //#region ============ 數學函數 ============
+    function softMax(arr = []) {
+      const max = Math.max(...arr);
+
+      const exps = arr.map((v) => Math.exp(v - max));
+
+      let sum = 0;
+      for (const e of exps) sum += e;
+
+      return exps.map((e) => e / sum);
+    }
+    //#endregion
+    //#endregion
+    //#region ============ 渲染 ============
+    //#region ============ 劃格線 ============
+    function drawGrid(fit = false) {
+      bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
+      if (grid) {
+        bgCtx.clearRect(-w, -h, 3 * w, 3 * h);
+        bgCtx.setTransform(
+          zoom,
+          0,
+          0,
+          zoom,
+          -camera.x * zoom,
+          -camera.y * zoom,
+        );
+        for (let y = 0; y <= maxGridY; y += 1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          if (fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+          bgCtx.lineWidth = 1;
+          bgCtx.moveTo(0, y * sizeY);
+          bgCtx.lineTo(w, y * sizeY);
+          bgCtx.stroke();
+        }
+        for (let x = 0; x <= maxGridX; x += 1) {
+          bgCtx.beginPath();
+          bgCtx.strokeStyle = "hsla(240, 10%, 40%, 1)";
+          if (fit) bgCtx.strokeStyle = "hsla(120, 50%, 70%, 1)";
+          bgCtx.lineWidth = 1;
+          bgCtx.moveTo(x * sizeX, 0);
+          bgCtx.lineTo(x * sizeX, h);
+          bgCtx.stroke();
+        }
+      }
+    }
+    //#endregion
+    //#region ============ 畫世界資訊頁 ============
+    function drawInfo() {
+      textInfo.innerHTML =
+        `fps: ${Math.round(fps)}<br>` +
+        `🔵${agents[plant].length} | 🟡${agents[normal].length} | 🔴${agents[hunter].length}<br>` +
+        `generation: ${generation}`;
+
+      for (let t = plant; t <= hunter; t++) {
+        if (t === food) continue;
+        //畫框縣
+        const iCtx = infoCtx[t];
+        const cw = infoCanvas[t].width;
+        const ch = infoCanvas[t].height;
+        iCtx.beginPath();
+        iCtx.moveTo(infoPadding, infoPadding - 2);
+        iCtx.lineTo(cw - infoPadding, infoPadding - 2);
+        iCtx.lineTo(cw - infoPadding, ch - infoPadding);
+        iCtx.lineTo(infoPadding, ch - infoPadding);
+        iCtx.closePath();
+        iCtx.strokeStyle = "hsla(0,0%,100%,0.8)";
+        iCtx.lineWidth = cw / 320;
+        iCtx.stroke();
+
+        if (infoShow === "min") {
+          drawChart(t, counts[t]);
+        } else if (infoShow === "hour") {
+          drawChart(t, hourCounts[t]);
+        } else if (infoShow === "species") {
+          for(const [k,v] of speciesInfo) {
+            drawChart(t, v, k);
+          }
+        }
+    }
+    //#endregion
+    //#region ============ 畫圖表 ============
+    function drawChart(type, orgValue, species) {
+      //數據長度
+      const iCtx = infoCtx[type];
+      const minL = orgValue.length;
+      let max = 0;
+      for (let i = 0; i < 60; i++) {
+        let value = orgValue[Math.max(0, minL - 59) + i];
+        if (value > max) max = value;
+      }
+      if(max===0) return;
+      iCtx.beginPath();
+      let lastX;
+
+      for (let i = 0; i < 60; i++) {
+        let value;
+        value = orgValue[Math.max(0, minL - 59) + i];
+
+        if (!value && value!==0) continue;
+        if (i === 0)
+          iCtx.moveTo(
+            infoPadding,
+            infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
+          );
+        else
+          iCtx.lineTo(
+            infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59,
+            infoPadding + ((ch - 2 * infoPadding) * (max - value)) / max,
+          );
+        lastX = infoPadding + (i * (cw - 2 * infoPadding - cw / 320)) / 59;
+      }
+
+      if (type === plant) {
+        iCtx.strokeStyle = "hsla(200, 70%, 70%, 1)";
+        iCtx.fillStyle = "hsla(200, 40%, 40%, 0.3)";
+      } else if (type === normal) {
+        iCtx.strokeStyle = "hsla(80, 50%, 60%, 1)";
+        iCtx.fillStyle = "hsla(80, 20%, 60%, 0.3)";
+      } else {
+        iCtx.strokeStyle = `hsla(${(360 * species) / 1e7}, 100%, 50%, 1)`;
+        iCtx.fillStyle = "transparent";
+      }
+      iCtx.lineWidth = cw / 160;
+      iCtx.stroke();
+
+      iCtx.lineTo(lastX, ch - infoPadding);
+      iCtx.lineTo(infoPadding, ch - infoPadding);
+      iCtx.closePath();
+      iCtx.fill();
+    }
+    //#endregion
+    //#region ============ 畫點點資訊頁 ============
+    function drawDianBrain() {
+      const vision = brainDian.vision;
+      const maxVision = brainDian.maxVision;
+      const face = brainDian.face;
+      const intent = brainDian.currentIntent;
+      const quarH = Math.PI / 4;
+      const rightStart = quarH;
+      const backStart = quarH + 0.5 * Math.PI;
+      const leftStart = quarH + Math.PI;
+      const frontStart = quarH + 1.5 * Math.PI;
+      const a = (brainDian.hp / brainDian.maxHp) * 0.8 + 0.2;
+      const r = brainDian.erg / brainDian.maxErg + 2.5;
+      const turn = brainDian.turnForce;
+      const front = brainDian.frontForce;
+
+      //決策層
+      let bCtx = brainCtx[0];
+
+      bCtx.clearRect(0, 0, 180, 180);
+      bCtx.beginPath();
+      bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
+      bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+      bCtx.lineWidth = 0.5;
+      bCtx.stroke();
+      for (let d = 0; d < 4; d++) {
+        const dir = vision[d]; //右後左前
+
+        for (let t = 0; t < 4; t++) {
+          const type = dir[t];
+          if (type.minDist2 === Infinity) continue;
+          const distance = Math.sqrt(type.minDist2) / maxVision;
+          const angle = Math.atan2(type.closestCross, type.closestDot);
+
+          bCtx.beginPath();
+          bCtx.arc(
+            73,
+            73,
+            72 * distance,
+            quarH + ((d - 1) * Math.PI) / 2,
+            quarH + (d * Math.PI) / 2,
+          );
+          bCtx.lineTo(73, 73);
+          bCtx.closePath();
+          const c = color[t + 1];
+          bCtx.fillStyle = `hsla(${c.h},${c.s}%,${c.l}%,${Math.min(1, 1600 * type.signal)})`;
+          bCtx.fill();
+
+          bCtx.beginPath();
+          bCtx.arc(
+            73 + 72 * distance * Math.cos(-Math.PI / 2 + angle),
+            73 + 72 * distance * Math.sin(-Math.PI / 2 + angle),
+            2,
+            0,
+            2 * Math.PI,
+          );
+          bCtx.strokeStyle = `hsla(${c.h},${c.s}%,${c.l + 10}%,1)`;
+          bCtx.stroke();
+        }
+      }
+
+      bCtx.beginPath();
+      bCtx.arc(73, 73, r, 0, 2 * Math.PI);
+      bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(quarH - Math.PI / 2),
+        73 + r * Math.sin(quarH - Math.PI / 2),
+        2,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(quarH - Math.PI / 2),
+        73 + r * Math.sin(quarH - Math.PI / 2),
+        1,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(Math.PI * 1.5 - quarH),
+        73 + r * Math.sin(Math.PI * 1.5 - quarH),
+        2,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(Math.PI * 1.5 - quarH),
+        73 + r * Math.sin(Math.PI * 1.5 - quarH),
+        1,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+      bCtx.fill();
+
+      eatBar.style.width = `${intent[0] * 100}%`;
+      cloneBar.style.width = `${intent[1] * 100}%`;
+      fightBar.style.width = `${intent[2] * 100}%`;
+      wanderBar.style.width = `${intent[3] * 100}%`;
+
+      //行動層
+      bCtx = brainCtx[2];
+      bCtx.clearRect(0, 0, 180, 180);
+      bCtx.beginPath();
+      bCtx.arc(73, 73, 72, 0, 2 * Math.PI);
+      bCtx.strokeStyle = "hsla(200, 20%, 30%, 0.8)";
+      bCtx.lineWidth = 0.5;
+      bCtx.stroke();
+
+      bCtx.beginPath();
+      bCtx.arc(73, 73, r, 0, 2 * Math.PI);
+      bCtx.fillStyle = `hsla(80, 20%, 60%, ${a})`;
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(face + quarH),
+        73 + r * Math.sin(face + quarH),
+        2,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(face + quarH),
+        73 + r * Math.sin(face + quarH),
+        1,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(face - quarH),
+        73 + r * Math.sin(face - quarH),
+        2,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 100%, 1)";
+      bCtx.fill();
+
+      bCtx.beginPath();
+      bCtx.arc(
+        73 + r * Math.cos(face - quarH),
+        73 + r * Math.sin(face - quarH),
+        1,
+        0,
+        2 * Math.PI,
+      );
+      bCtx.fillStyle = "hsla(50, 0%, 0%, 1)";
+      bCtx.fill();
+
+      let px = 73;
+      let py = 73;
+      let ang = face;
+
+      bCtx.beginPath();
+      bCtx.moveTo(px, py);
+
+      for (let i = 0; i < 36; i++) {
+        const nx = px + Math.cos(ang) * front * 2;
+        const ny = py + Math.sin(ang) * front * 2;
+
+        bCtx.beginPath();
+        bCtx.moveTo(px, py);
+        bCtx.lineTo(nx, ny);
+
+        bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
+        bCtx.lineWidth = 1 + i;
+        bCtx.stroke();
+
+        bCtx.strokeStyle = `hsla(80, 80%, 70%, ${1 - i / 36})`;
+        bCtx.lineWidth = 1 + i / 18;
+        bCtx.stroke();
+
+        ang += turn / 36;
+        px = nx;
+        py = ny;
+      }
+    }
+    //#endregion
+    //#region ============ 儲存動畫 ============
+    function saveAnimation() {
+      if (saveAnim > 0) {
+        saveAnim--;
+
+        ctx.save();
+
+        ctx.translate(canvas.width - 30, 30);
+        ctx.rotate(saveAnim * 0.1);
+
+        ctx.font = "10px Arial";
+        ctx.textAlign = "center";
+
+        ctx.fillText("🦈", 0, 0);
+
+        ctx.restore();
+      }
+    }
+    //#endregion
+    //#endregion
+    //#region ============ 運行 ============
+    let timeStamp = 0;
+    let deadClearFrame = 0;
+    let fps = 0;
+    let lastTime = performance.now();
+    let frames = 0;
+    let showFps = false;
+    let infoShow = "min";
+    const counts = [[], [], [], [], []];
+    const hourCounts = [[], [], [], [], []];
+
+    function loop() {
+      /*清理agents==========================*/
+      clearDead();
+
+      /*畫布重置==========================*/
+      ctx.clearRect(-w, -h, 3 * w, 3 * h);
+      ctx.setTransform(zoom, 0, 0, zoom, -camera.x * zoom, -camera.y * zoom);
+      saveAnimation();
+      /*資訊卡更新==========================*/
+      fpsCount();
+      /*agents更新&畫==========================*/
+      speciesMap.clear();
+      for (let i = 5; i > 0; i--) {
+        for (const a of agents[i]) {
+          if (a.dead) continue;
+          a.update();
+        }
+      }
+      if (timeStamp % 60 === 0) updateSpeciesInfo();
+      /*最老草食點點========================*/
+      if (!brainDian || brainDian.dead) newBrainDian();
+      else {
+        if (follow) followBrainDian();
+        drawDianBrain();
+      }
+
+      //滅絕
+      if (agents[normal].length <= 3) {
+        generation++;
+
+        // 沒進化資料 → fallback
+
+        const survive = [];
+        for (const a of agents[normal]) survive.push(a);
+        if (survive.length > 0) {
+          for (let i = 0; i < 70; i++) {
+            // 取倖存者DNA
+            const parent =
+              survive[Math.floor(Math.random() * survive.length)];
+            const d = new normalDian(parent);
+            d.newGen = true;
+            addToCell(toKey(d.x, d.y), d);
+            agents[d.type].push(d);
+          }
+        }
+        if (evolutionPool[normal].length === 0) {
+          for (let i = 0; i < 100; i++) {
+            const d = new normalDian();
+            addToCell(toKey(d.x, d.y), d);
+            agents[d.type].push(d);
+          }
+        } else {
+          for (let i = 0; i < 70; i++) {
+            // 依機率取 DNA
+            const pool = evolutionPool[normal];
+            const parent = pool[Math.floor(Math.random() * pool.length)];
+
+            const d = new normalDian(parent);
+            d.newGen = true;
+            addToCell(toKey(d.x, d.y), d);
+            agents[d.type].push(d);
+          }
+        }
+
+        //植物復甦
+        if (agents[plant].length < (maxGridX * maxGridY) / 2) {
+          for (let i = 0; i < (maxGridX * maxGridY) / 2; i++) {
+            const n = new producer();
+            n.hp = 10000 * Math.random();
+            n.age = Math.floor(5000 * Math.random());
+            addToCell(toKey(n.x, n.y), n);
+            agents[n.type].push(n);
+          }
+        }
+        let times = 0;
+        seedDelay = 0;
+        while (agents[plant].length < (w * h) / 2100 && times < 1000000) {
+          times++;
+          for (const p of agents[plant]) {
+            if (!p.dead) p.update();
+          }
+        }
+        seedDelay = 2000;
+      }
+
+      for (const [k, v] of fertilizerMap) {
+        let next = v * 0.998;
+        if (v > 50 && Math.random() <= v / 1000) {
+          setTimeout(() => {
+            const n = new producer({
+              x: (keyToCellX(k) + Math.random()) * sizeX,
+              y: (keyToCellY(k) + Math.random()) * sizeY,
+            });
+            if (n.x > w) n.x -= w;
+            if (n.x < 0) n.x += w;
+            if (n.y > h) n.y -= h;
+            if (n.y < 0) n.y += h;
+            const nKey = toKey(n.x, n.y);
+            addToCell(nKey, n);
+            agents[n.type].push(n);
+          }, 10000);
+          next -= 50;
+        }
+        if (next < 1) {
+          fertilizerMap.delete(k);
+          continue;
+        }
+        fertilizerMap.set(k, next);
+      }
+      timeStamp++;
+      requestAnimationFrame(loop);
+    }
+    //#endregion
+  </script>
+  <!-- #endregion -->
+</body>
+
 </html>
