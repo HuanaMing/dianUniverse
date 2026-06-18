@@ -2348,10 +2348,17 @@
       const ch = infoCanvas[type].height;
       const minL = orgValue.length;
       let max = 0;
-      for (let i = 0; i < 60; i++) {
-        let value = orgValue[Math.max(0, minL - 59) + i];
-        if (value > max) max = value;
+      if(!species) {
+        for (let i = 0; i < 60; i++) {
+          let value = orgValue[Math.max(0, minL - 59) + i];
+          if (value > max) max = value;
+        }
+      } else if(species) {
+        for (const [k,v] of speciesInfo) {
+          for(const c of v) if(v>max) max=v;
+        }
       }
+
       if (max === 0) return;
       iCtx.beginPath();
       let lastX;
