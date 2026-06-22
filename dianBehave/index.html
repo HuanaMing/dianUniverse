@@ -2171,7 +2171,7 @@
             for (let i = 0; i < 60; i++) {
               sum += counts[t][i];
             }
-            counts.splice(0, 60);
+            counts[t].splice(0, 60);
             sum /= 60;
             hourCounts[t].push(sum);
             if (hourCounts[t].length > 60) hourCounts.shift();
