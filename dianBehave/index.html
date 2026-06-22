@@ -2166,6 +2166,7 @@
 
         if(counts[plant].length>=120) {
           for(let t=plant; t<=hunter; t++) {
+            if(counts[t].length <=0) continue;
             let sum=0;
             for(let i=0; i<60; i++) {
               sum+=counts[t][i];
