@@ -2164,6 +2164,18 @@
           (frames = 0));
         lastTime = now;
 
+        if(counts[plant].length>=120) {
+          for(let t=plant; t<=hunter; t++) {
+            let sum=0;
+            for(let i=0; i<60; i++) {
+              sum+=counts[t][i];
+            }
+            sum/=60;
+            hourCounts[t].push(sum);
+            if(hoursCounts[t].length>60) hourCounts.shift();
+          }
+        }
+
         textInfo.innerHTML = "";
         for (const c of infoCtx) {
           if (c === null) continue;
