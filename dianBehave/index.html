@@ -334,7 +334,8 @@
     let evolutionPool = [[], [], [], [], []];
     const grids = []; //grids[key] = agents
     const speciesMap = new Map(); //及時
-    const speciesInfo = new Map(); //歷史
+    const speciesInfo = new Map(); //每分鐘
+    const hourSpeciesInfo = new Map(); //每小時
     //#endregion
     //#region ============ 進度存取 ============
     //#region ============ 取得/建立資料庫 ============
@@ -2205,7 +2206,6 @@
         const v = speciesMap.get(s) || 0;
         const infoV = speciesInfo.get(s) || [];
         infoV.push(v);
-        if (infoV.length > 60) infoV.shift();
 
         let allZero = true;
         for (const c of infoV) {
@@ -2216,8 +2216,20 @@
         }
         if (allZero) {
           speciesInfo.delete(s);
-        } else {
-          speciesInfo.set(s, infoV)
+          hourSpeciesInfo.delete(s);
+        } else if(infoV.length < 60) {
+          speciesInfo.set(s, infoV);
+        } else if(infoV.length >= 60) {
+          let sum = 0;
+          for (let i = 0; i < 60; i++) {
+            sum += infoV[i];
+          }
+          sum /= 60;
+          speciesInfo.set(s, 0);
+          const hourInfoV = hourSpeciesInfo.get(s) || [];
+          hourInfoV.push(sum);
+          if (hourInfoV.length > 60) hourInfoV.shift();
+          hourSpeciesInfo.set(s, hourInfoV);
         }
       }
     }
@@ -2347,7 +2359,7 @@
         } else if (infoShow === "hour") {
           drawChart(t, hourCounts[t]);
         } else if (infoShow === "species") {
-          for (const [k, v] of speciesInfo) {
+          for (const [k, v] of hourSpeciesInfo) {
             drawChart(t, v, k);
           }
         }
