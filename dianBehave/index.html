@@ -2174,7 +2174,7 @@
             counts[t].splice(0, 60);
             sum /= 60;
             hourCounts[t].push(sum);
-            if (hourCounts[t].length > 60) hourCounts.shift();
+            if (hourCounts[t].length > 60) hourCounts[t].shift();
           }
         }
 
