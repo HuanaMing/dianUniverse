@@ -843,6 +843,32 @@
         this.maxAge = 5000;
         this.atk = 5;
 
+        const DNA = JSON.stringify(this.intentBrain.outByIn);
+        
+        let newSpecies = true;
+        if(DNAMap.has(DNA)) {
+          this.species = DNAMap.get(DNA);
+          newSpecies = false;
+        }
+        if(newSpecies) {
+          let hasSame = true;
+          while (hasSame) {
+            this.species = Math.floor(Math.random() *1e7);
+            hasSame = false;
+            for(const [k,v] of DNAMap) {
+              if (this.species === v) {
+                hasSame = true;
+                break;
+              }
+            }
+          }
+        }
+        if(!parent && data) {
+          this.bias = data.bias;
+        } else {
+          this.bias = this.species / 1e7 + Math.floor(Math.random() * 1e3) / 1e10;
+        }
+        /*
         if (parent && parent.bias !== undefined) {
           const scale = 1e10;
           // 轉成整數基因
@@ -858,7 +884,7 @@
           this.bias = Math.floor(Math.random() * 1e10) / 1e10;
         }
         this.species = Math.floor(this.bias * 1e7);
-
+        */
         this.nextBuffer = new Float32Array(
           this.intentBrain.nodes.length +
           this.eatBrain.nodes.length +
