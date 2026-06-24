@@ -2240,7 +2240,7 @@
           }
           sum /= 60;
           speciesInfo.set(s, []);
-          const hourInfoV = hourSpeciesInfo.get(s) || [];
+          const hourInfoV = hourSpeciesInfo.get(s) || Array(59).fill(0);
           hourInfoV.push(sum);
           if (hourInfoV.length > 60) hourInfoV.shift();
 
