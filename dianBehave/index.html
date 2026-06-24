@@ -463,6 +463,11 @@
       fertilizerMap.clear();
       for (const t of agents) t.length = 0;
       evolutionPool = [[], [], [], [], []];
+      counts = [[], [], [], [], []];
+      hourCounts = [[], [], [], [], []];
+      speciesMap = new Map();
+      speciesInfo = new Map();
+      hourSpeciesInfo = new Map();
       generation = 0;
     }
     //#endregion
