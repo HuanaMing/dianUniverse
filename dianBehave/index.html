@@ -277,6 +277,8 @@
     //#region ============ 功能開關 ============
     let grid = false;
     let follow = false;
+    let showFps = false;
+    let infoShow = "min";
     //#endregion
     //#region ============ 世界常數 ============
     let maxDistX = w / 2;
@@ -333,9 +335,11 @@
     let brainDian = null;
     let evolutionPool = [[], [], [], [], []];
     const grids = []; //grids[key] = agents
-    const speciesMap = new Map(); //及時
-    const speciesInfo = new Map(); //每分鐘
-    const hourSpeciesInfo = new Map(); //每小時
+    let counts = [[], [], [], [], []];
+    let hourCounts = [[], [], [], [], []];
+    let speciesMap = new Map(); //及時
+    let speciesInfo = new Map(); //每分鐘
+    let hourSpeciesInfo = new Map(); //每小時
     //#endregion
     //#region ============ 進度存取 ============
     //#region ============ 取得/建立資料庫 ============
@@ -364,6 +368,13 @@
         plant: serializePlant(),
         food: serializeFood(),
         normal: serializeNormal(),
+        species: {
+          speciesMap: speciesMap,
+          speciesInfo: speciesInfo,
+          hourSpeciesInfo: hourSpeciesInfo,
+          counts: counts,
+          hourCounts: hourCounts,
+        },
         camera: {
           pos: camera,
           zoom: zoom,
@@ -407,14 +418,14 @@
         }
 
         //有存檔
-        camera = data.camera.pos;
-        zoom = data.camera.zoom;
-        newZoom = data.camera.newZoom;
-        w = data.world.w;
-        h = data.world.h;
+        camera = data.camera?.pos || { x: 0, y: 0 };
+        zoom = data.camera?.zoom || 1;
+        newZoom = data.camera?.newZoom || 1;
+        w = data.world.w || window.innerWidth;
+        h = data.world.h || window.innerHeight;
         resize();
 
-        fertilizerMap = new Map(data.fertilizer);
+        fertilizerMap = new Map(data.fertilizer || []);
 
         for (const d of data.plant || []) {
           let p = new producer(null, d);
@@ -433,6 +444,12 @@
           addToCell(toKey(n.x, n.y), n);
           agents[normal].push(n);
         }
+
+        speciesMap = new Map(data.species?.speciesMap || []);
+        speciesInfo = new Map(data.species?.speciesInfo || []);
+        hourSpeciesInfo = new Map(data.species?.hourSpeciesInfo || []);
+        counts = new Map(data.species?.counts || []);
+        hourCounts = new Map(data.species?.hourCounts || []);
         console.log("歡迎回來!");
         loop();
       };
@@ -2656,10 +2673,7 @@
     let fps = 0;
     let lastTime = performance.now();
     let frames = 0;
-    let showFps = false;
-    let infoShow = "min";
-    const counts = [[], [], [], [], []];
-    const hourCounts = [[], [], [], [], []];
+
 
     function loop() {
       /*清理agents==========================*/
