@@ -445,11 +445,11 @@
           agents[normal].push(n);
         }
 
-        speciesMap = new Map(data.species?.speciesMap || []);
-        speciesInfo = new Map(data.species?.speciesInfo || []);
-        hourSpeciesInfo = new Map(data.species?.hourSpeciesInfo || []);
-        counts = new Map(data.species?.counts || []);
-        hourCounts = new Map(data.species?.hourCounts || []);
+        speciesMap = data.species?.speciesMap || new Map();
+        speciesInfo = data.species?.speciesInfo || new Map();
+        hourSpeciesInfo = data.species?.hourSpeciesInfo || new Map();
+        counts = data.species.counts || [[], [], [], [], []];
+        hourCounts = data.species.hourCounts || [[], [], [], [], []];
         console.log("歡迎回來!");
         loop();
       };
