@@ -338,6 +338,7 @@
     let counts = [[], [], [], [], []];
     let hourCounts = [[], [], [], [], []];
     let speciesMap = new Map(); //及時
+    let DNAMap = new Map(); //DNA對應物種
     let speciesInfo = new Map(); //每分鐘
     let hourSpeciesInfo = new Map(); //每小時
     //#endregion
@@ -374,6 +375,7 @@
           hourSpeciesInfo: hourSpeciesInfo,
           counts: counts,
           hourCounts: hourCounts,
+          DNAMap: DNAMap,
         },
         camera: {
           pos: camera,
@@ -446,10 +448,12 @@
         }
 
         speciesMap = data.species?.speciesMap || new Map();
+        DNAMap = data.species.DNAMap || new Map();
         speciesInfo = data.species?.speciesInfo || new Map();
         hourSpeciesInfo = data.species?.hourSpeciesInfo || new Map();
         counts = data.species.counts || [[], [], [], [], []];
         hourCounts = data.species.hourCounts || [[], [], [], [], []];
+
         console.log("歡迎回來!");
         loop();
       };
