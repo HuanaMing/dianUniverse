@@ -448,11 +448,11 @@
         }
 
         speciesMap = data.species?.speciesMap || new Map();
-        DNAMap = data.species.DNAMap || new Map();
+        DNAMap = data.species?.DNAMap || new Map();
         speciesInfo = data.species?.speciesInfo || new Map();
         hourSpeciesInfo = data.species?.hourSpeciesInfo || new Map();
-        counts = data.species.counts || [[], [], [], [], []];
-        hourCounts = data.species.hourCounts || [[], [], [], [], []];
+        counts = data.species?.counts || [[], [], [], [], []];
+        hourCounts = data.species?.hourCounts || [[], [], [], [], []];
 
         console.log("歡迎回來!");
         loop();
