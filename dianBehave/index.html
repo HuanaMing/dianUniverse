@@ -883,9 +883,20 @@
           this.maxAge = 5000;
           this.atk = 5;
 
-          const DNA = JSON.stringify(
-            this.intentBrain.outByIn.map((a) => a.map((b) => b.outId)),
-          );
+          const map = ["A", "T", "C", "G"];
+          const DNA = this.intentBrain.outByIn
+            .map((a) =>
+              a
+                .map((b) =>
+                  b.outId
+                    .toString(4)
+                    .split("")
+                    .map((d) => map[Number(d)])
+                    .join(""),
+                )
+                .join(""),
+            )
+            .join("|");
 
           let newSpecies = true;
           if (DNAMap.has(DNA)) {
