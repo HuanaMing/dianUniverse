@@ -847,7 +847,7 @@
         this.maxAge = 5000;
         this.atk = 5;
 
-        const DNA = JSON.stringify(this.intentBrain.outByIn);
+        const DNA = JSON.stringify(this.intentBrain.outByIn.map(a => a.map(b=> b.outId)));
         
         let newSpecies = true;
         if(DNAMap.has(DNA)) {
@@ -866,6 +866,7 @@
               }
             }
           }
+          DNAMap.set(DNA, this.species);
         }
         if(!parent && data) {
           this.bias = data.bias;
@@ -2274,20 +2275,18 @@
           hourInfoV.push(sum);
           if (hourInfoV.length > 60) hourInfoV.shift();
 
-          let allZero = true;
-          for(const v of hourInfoV) {
-            if(v>1) {
-              allZero = false;
-              break;
-            }
-          }
-          if(allZero) {
+          if(!hourInfoV.some(v => v > 1)) {
             hourSpeciesInfo.delete(s);
             speciesInfo.delete(s);
+            for (const [dna, id] of DNAMap) {
+              if (id === s) {
+              DNAMap.delete(dna);
+              break;
+              }
+            }
           } else {
             hourSpeciesInfo.set(s, hourInfoV);
           }
-
         }
       }
     }
