@@ -2229,17 +2229,9 @@
         const infoV = speciesInfo.get(s) || [];
         infoV.push(v);
 
-        let allZero = true;
-        for (const c of infoV) {
-          if (c !== 0) {
-            allZero = false;
-            break;
-          }
-        }
-        if (allZero) {
-          speciesInfo.delete(s);
-          hourSpeciesInfo.delete(s);
-        } else if(infoV.length < 60) {
+
+
+        if(infoV.length < 60) {
           speciesInfo.set(s, infoV);
         } else if(infoV.length >= 60) {
           let sum = 0;
@@ -2247,11 +2239,25 @@
             sum += infoV[i];
           }
           sum /= 60;
-          speciesInfo.set(s, 0);
+          speciesInfo.set(s, []);
           const hourInfoV = hourSpeciesInfo.get(s) || [];
           hourInfoV.push(sum);
           if (hourInfoV.length > 60) hourInfoV.shift();
-          hourSpeciesInfo.set(s, hourInfoV);
+
+          let allZero = true;
+          for(const v of hourInfoV) {
+            if(v>0) {
+              allZero = false;
+              break;
+            }
+          }
+          if(allZero) {
+            hourSpeciesInfo.delete(s);
+            speciesInfo.delete(s);
+          } else {
+            hourSpeciesInfo.set(s, hourInfoV);
+          }
+
         }
       }
     }
